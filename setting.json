@@ -1,6 +1,12 @@
 {
   "TOKEN": "",
   "Cmd_channel": "743677861000380527",
-  "Guild_icon": "D:\\Coding\\Github\\HSQCC_bot\\pic\\Guild_icon.png",
-  "pic": ["D:\\Coding\\Github\\HSQCC_bot\\pic\\pic1.jpg", "D:\\Coding\\Github\\HSQCC_bot\\pic\\pic2.png"]
+  "Guild_icon": "D:\\Coding\\Github\\SQCS_bot\\pic\\Guild_icon.png",
+  "pic": ["D:\\Coding\\Github\\SQCS_bot\\pic\\pic1.jpg", "D:\\Coding\\Github\\SQCS_bot\\pic\\pic2.png"],
+  "VC": "743512536695177327",
+  "ADD": "745600386030764084",
+  "NMD": "743512574938710078",
+  "PRD": "743670948384866357",
+  "MAD": "760747391484952577",
+  "SAD": "760746923208212530"
 }

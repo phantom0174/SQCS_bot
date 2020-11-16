@@ -1,0 +1,6 @@
+副召(Vice Coordinator): role_update_VC
+美宣(Artistic Design Department): role_update_ADD
+網管(Network management Department): role_update_NMD
+公關(Public Relations Department): role_update_PRD
+議程(Meeting Agendas Department): role_update_MAD
+管理(Settings Administration Department): role_update_SAD
