@@ -89,7 +89,6 @@ async def role_update(ctx, msg):
 
 @bot.command()
 async def sqe(ctx, msg):
-    await ctx.send('--testing--SQCS--bot--')
     role_bool = int(0)
     for role in ctx.author.roles:
         if(str(role) == '總召'):
@@ -119,7 +118,6 @@ async def sqe(ctx, msg):
 
 @bot.command()
 async def eqe(ctx):
-    await ctx.send('--testing--SQCS--bot--')
     role_bool = int(0)
     for role in ctx.author.roles:
         if (str(role) == '總召'):
@@ -164,26 +162,32 @@ async def eqe(ctx):
     embed.set_footer(text=str(dt2.strftime("%Y-%m-%d %H:%M:%S")))
     await ctx.send(embed=embed)
 
-    print(quiz_data)
-    temp_file = open('quiz.json', mode='w', encoding='utf8')
-    json.dump(quiz_data, temp_file)
-    temp_file.close()
-
     #adding scores to score.json
-    temp_file = open('score.json', mode='r', encoding='utf8')
-    score_data = json.load(temp_file)
-    temp_file.close()
+    stemp_file = open('score.json', mode='r', encoding='utf8')
+    score_data = json.load(stemp_file)
+    stemp_file.close()
     print(score_data)
 
     for correct_member in quiz_data['correct_ans_member']:
-        #error
-        if correct_member in score_data['member_score']:
-            correct_member['score'] = int(correct_member['score']) + 1
-        else:
-            score_data['member_score'].append(str(correct_member))
-        #error
+        user_log = int(0)
+        for i in range(len(score_data['member_id'])):
+            if(score_data['member_id'][i] == str(correct_member)):
+                score_data['member_score'][i] = str(int(score_data['member_score'][i]) + 1)
+                user_log = int(1)
+                break
+
+        if(user_log == int(0)):
+            score_data['member_id'].append(str(correct_member))
+            score_data['member_score'].append(str(1))
+
+
 
     quiz_data['correct_ans_member'].clear()
+
+    print(quiz_data)
+    stemp_file = open('quiz.json', mode='w', encoding='utf8')
+    json.dump(quiz_data, stemp_file)
+    stemp_file.close()
 
     print(score_data)
     temp_file = open('score.json', mode='w', encoding='utf8')
@@ -192,7 +196,7 @@ async def eqe(ctx):
 
 @bot.listen()
 async def on_message(msg):
-    if(msg.author == bot.user or msg.content[0] == '+'):
+    if(msg.author == bot.user or msg.content[0] == '+' or msg.content[0] == '~'):
         return
 
     await msg.delete()
@@ -225,9 +229,6 @@ async def on_message(msg):
     temp_file = open('quiz.json', mode='w', encoding='utf8')
     json.dump(quiz_data, temp_file)
     temp_file.close()
-
-
-
 
 
 """
