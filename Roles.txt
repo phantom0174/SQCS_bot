@@ -4,3 +4,6 @@
 公關(Public Relations Department): role_update_PRD
 議程(Meeting Agendas Department): role_update_MAD
 管理(Settings Administration Department): role_update_SAD
+
+{"event_status": "True", "correct_ans": "a", "correct_ans_member": [], "answered_member": []}
+{"member_score": []}
