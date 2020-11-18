@@ -33,8 +33,7 @@ async def ping(ctx):
 @bot.command()
 async def rpic(ctx):
     randPic = random.choice(jdata['pic'])
-    pic = discord.File(randPic)
-    await ctx.send(file=pic)
+    await ctx.send(randPic)
 
 @bot.command()
 async def role_update(ctx, msg):
@@ -107,7 +106,12 @@ async def sqe(ctx, msg):
 
     await ctx.channel.send(f'Quiz Event status set to {quiz_data["event_status"]}, correct answer set to {quiz_data["correct_ans"]}!')
     channel = discord.utils.get(ctx.guild.text_channels, name='懸賞區')
-    await channel.send('@here, a new term of quiz has started!\n Please make sure that your answer format is in spoiler form!\n (Put \"||\") at both front and back of your answer.)')
+    await channel.send('@here，有一個新的懸賞活動開始了，請確認你的答案是隱藏模式！\n (請在答案的前方與後方各加上"||"的符號)')
+
+    dt1 = datetime.utcnow().replace(tzinfo=timezone.utc)
+    dt2 = dt1.astimezone(timezone(timedelta(hours=8)))  # 轉換時區 -> 東八區
+
+    await channel.send(f'活動開始於 {dt2.strftime("%Y-%m-%d %H:%M:%S")}')
     await channel.set_permissions(ctx.guild.default_role, send_messages=True)
 
     print(quiz_data)
@@ -131,6 +135,10 @@ async def eqe(ctx):
     temp_file.close()
     print(quiz_data)
 
+    if(quiz_data['event_status'] == "False"):
+        await ctx.send('沒有任何進行中的活動！')
+        return
+
     quiz_data['event_status'] = "False"
     quiz_data['correct_ans'] = "N/A"
 
@@ -142,7 +150,7 @@ async def eqe(ctx):
     dt1 = datetime.utcnow().replace(tzinfo=timezone.utc)
     dt2 = dt1.astimezone(timezone(timedelta(hours=8)))  # 轉換時區 -> 東八區
 
-    await ctx.send(f'Quiz Event finished at time {dt2.strftime("%Y-%m-%d %H:%M:%S")}')
+    await ctx.send(f'活動結束於 {dt2.strftime("%Y-%m-%d %H:%M:%S")}')
 
     winners = str()
     for winner in quiz_data["correct_ans_member"]:
@@ -194,12 +202,52 @@ async def eqe(ctx):
     json.dump(score_data, temp_file)
     temp_file.close()
 
+@bot.command()
+async def sb(ctx):
+    if(ctx.author == bot.user):
+        return
+
+    print('ji!')
+    temp_file = open('score.json', mode='r', encoding='utf8')
+    score_data = json.load(temp_file)
+    temp_file.close()
+    print(score_data)
+
+    rank_index = []
+    top = int(max(score_data['member_score']))
+    while(top >= 0):
+        for i in range(len(score_data['member_score'])):
+            if(int(score_data['member_score'][i]) == top):
+                rank_index.append(i)
+        top -= 1
+
+    score_board = str()
+    for i in range(len(rank_index)):
+        user = await bot.fetch_user(int(score_data['member_id'][rank_index[i]]))
+        name = user.display_name
+        score_board += name + ": " + score_data['member_score'][rank_index[i]]
+        score_board += '\n'
+
+    dt1 = datetime.utcnow().replace(tzinfo=timezone.utc)
+    dt2 = dt1.astimezone(timezone(timedelta(hours=8)))  # 轉換時區 -> 東八區
+
+    embed = discord.Embed(title="Score Board", color=0x42fcff)
+    embed.set_thumbnail(url="https://i.imgur.com/26skltl.png")
+    embed.add_field(name="Member score", value=score_board, inline=False)
+    embed.set_footer(text=str(dt2.strftime("%Y-%m-%d %H:%M:%S")))
+    await ctx.send(embed=embed)
+
+
+
+
 @bot.listen()
 async def on_message(msg):
+    if(msg.channel.id != 746014424086610012):
+        return
+
     if(msg.author == bot.user or msg.content[0] == '+' or msg.content[0] == '~'):
         return
 
-    await msg.delete()
     temp_file = open('quiz.json', mode='r', encoding='utf8')
     quiz_data = json.load(temp_file)
     temp_file.close()
@@ -208,22 +256,23 @@ async def on_message(msg):
     if(quiz_data["event_status"] == 'False'):
         return
 
+    await msg.delete()
     print(msg.content[0:2], msg.content[-2:], msg.content[2:-2])
-    if(msg.content[0:2] == '||' and msg.content[-2:] == '||' and msg.channel.id == 746014424086610012):
+    if(msg.content[0:2] == '||' and msg.content[-2:] == '||'):
         answered = int(0)
         for answered_member_id in quiz_data['answered_member']:
             if(str(msg.author.id) == answered_member_id):
-                await msg.channel.send(f'{msg.author.mention}, I\'ve already got your answer!')
+                await msg.author.send('你已經傳送過答案了，請不要重複傳送！')
                 answered = int(1)
                 break
 
         if(answered == int(0)):
-            await msg.channel.send(f'{msg.author.mention}, I got your answer!')
+            await msg.author.send('我收到你的答案了!')
+            quiz_data["answered_member"].append(str(msg.author.id))
             if(msg.content[2:-2] == quiz_data["correct_ans"]):
                 quiz_data["correct_ans_member"].append(str(msg.author.id))
-                quiz_data["answered_member"].append(str(msg.author.id))
     else:
-        await msg.channel.send(f'{msg.author.mention}, your answer has a wrong format!')
+        await msg.author.send('你的答案是錯誤的格式！')
 
     print(quiz_data)
     temp_file = open('quiz.json', mode='w', encoding='utf8')
