@@ -1,4 +1,4 @@
-# HSQCC\_bot
+# HSQCC_bot
 If using relevent data, please cite the data source.
 
 ### Event update - 2020/11/18
@@ -24,7 +24,7 @@ Bot set by phantom0174
 ---
 
 - sqe \<correct answer\> - Start quiz event
-- eqe - End quiz event 
+- eqe - End quiz event
 
 ---
 
