@@ -2,13 +2,8 @@ import discord
 from discord.ext import commands
 import json
 import random
-from datetime import datetime, timezone, timedelta
+from functions import *
 
-
-def now_time():
-    dt1 = datetime.utcnow().replace(tzinfo=timezone.utc)
-    dt2 = dt1.astimezone(timezone(timedelta(hours=8)))  # 轉換時區 -> 東八區
-    return str(dt2.strftime("%Y-%m-%d %H:%M:%S"))
 
 with open('setting.json', mode='r', encoding='utf8') as jfile:
     jdata = json.load(jfile)
@@ -41,12 +36,14 @@ async def on_member_remove(member):
 async def ping(ctx):
     await ctx.send(f'{round(bot.latency * 1000)} (ms)')
 
-#main group of picture
+
+# main group of picture
 @bot.group()
 async def pic(ctx):
     pass
 
-#===== group - picture =====>>
+
+# ===== group - picture =====>>
 # picture_manipulation
 @pic.command()
 async def p_m(ctx, *, msg):
@@ -121,8 +118,9 @@ async def rpic(ctx):
     await ctx.message.delete()
     randPic = random.choice(jdata['pic'])
     await ctx.send(randPic)
-#===== group - picture =====<<
 
+
+# ===== group - picture =====<<
 
 # member check
 @bot.command()
@@ -131,8 +129,8 @@ async def m_check(ctx):
         print(member)
 
 
-#===== group - event =====>>
-#main group of event command
+# ===== group - event =====>>
+# main group of event command
 @bot.group()
 async def event(ctx):
     pass
@@ -226,17 +224,24 @@ async def end(ctx):
     stemp_file.close()
     print(score_data)
 
+    # opening score parameters
+    sptemp_file = open('score_parameters.json', mode='r', encoding='utf8')
+    para = json.load(sptemp_file)
+    sptemp_file.close()
+
+    earned_score = int(para['quiz_event_point'])*int(para['point_weight'])
+
     for correct_member in quiz_data['correct_ans_member']:
         user_log = int(0)
         for i in range(len(score_data['member_id'])):
             if (score_data['member_id'][i] == str(correct_member)):
-                score_data['member_score'][i] = str(int(score_data['member_score'][i]) + 1)
+                score_data['member_score'][i] = str(int(score_data['member_score'][i]) + earned_score)
                 user_log = int(1)
                 break
 
         if (user_log == int(0)):
             score_data['member_id'].append(str(correct_member))
-            score_data['member_score'].append(str(1))
+            score_data['member_score'].append(str(earned_score))
 
     quiz_data['correct_ans_member'].clear()
 
@@ -249,9 +254,11 @@ async def end(ctx):
     temp_file = open('score.json', mode='w', encoding='utf8')
     json.dump(score_data, temp_file)
     temp_file.close()
-#===== group - event =====<<
 
-#event answer listen function
+
+# ===== group - event =====<<
+
+# event answer listen function
 @bot.listen()
 async def on_message(msg):
     if (msg.channel.id != 746014424086610012):
@@ -292,10 +299,11 @@ async def on_message(msg):
     temp_file.close()
 
 
-#===== group - score =====>>
+# ===== group - score =====>>
 @bot.group()
 async def score(ctx):
     pass
+
 
 # scoreboare show
 @score.command()
@@ -332,6 +340,7 @@ async def sb(ctx):
     embed.add_field(name="Member score", value=score_board, inline=False)
     embed.set_footer(text=now_time())
     await ctx.send(embed=embed)
+
 
 # score_manipulation
 @score.command()
@@ -375,7 +384,49 @@ async def s_m(ctx, *, msg):
     temp_file = open('score.json', mode='w', encoding='utf8')
     json.dump(score_data, temp_file)
     temp_file.close()
-#===== group - score =====<<
+# ===== group - score =====<<
+
+
+# ===== group - lecture =====>>
+@bot.group()
+async def lect(ctx):
+    pass
+
+@lect.command()
+async def start(ctx):
+    role_bool = int(0)
+    for role in ctx.author.roles:
+        if (str(role) == '總召'):
+            role_bool = int(1)
+            break
+
+    if (role_bool == int(0)):
+        await ctx.send('You can\'t use that command!')
+        return
+
+    temp_file = open('lecture.json', mode='r', encoding='utf8')
+    lecture_data = json.load(temp_file)
+    temp_file.close()
+
+    if(lecture_data['status'] == '1'):
+        await ctx.send('The lecture has already started!')
+        return
+
+    await ctx.send('@here, the lecture has started!')
+
+    lecture_data['status'] = '1'
+
+    temp_file = open('lecture.json', mode='w', encoding='utf8')
+    json.dump(lecture_data, temp_file)
+    temp_file.close()
+
+'''
+#lecture ans check
+@lect.command()
+async def ans_check(ctx):
+    #wait to be finished
+'''
+# ===== group - lecture =====<<
 
 @bot.command()
 async def info(ctx):
@@ -411,5 +462,16 @@ async def sayd(ctx, *, msg):
     await ctx.message.delete()
     await ctx.send(msg)
 """
+
+'''acceptible
+@bot.listen()
+async def on_message(ctx):
+    if(ctx.author.bot == 'False' and ctx.author == bot.user):
+        return
+
+    MsgContent = str(ctx.content).split(' ')
+    if(MsgContent[0] == 'SQCS'):
+'''
+
 
 bot.run(jdata['TOKEN'])

@@ -7,3 +7,34 @@
 
 {"event_status": "True", "correct_ans": "a", "correct_ans_member": [], "answered_member": []}
 {"member_score": []}
+
+1-1. 懸賞題結束時做大更新(差不多一個禮拜)?
+or
+1-2. 一個禮拜結束時做大更新(以星期一為第一天)?
+
+講座commands:
+* 星期五晚上有講座1, 星期日晚上有講座2 (依照Index)
+* 講座開始時執行start指令
+* 新增答案檢查指令"ans_check"，自動往前搜尋訊息中以&為前綴的訊息(通知以"&"為標註答案的符號)
+並利用ans_check中的正確答案字串參數(correct answer)作為標準，判斷其訊息內容是否屬於correct answer的連續子字串
+* 檢查完答案後，以備有下一次的問答，須於ans_check指令中寫入"將上一次所有以&為前綴的訊息刪除"之指令
+* 為應講座結束時方便統計此次正確答案者，需在撰寫ans_check函數中寫入lecture.json占存功能
+並於執行end函數時，將複數個回答正確答案的人統整成二維陣列，並將其轉換成embed傳送至講座頻道
+* 同時，執行end函數時，需要與ans_check同樣的"刪除&訊息"程式碼
+* 搶答分數為[3, 3, 2, 2, 2, 1, ..., 1]*score weight
+
+score update commands(必須全自動):
+* 先將weekly total score更新，新增到score logs後，再將maximum score、minimum score更新
+* 再執行score weight更新函數
+
+
+檔案讀寫懶人包:
+#open
+temp_file = open('quiz.json', mode='r', encoding='utf8')
+quiz_data = json.load(temp_file)
+temp_file.close()
+
+#close
+temp_file = open('quiz.json', mode='w', encoding='utf8')
+json.dump(quiz_data, temp_file)
+temp_file.close()
