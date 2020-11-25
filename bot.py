@@ -127,10 +127,6 @@ async def rpic(ctx):
 # member check
 @bot.command()
 async def m_check(ctx):
-    if (round(bot.latency * 1000) <= 100):
-        await ctx.send('The bot is now hosting on repl.it, please host it on pc to use this command!')
-        return
-
     for member in ctx.guild.members:
         print(member)
 
