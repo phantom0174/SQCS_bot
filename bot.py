@@ -18,19 +18,6 @@ async def on_ready():
     print(">> Bot is online <<")
 
 
-"""
-@bot.event
-async def on_member_join(member):
-    channel = bot.get_channel(int(jdata['Cmd_channel']))
-    await channel.send(f'{member} join!')
-
-@bot.event
-async def on_member_remove(member):
-    channel = bot.get_channel(int(jdata['Cmd_channel']))
-    await channel.send(f'{member} leave!')
-"""
-
-
 # ping
 @bot.command()
 async def ping(ctx):
@@ -514,6 +501,10 @@ async def end(ctx):
         score = l_data['crt_member_score'][i]
         answerer += f'{member}: {times}(times), {score}(score)\n'
 
+    l_data['crt_member_id'].clear()
+    l_data['crt_member_times'].clear()
+    l_data['crt_member_score'].clear()
+
 
     embed = discord.Embed(title="Lecture Event Result", color=0x42fcff)
     embed.set_thumbnail(url="https://i.imgur.com/26skltl.png")
@@ -521,29 +512,13 @@ async def end(ctx):
     embed.set_footer(text=now_time())
     await ctx.send(embed=embed)
 
-
-
+    temp_file = open('lecture.json', mode='w', encoding='utf8')
+    json.dump(l_data, temp_file)
+    temp_file.close()
 # ===== group - lecture =====<<
 
-
-
-
-"""
-@bot.listen()
-async def on_message(msg):
-    if(msg.author == bot.user):
-        return
-
-    if(msg.content.find('hi') != -1):
-        await msg.channel.send('i got it!')
-
-@bot.command()
-async def sayd(ctx, *, msg):
-    await ctx.message.delete()
-    await ctx.send(msg)
-"""
-
-'''acceptible
+'''
+#bots communication event
 @bot.listen()
 async def on_message(ctx):
     if(ctx.author.bot == 'False' and ctx.author == bot.user):
@@ -552,6 +527,5 @@ async def on_message(ctx):
     MsgContent = str(ctx.content).split(' ')
     if(MsgContent[0] == 'SQCS'):
 '''
-
 
 bot.run(jdata['TOKEN'])
