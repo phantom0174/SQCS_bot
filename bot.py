@@ -420,32 +420,112 @@ async def start(ctx):
     json.dump(lecture_data, temp_file)
     temp_file.close()
 
-'''
+    msg_logs = await ctx.channel.history(limit=200).flatten()
+    for msg in msg_logs:
+        if(msg.content[0] == '&'):
+            await msg.delete()
+
+
+
 #lecture ans check
 @lect.command()
-async def ans_check(ctx):
-    #wait to be finished
-'''
-# ===== group - lecture =====<<
+async def ans_check(ctx, *, msg):
+    Ans = msg.content.split(' ')
+    msg_logs = await ctx.channel.history(limit=100).flatten()
+    MemberCrtMsg = [] #correct message
+    for msg in msg_logs:
+        if(msg.author.bot == 'False' and msg.content[0] == '&'):
+            for ans in Ans:
+                if(msg.find(ans) != -1):
+                    MemberCrtMsg.insert(0, msg)
+                    await msg.delete()
+                    break
 
-@bot.command()
-async def info(ctx):
-    embed = discord.Embed(title="Prefix = +", description="Ad as Administrator", color=0x32ec60)
-    embed.set_author(name="Author: phantom0174", icon_url="https://i.imgur.com/H5OiNY3.jpg")
-    embed.set_thumbnail(url="https://i.imgur.com/U2l3MiW.jpg")
-    embed.add_field(name="ping", value="The basic testing function", inline=False)
-    embed.add_field(name="rpic", value="Get a random picture", inline=False)
-    embed.add_field(name="role_update", value="(Ad only) Department role update", inline=False)
-    embed.add_field(name="m_check", value="(Ad only)(PC only) Get the member list of the guild", inline=False)
-    embed.add_field(name="sqe", value="(Ad only) Event start function", inline=False)
-    embed.add_field(name="eqe", value="(Ad only) Event end function", inline=False)
-    embed.add_field(name="sb", value="Check scoreboard", inline=False)
-    embed.add_field(name="p_m", value="(Ad only) Picture manipulation", inline=False)
-    embed.add_field(name="p_check", value="(Ad only) Picture check", inline=False)
-    embed.add_field(name="s_m", value="(Ad only) Scoreboard manipulation", inline=False)
-    embed.add_field(name="info", value="Show SQCS Bot info", inline=False)
+    temp_file = open('lecture.json', mode='r', encoding='utf8')
+    l_data = json.load(temp_file) #lecture data
+    temp_file.close()
+
+    temp_file = open('score_parameters.json', mode='r', encoding='utf8')
+    sp_data = json.load(temp_file)  # score parameters data
+    temp_file.close()
+
+    Score = int(5)
+    for crt_msg in MemberCrtMsg:
+        IdIndex = int(-1)
+        try:
+            IdIndex = l_data['crt_member_id'].index(str(crt_msg.author.id))
+        except:
+            pass
+
+        if(IdIndex > -1):
+            l_data['crt_member_times'][IdIndex] = str(int(l_data['crt_member_times'][IdIndex]) + 1)
+            l_data['crt_member_score'][IdIndex] = str(int(l_data['crt_member_score'][IdIndex]) + int(sp_data['point_weight'])*Score)
+        else:
+            l_data['crt_member_id'].append(str(crt_msg.author.id))
+            l_data['crt_member_times'].append('1')
+            l_data['crt_member_score'].append(str(int(sp_data['point_weight'])*Score))
+
+
+        if (Score > 1):
+            Score -= 1
+
+    temp_file = open('lecture.json', mode='w', encoding='utf8')
+    json.dump(l_data, temp_file)
+    temp_file.close()
+
+
+@lect.command()
+async def end(ctx):
+    role_bool = int(0)
+    for role in ctx.author.roles:
+        if (str(role) == '總召'):
+            role_bool = int(1)
+            break
+
+    if (role_bool == int(0)):
+        await ctx.send('You can\'t use that command!')
+        return
+
+    temp_file = open('lecture.json', mode='r', encoding='utf8')
+    lecture_data = json.load(temp_file)
+    temp_file.close()
+
+    if (lecture_data['status'] == '0'):
+        await ctx.send('The lecture has already ended!')
+        return
+
+    await ctx.send('@here, the lecture has ended!')
+
+    lecture_data['status'] = '0'
+
+    temp_file = open('lecture.json', mode='w', encoding='utf8')
+    json.dump(lecture_data, temp_file)
+    temp_file.close()
+
+    answerer = str()
+
+    temp_file = open('lecture.json', mode='r', encoding='utf8')
+    l_data = json.load(temp_file)  # lecture data
+    temp_file.close()
+
+    for i in range(len(l_data['crt_member_id'])):
+        member = (await ctx.guild.fetch_member(int(l_data['crt_member_id'][i]))).name
+        times = l_data['crt_member_times'][i]
+        score = l_data['crt_member_score'][i]
+        answerer += f'{member}: {times}(times), {score}(score)\n'
+
+
+    embed = discord.Embed(title="Lecture Event Result", color=0x42fcff)
+    embed.set_thumbnail(url="https://i.imgur.com/26skltl.png")
+    embed.add_field(name="Answerer", value=answerer, inline=False)
     embed.set_footer(text=now_time())
     await ctx.send(embed=embed)
+
+
+
+# ===== group - lecture =====<<
+
+
 
 
 """
