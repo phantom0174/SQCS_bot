@@ -2,10 +2,11 @@ import discord
 from discord.ext import commands
 import json
 import random
+#import keep_alive
 from functions import *
 
 
-with open('setting.json', mode='r', encoding='utf8') as jfile:
+with open('jsons/setting.json', mode='r', encoding='utf8') as jfile:
     jdata = json.load(jfile)
 
 intents = discord.Intents.all()
@@ -35,13 +36,8 @@ async def pic(ctx):
 @pic.command()
 async def p_m(ctx, *, msg):
     await ctx.message.delete()
-    role_bool = int(0)
-    for role in ctx.author.roles:
-        if (str(role) == '總召'):
-            role_bool = int(1)
-            break
 
-    if (role_bool == int(0)):
+    if (role_check(ctx.author.roles, '總召') == False):
         await ctx.send('You can\'t use that command!')
         return
 
@@ -55,7 +51,7 @@ async def p_m(ctx, *, msg):
 
     await msg.delete()
 
-    temp_file = open('setting.json', mode='r', encoding='utf8')
+    temp_file = open('jsons/setting.json', mode='r', encoding='utf8')
     setting_data = json.load(temp_file)
     temp_file.close()
 
@@ -77,7 +73,7 @@ async def p_m(ctx, *, msg):
         await ctx.send('Mode argument error!')
 
     print(setting_data)
-    temp_file = open('setting.json', mode='w', encoding='utf8')
+    temp_file = open('jsons/setting.json', mode='w', encoding='utf8')
     json.dump(setting_data, temp_file)
     temp_file.close()
 
@@ -86,7 +82,7 @@ async def p_m(ctx, *, msg):
 @pic.command()
 async def p_check(ctx):
     await ctx.message.delete()
-    temp_file = open('setting.json', mode='r', encoding='utf8')
+    temp_file = open('jsons/setting.json', mode='r', encoding='utf8')
     setting_data = json.load(temp_file)
     temp_file.close()
 
@@ -126,17 +122,12 @@ async def event(ctx):
 # start quiz event
 @event.command()
 async def start(ctx, msg):
-    role_bool = int(0)
-    for role in ctx.author.roles:
-        if (str(role) == '總召'):
-            role_bool = int(1)
-            break
 
-    if (role_bool == int(0)):
+    if (role_check(ctx.author.roles, '總召') == False):
         await ctx.send('You can\'t use that command!')
         return
 
-    temp_file = open('quiz.json', mode='r', encoding='utf8')
+    temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
     quiz_data = json.load(temp_file)
     temp_file.close()
 
@@ -152,7 +143,7 @@ async def start(ctx, msg):
     await channel.set_permissions(ctx.guild.default_role, send_messages=True)
 
     print(quiz_data)
-    temp_file = open('quiz.json', mode='w', encoding='utf8')
+    temp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
     json.dump(quiz_data, temp_file)
     temp_file.close()
 
@@ -160,17 +151,12 @@ async def start(ctx, msg):
 # end quiz event
 @event.command()
 async def end(ctx):
-    role_bool = int(0)
-    for role in ctx.author.roles:
-        if (str(role) == '總召'):
-            role_bool = int(1)
-            break
 
-    if (role_bool == int(0)):
+    if (role_check(ctx.author.roles, '總召') == False):
         await ctx.send('You can\'t use that command!')
         return
 
-    temp_file = open('quiz.json', mode='r', encoding='utf8')
+    temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
     quiz_data = json.load(temp_file)
     temp_file.close()
     print(quiz_data)
@@ -206,13 +192,13 @@ async def end(ctx):
     await ctx.send(embed=embed)
 
     # adding scores to score.json
-    stemp_file = open('score.json', mode='r', encoding='utf8')
+    stemp_file = open('jsons/score.json', mode='r', encoding='utf8')
     score_data = json.load(stemp_file)
     stemp_file.close()
     print(score_data)
 
     # opening score parameters
-    sptemp_file = open('score_parameters.json', mode='r', encoding='utf8')
+    sptemp_file = open('jsons/score_parameters.json', mode='r', encoding='utf8')
     para = json.load(sptemp_file)
     sptemp_file.close()
 
@@ -233,12 +219,12 @@ async def end(ctx):
     quiz_data['correct_ans_member'].clear()
 
     print(quiz_data)
-    stemp_file = open('quiz.json', mode='w', encoding='utf8')
+    stemp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
     json.dump(quiz_data, stemp_file)
     stemp_file.close()
 
     print(score_data)
-    temp_file = open('score.json', mode='w', encoding='utf8')
+    temp_file = open('jsons/score.json', mode='w', encoding='utf8')
     json.dump(score_data, temp_file)
     temp_file.close()
 
@@ -254,7 +240,7 @@ async def on_message(msg):
     if (msg.author == bot.user or msg.content[0] == '+' or msg.content[0] == '~'):
         return
 
-    temp_file = open('quiz.json', mode='r', encoding='utf8')
+    temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
     quiz_data = json.load(temp_file)
     temp_file.close()
     print(quiz_data)
@@ -281,7 +267,7 @@ async def on_message(msg):
         await msg.author.send('你的答案是錯誤的格式！')
 
     print(quiz_data)
-    temp_file = open('quiz.json', mode='w', encoding='utf8')
+    temp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
     json.dump(quiz_data, temp_file)
     temp_file.close()
 
@@ -298,7 +284,7 @@ async def sb(ctx):
     if (ctx.author == bot.user):
         return
 
-    temp_file = open('score.json', mode='r', encoding='utf8')
+    temp_file = open('jsons/score.json', mode='r', encoding='utf8')
     score_data = json.load(temp_file)
     temp_file.close()
     print(score_data)
@@ -332,13 +318,8 @@ async def sb(ctx):
 # score_manipulation
 @score.command()
 async def s_m(ctx, *, msg):
-    role_bool = int(0)
-    for role in ctx.author.roles:
-        if (str(role) == '總召'):
-            role_bool = int(1)
-            break
 
-    if (role_bool == int(0)):
+    if (role_check(ctx.author.roles, '總召') == False):
         await ctx.send('You can\'t use that command!')
         return
 
@@ -350,7 +331,7 @@ async def s_m(ctx, *, msg):
     userId = msg.split(' ')[1]
     user_s = int(0)
 
-    temp_file = open('score.json', mode='r', encoding='utf8')
+    temp_file = open('jsons/score.json', mode='r', encoding='utf8')
     score_data = json.load(temp_file)
     temp_file.close()
 
@@ -368,7 +349,7 @@ async def s_m(ctx, *, msg):
         await ctx.send(f'Success manipulating member\'s score to {user_s}!')
 
     print(score_data)
-    temp_file = open('score.json', mode='w', encoding='utf8')
+    temp_file = open('jsons/score.json', mode='w', encoding='utf8')
     json.dump(score_data, temp_file)
     temp_file.close()
 # ===== group - score =====<<
@@ -381,17 +362,12 @@ async def lect(ctx):
 
 @lect.command()
 async def start(ctx):
-    role_bool = int(0)
-    for role in ctx.author.roles:
-        if (str(role) == '總召'):
-            role_bool = int(1)
-            break
 
-    if (role_bool == int(0)):
+    if (role_check(ctx.author.roles, '總召') == False):
         await ctx.send('You can\'t use that command!')
         return
 
-    temp_file = open('lecture.json', mode='r', encoding='utf8')
+    temp_file = open('jsons/lecture.json', mode='r', encoding='utf8')
     lecture_data = json.load(temp_file)
     temp_file.close()
 
@@ -403,7 +379,7 @@ async def start(ctx):
 
     lecture_data['status'] = '1'
 
-    temp_file = open('lecture.json', mode='w', encoding='utf8')
+    temp_file = open('jsons/lecture.json', mode='w', encoding='utf8')
     json.dump(lecture_data, temp_file)
     temp_file.close()
 
@@ -412,6 +388,34 @@ async def start(ctx):
         if(msg.content[0] == '&'):
             await msg.delete()
 
+    # add score to the attendances
+    temp_file = open('jsons/score.json', mode='r', encoding='utf8')
+    score_data = json.load(temp_file)
+    temp_file.close()
+
+    temp_file = open('jsons/score_parameters.json', mode='r', encoding='utf8')
+    sp = json.load(temp_file)
+    temp_file.close()
+
+
+    voice_channel = discord.utils.get(ctx.guild.voice_channels, name='星期五晚上固定講座')
+    for member in voice_channel.members:
+        d_score = int(sp['lecture_point']) * int(sp['weight'])
+        IdIndex = int(-1)
+        try:
+            IdIndex = score_data['id'].index(str(member.id))
+        except:
+            pass
+
+        if (IdIndex != -1):
+            score_data['score'][IdIndex] = str(int(score_data['score'][IdIndex]) + d_score)
+        else:
+            score_data['id'].append(str(member.id))
+            score_data['score'].append(str(d_score))
+
+    temp_file = open('jsons/score.json', mode='w', encoding='utf8')
+    json.dump(score_data, temp_file)
+    temp_file.close()
 
 
 #lecture ans check
@@ -428,11 +432,11 @@ async def ans_check(ctx, *, msg):
                     await msg.delete()
                     break
 
-    temp_file = open('lecture.json', mode='r', encoding='utf8')
+    temp_file = open('jsons/lecture.json', mode='r', encoding='utf8')
     l_data = json.load(temp_file) #lecture data
     temp_file.close()
 
-    temp_file = open('score_parameters.json', mode='r', encoding='utf8')
+    temp_file = open('jsons/score_parameters.json', mode='r', encoding='utf8')
     sp_data = json.load(temp_file)  # score parameters data
     temp_file.close()
 
@@ -456,24 +460,19 @@ async def ans_check(ctx, *, msg):
         if (Score > 1):
             Score -= 1
 
-    temp_file = open('lecture.json', mode='w', encoding='utf8')
+    temp_file = open('jsons/lecture.json', mode='w', encoding='utf8')
     json.dump(l_data, temp_file)
     temp_file.close()
 
 
 @lect.command()
 async def end(ctx):
-    role_bool = int(0)
-    for role in ctx.author.roles:
-        if (str(role) == '總召'):
-            role_bool = int(1)
-            break
 
-    if (role_bool == int(0)):
+    if (role_check(ctx.author.roles, '總召') == False):
         await ctx.send('You can\'t use that command!')
         return
 
-    temp_file = open('lecture.json', mode='r', encoding='utf8')
+    temp_file = open('jsons/lecture.json', mode='r', encoding='utf8')
     lecture_data = json.load(temp_file)
     temp_file.close()
 
@@ -485,13 +484,13 @@ async def end(ctx):
 
     lecture_data['status'] = '0'
 
-    temp_file = open('lecture.json', mode='w', encoding='utf8')
+    temp_file = open('jsons/lecture.json', mode='w', encoding='utf8')
     json.dump(lecture_data, temp_file)
     temp_file.close()
 
     answerer = str()
 
-    temp_file = open('lecture.json', mode='r', encoding='utf8')
+    temp_file = open('jsons/lecture.json', mode='r', encoding='utf8')
     l_data = json.load(temp_file)  # lecture data
     temp_file.close()
 
@@ -512,7 +511,7 @@ async def end(ctx):
     embed.set_footer(text=now_time())
     await ctx.send(embed=embed)
 
-    temp_file = open('lecture.json', mode='w', encoding='utf8')
+    temp_file = open('jsons/lecture.json', mode='w', encoding='utf8')
     json.dump(l_data, temp_file)
     temp_file.close()
 # ===== group - lecture =====<<
@@ -527,5 +526,7 @@ async def on_message(ctx):
     MsgContent = str(ctx.content).split(' ')
     if(MsgContent[0] == 'SQCS'):
 '''
+
+#keep_alive.keep_alive()
 
 bot.run(jdata['TOKEN'])
