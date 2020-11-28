@@ -30,11 +30,11 @@ score update commands(必須全自動):
 
 檔案讀寫懶人包:
 #open
-temp_file = open('quiz.json', mode='r', encoding='utf8')
+temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
 quiz_data = json.load(temp_file)
 temp_file.close()
 
 #close
-temp_file = open('quiz.json', mode='w', encoding='utf8')
+temp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
 json.dump(quiz_data, temp_file)
 temp_file.close()

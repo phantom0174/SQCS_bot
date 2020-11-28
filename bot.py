@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+import asyncio
 import json
 import random
 #import keep_alive
@@ -19,10 +20,31 @@ async def on_ready():
     print(">> Bot is online <<")
 
 
+async def main_autotask():
+    guild = bot.guilds[0]
+    while(1):
+        temp_file = open('quiz.json', mode='r', encoding='utf8')
+        quiz_data = json.load(temp_file)
+        temp_file.close()
+
+        if(now_time_info('date') == 1 and now_time_info('hour') >= 6 and quiz_data['event_status'] == 'False'):
+            await start(guild)
+        elif(now_time_info('date') == 7 and now_time_info('hour') >= 11 and quiz_data['event_status'] == 'True'):
+            await end(guild)
+
+        if(now_time_info('date') >= 1 and now_time_info('date') <= 5 and quiz_data['event_status'] == 'True' and quiz_data['stand_by_ans'] == 'N/A'):
+            member = await bot.fetch_user(610327503671656449)
+            await member.send('My master, the correct answer hasn\'t been set yet!')
+
+        await asyncio.sleep(600)
+
+
+
 # ping
 @bot.command()
 async def ping(ctx):
     await ctx.send(f'{round(bot.latency * 1000)} (ms)')
+    await ctx.send(now_time_info('date'))
 
 
 # main group of picture
@@ -119,28 +141,49 @@ async def event(ctx):
     pass
 
 
-# start quiz event
-@event.command()
-async def start(ctx, msg):
+# push back stand by answer
+@event.commands()
+async def push_back(ctx, msg):
+    temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
+    quiz_data = json.load(temp_file)
+    temp_file.close()
 
-    if (role_check(ctx.author.roles, '總召') == False):
-        await ctx.send('You can\'t use that command!')
+    if(role_check(ctx.author.roles, '總召') == False):
+        await ctx.send('You can\'t use this command!')
         return
+
+    if(quiz_data['stand_by_ans'] != 'N/A'):
+        await ctx.send(f'The stand-by answer had already been set as {quiz_data["stand_by_ans"]}!')
+        return
+
+    quiz_data['stand_by_ans'] = msg.content
+
+    await ctx.send(f'The stand-by answer has been set as {quiz_data["stand_by_ans"]}!')
+
+    temp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
+    json.dump(quiz_data, temp_file)
+    temp_file.close()
+
+
+# auto start quiz event
+async def start(guild):
+    main_channel = discord.utils.get(guild.text_channels, name='懸賞區')
+    cmd_channel = discord.utils.get(guild.text_channels, name='◉總指令區')
 
     temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
     quiz_data = json.load(temp_file)
     temp_file.close()
 
     quiz_data['event_status'] = "True"
-    quiz_data['correct_ans'] = str(msg)
+    quiz_data['correct_ans'] = quiz_data['stand_by_ans']
+    quiz_data['stand_by_ans'] = 'N/A'
 
-    await ctx.channel.send(
+    await cmd_channel.send(
         f'Quiz Event status set to {quiz_data["event_status"]}, correct answer set to {quiz_data["correct_ans"]}!')
-    channel = discord.utils.get(ctx.guild.text_channels, name='懸賞區')
-    await channel.send('@here，有一個新的懸賞活動開始了，請確認你的答案是隱蔽模式！\n (請在答案的前方與後方各加上"||"的符號)')
 
-    await channel.send(f'活動開始於 {now_time()}')
-    await channel.set_permissions(ctx.guild.default_role, send_messages=True)
+    await main_channel.send('@here，有一個新的懸賞活動開始了，請確認你的答案是隱蔽模式！\n (請在答案的前方與後方各加上"||"的符號)')
+    await main_channel.send(f'活動開始於 {now_time_info("whole")}')
+    await main_channel.set_permissions(guild.default_role, send_messages=True)
 
     print(quiz_data)
     temp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
@@ -148,31 +191,21 @@ async def start(ctx, msg):
     temp_file.close()
 
 
-# end quiz event
-@event.command()
-async def end(ctx):
-
-    if (role_check(ctx.author.roles, '總召') == False):
-        await ctx.send('You can\'t use that command!')
-        return
+# auto end quiz event
+async def end(guild):
+    main_channel = discord.utils.get(guild.text_channels, name='懸賞區')
 
     temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
     quiz_data = json.load(temp_file)
     temp_file.close()
-    print(quiz_data)
-
-    if (quiz_data['event_status'] == "False"):
-        await ctx.send('沒有任何進行中的活動！')
-        return
 
     quiz_data['event_status'] = "False"
     quiz_data['correct_ans'] = "N/A"
 
     # await ctx.send(f'Quiz Event status set to {quiz_data["event_status"]}, correct answer set to {quiz_data["correct_ans"]}!')
-    channel = discord.utils.get(ctx.guild.text_channels, name='懸賞區')
-    await channel.set_permissions(ctx.guild.default_role, send_messages=False)
+    await main_channel.set_permissions(guild.default_role, send_messages=False)
 
-    await ctx.send(f'活動結束於 {now_time()}')
+    await main_channel.send(f'活動結束於 {now_time_info("whole")}')
 
     winners = str()
     for winner in quiz_data["correct_ans_member"]:
@@ -188,8 +221,8 @@ async def end(ctx):
     embed = discord.Embed(title="Quiz Event Result", color=0x42fcff)
     embed.set_thumbnail(url="https://i.imgur.com/26skltl.png")
     embed.add_field(name="Winner", value=winners, inline=False)
-    embed.set_footer(text=now_time())
-    await ctx.send(embed=embed)
+    embed.set_footer(text=now_time_info("whole"))
+    await main_channel.send(embed=embed)
 
     # adding scores to score.json
     stemp_file = open('jsons/score.json', mode='r', encoding='utf8')
@@ -205,25 +238,24 @@ async def end(ctx):
     earned_score = int(para['quiz_event_point'])*int(para['point_weight'])
 
     for correct_member in quiz_data['correct_ans_member']:
-        user_log = int(0)
-        for i in range(len(score_data['member_id'])):
-            if (score_data['member_id'][i] == str(correct_member)):
-                score_data['member_score'][i] = str(int(score_data['member_score'][i]) + earned_score)
-                user_log = int(1)
-                break
+        UserIndex = int(-1)
+        try:
+            UserIndex = score_data['member_id'].index(str(correct_member))
+        except:
+            pass
 
-        if (user_log == int(0)):
+        if(UserIndex != -1):
+            score_data['member_score'][UserIndex] = str(int(score_data['member_score'][UserIndex]) + earned_score)
+        else:
             score_data['member_id'].append(str(correct_member))
             score_data['member_score'].append(str(earned_score))
 
     quiz_data['correct_ans_member'].clear()
 
-    print(quiz_data)
     stemp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
     json.dump(quiz_data, stemp_file)
     stemp_file.close()
 
-    print(score_data)
     temp_file = open('jsons/score.json', mode='w', encoding='utf8')
     json.dump(score_data, temp_file)
     temp_file.close()
@@ -311,7 +343,7 @@ async def sb(ctx):
     embed = discord.Embed(title="Score Board", color=0xffcd82)
     embed.set_thumbnail(url="https://i.imgur.com/26skltl.png")
     embed.add_field(name="Member score", value=score_board, inline=False)
-    embed.set_footer(text=now_time())
+    embed.set_footer(text=now_time_info("whole"))
     await ctx.send(embed=embed)
 
 
@@ -508,7 +540,7 @@ async def end(ctx):
     embed = discord.Embed(title="Lecture Event Result", color=0x42fcff)
     embed.set_thumbnail(url="https://i.imgur.com/26skltl.png")
     embed.add_field(name="Answerer", value=answerer, inline=False)
-    embed.set_footer(text=now_time())
+    embed.set_footer(text=now_time_info("whole"))
     await ctx.send(embed=embed)
 
     temp_file = open('jsons/lecture.json', mode='w', encoding='utf8')
