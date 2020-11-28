@@ -24,8 +24,8 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Synthesizer" />
-    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RunManager">
     <configuration name="bot" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
@@ -92,10 +92,11 @@
       <screen x="0" y="31" width="1280" height="689" />
     </state>
     <state width="1259" height="166" key="GridCell.Tab.0.right/0.31.1280.689@0.31.1280.689" timestamp="1605510779081" />
-    <state x="135" y="30" key="SettingsEditor" timestamp="1605534084415">
+    <state x="135" y="30" key="SettingsEditor" timestamp="1606493683733">
       <screen x="0" y="31" width="1280" height="689" />
     </state>
     <state x="135" y="30" key="SettingsEditor/0.31.1280.689/1920.30.1920.1050@0.31.1280.689" timestamp="1605534084415" />
+    <state x="135" y="30" key="SettingsEditor/0.31.1280.689@0.31.1280.689" timestamp="1606493683733" />
     <state x="406" y="249" width="613" height="281" key="org.intellij.images.editor.actions.BackgroundImageDialog" timestamp="1605533759307">
       <screen x="0" y="31" width="1280" height="689" />
     </state>
