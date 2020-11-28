@@ -8,9 +8,7 @@
 {"event_status": "True", "correct_ans": "a", "correct_ans_member": [], "answered_member": []}
 {"member_score": []}
 
-1-1. 懸賞題結束時做大更新(差不多一個禮拜)?
-or
-1-2. 一個禮拜結束時做大更新(以星期一為第一天)?
+1_ok. 2020/11/28更新: 採用quiz event在星期日晚上11.後結束，並且自動統計接下來的score update
 
 講座commands:
 * 星期五晚上有講座1, 星期日晚上有講座2 (依照Index)
