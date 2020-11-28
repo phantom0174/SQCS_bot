@@ -5,6 +5,7 @@ import json
 import random
 #import keep_alive
 from functions import *
+import os
 
 
 with open('jsons/setting.json', mode='r', encoding='utf8') as jfile:
@@ -561,4 +562,4 @@ async def on_message(ctx):
 
 #keep_alive.keep_alive()
 
-bot.run(jdata['TOKEN'])
+bot.run(os.environ.get("TOKEN"))
