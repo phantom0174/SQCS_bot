@@ -8,6 +8,8 @@ If using relevent data, please cite the data source.
 - 2020/11/18: Bot 24/7 online.
 - 2020/11/25: Intents activate.
 - 2020/11/28: Quiz event automize.
+- 2020/11/29: Member full info sqlite3-lize.
+- 2020/11/29: MVisualizer via score API functions set.
 
 
 #### Bot Info
@@ -18,3 +20,4 @@ Bot set by phantom0174
 - info - Get bot info
 
 - I'm just too lazy to type down other bunch of commands.
+- You can get by using command: +help

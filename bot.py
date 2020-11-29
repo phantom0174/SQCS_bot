@@ -1,10 +1,10 @@
-import discord
 from discord.ext import commands
-import asyncio
-import json
-import random
-#import keep_alive
 from functions import *
+#import keep_alive
+import discord
+import asyncio
+import random
+import json
 import os
 
 
@@ -45,7 +45,6 @@ async def main_autotask():
 @bot.command()
 async def ping(ctx):
     await ctx.send(f'{round(bot.latency * 1000)} (ms)')
-    await ctx.send(now_time_info('date'))
 
 
 # main group of picture
@@ -138,12 +137,12 @@ async def m_check(ctx):
 # ===== group - event =====>>
 # main group of event command
 @bot.group()
-async def event(ctx):
+async def quiz(ctx):
     pass
 
 
 # push back stand by answer
-@event.commands()
+@quiz.commands()
 async def push_back(ctx, msg):
     temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
     quiz_data = json.load(temp_file)
@@ -195,6 +194,7 @@ async def start(guild):
 # auto end quiz event
 async def end(guild):
     main_channel = discord.utils.get(guild.text_channels, name='懸賞區')
+    cmd_channel = discord.utils.get(guild.text_channels, name='◉總指令區')
 
     temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
     quiz_data = json.load(temp_file)
@@ -203,7 +203,7 @@ async def end(guild):
     quiz_data['event_status'] = "False"
     quiz_data['correct_ans'] = "N/A"
 
-    # await ctx.send(f'Quiz Event status set to {quiz_data["event_status"]}, correct answer set to {quiz_data["correct_ans"]}!')
+    await cmd_channel.send(f'Quiz Event status set to {quiz_data["event_status"]}, correct answer set to {quiz_data["correct_ans"]}!')
     await main_channel.set_permissions(guild.default_role, send_messages=False)
 
     await main_channel.send(f'活動結束於 {now_time_info("whole")}')
@@ -224,42 +224,6 @@ async def end(guild):
     embed.add_field(name="Winner", value=winners, inline=False)
     embed.set_footer(text=now_time_info("whole"))
     await main_channel.send(embed=embed)
-
-    # adding scores to score.json
-    stemp_file = open('jsons/score.json', mode='r', encoding='utf8')
-    score_data = json.load(stemp_file)
-    stemp_file.close()
-    print(score_data)
-
-    # opening score parameters
-    sptemp_file = open('jsons/score_parameters.json', mode='r', encoding='utf8')
-    para = json.load(sptemp_file)
-    sptemp_file.close()
-
-    earned_score = int(para['quiz_event_point'])*int(para['point_weight'])
-
-    for correct_member in quiz_data['correct_ans_member']:
-        UserIndex = int(-1)
-        try:
-            UserIndex = score_data['member_id'].index(str(correct_member))
-        except:
-            pass
-
-        if(UserIndex != -1):
-            score_data['member_score'][UserIndex] = str(int(score_data['member_score'][UserIndex]) + earned_score)
-        else:
-            score_data['member_id'].append(str(correct_member))
-            score_data['member_score'].append(str(earned_score))
-
-    quiz_data['correct_ans_member'].clear()
-
-    stemp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
-    json.dump(quiz_data, stemp_file)
-    stemp_file.close()
-
-    temp_file = open('jsons/score.json', mode='w', encoding='utf8')
-    json.dump(score_data, temp_file)
-    temp_file.close()
 
 
 # ===== group - event =====<<
@@ -295,97 +259,16 @@ async def on_message(msg):
             await msg.author.send('我收到你的答案了!')
             quiz_data["answered_member"].append(str(msg.author.id))
             if (msg.content[2:-2] == quiz_data["correct_ans"]):
+                coni_channel = discord.utils.get(msg.guild.text_channels, name='bot-coni')
+                await coni_channel.send(f'mv!score mani {msg.author.id} quiz_crt')
                 quiz_data["correct_ans_member"].append(str(msg.author.id))
     else:
         await msg.author.send('你的答案是錯誤的格式！')
 
-    print(quiz_data)
+
     temp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
     json.dump(quiz_data, temp_file)
     temp_file.close()
-
-
-# ===== group - score =====>>
-@bot.group()
-async def score(ctx):
-    pass
-
-
-# scoreboare show
-@score.command()
-async def sb(ctx):
-    if (ctx.author == bot.user):
-        return
-
-    temp_file = open('jsons/score.json', mode='r', encoding='utf8')
-    score_data = json.load(temp_file)
-    temp_file.close()
-    print(score_data)
-
-    if (len(score_data['member_score']) == 0):
-        await ctx.send('The score board is empty!')
-        return
-
-    rank_index = []
-    top = int(max(score_data['member_score']))
-    while (top >= 0):
-        for i in range(len(score_data['member_score'])):
-            if (int(score_data['member_score'][i]) == top):
-                rank_index.append(i)
-        top -= 1
-
-    score_board = str()
-    for i in range(len(rank_index)):
-        user = await bot.fetch_user(int(score_data['member_id'][rank_index[i]]))
-        name = user.display_name
-        score_board += name + ": " + score_data['member_score'][rank_index[i]]
-        score_board += '\n'
-
-    embed = discord.Embed(title="Score Board", color=0xffcd82)
-    embed.set_thumbnail(url="https://i.imgur.com/26skltl.png")
-    embed.add_field(name="Member score", value=score_board, inline=False)
-    embed.set_footer(text=now_time_info("whole"))
-    await ctx.send(embed=embed)
-
-
-# score_manipulation
-@score.command()
-async def s_m(ctx, *, msg):
-
-    if (role_check(ctx.author.roles, '總召') == False):
-        await ctx.send('You can\'t use that command!')
-        return
-
-    if (len(msg.split(' ')) > 2):
-        await ctx.send('Too many arguments!')
-        return
-
-    mScore = msg.split(' ')[0]
-    userId = msg.split(' ')[1]
-    user_s = int(0)
-
-    temp_file = open('jsons/score.json', mode='r', encoding='utf8')
-    score_data = json.load(temp_file)
-    temp_file.close()
-
-    m_bool = int(0)
-    for i in range(len(score_data['member_id'])):
-        if (score_data['member_id'][i] == userId):
-            score_data['member_score'][i] = str(int(score_data['member_score'][i]) + mScore)
-            user_s = int(score_data['member_score'][i]) + mScore
-            m_bool = int(1)
-            break
-
-    if (m_bool == 0):
-        await ctx.send(f'There are no member who\'s id is {userId} in the score board!')
-    elif (m_bool == 1):
-        await ctx.send(f'Success manipulating member\'s score to {user_s}!')
-
-    print(score_data)
-    temp_file = open('jsons/score.json', mode='w', encoding='utf8')
-    json.dump(score_data, temp_file)
-    temp_file.close()
-# ===== group - score =====<<
 
 
 # ===== group - lecture =====>>
@@ -421,34 +304,16 @@ async def start(ctx):
         if(msg.content[0] == '&'):
             await msg.delete()
 
+    # cd time from preventing member leave at once
+    random.seed(now_time_info('hour')*92384)
+    await asyncio.sleep(random.randint(30, 180))
+
     # add score to the attendances
-    temp_file = open('jsons/score.json', mode='r', encoding='utf8')
-    score_data = json.load(temp_file)
-    temp_file.close()
-
-    temp_file = open('jsons/score_parameters.json', mode='r', encoding='utf8')
-    sp = json.load(temp_file)
-    temp_file.close()
-
-
     voice_channel = discord.utils.get(ctx.guild.voice_channels, name='星期五晚上固定講座')
+    coni_channel = discord.utils.get(ctx.guild.text_channels, name='bot-coni')
     for member in voice_channel.members:
-        d_score = int(sp['lecture_point']) * int(sp['weight'])
-        IdIndex = int(-1)
-        try:
-            IdIndex = score_data['id'].index(str(member.id))
-        except:
-            pass
+        await coni_channel.send(f'mv!score mani {member.id} lecture')
 
-        if (IdIndex != -1):
-            score_data['score'][IdIndex] = str(int(score_data['score'][IdIndex]) + d_score)
-        else:
-            score_data['id'].append(str(member.id))
-            score_data['score'].append(str(d_score))
-
-    temp_file = open('jsons/score.json', mode='w', encoding='utf8')
-    json.dump(score_data, temp_file)
-    temp_file.close()
 
 
 #lecture ans check
@@ -456,7 +321,7 @@ async def start(ctx):
 async def ans_check(ctx, *, msg):
     Ans = msg.content.split(' ')
     msg_logs = await ctx.channel.history(limit=100).flatten()
-    MemberCrtMsg = [] #correct message
+    MemberCrtMsg = [] # correct message
     for msg in msg_logs:
         if(msg.author.bot == 'False' and msg.content[0] == '&'):
             for ans in Ans:
