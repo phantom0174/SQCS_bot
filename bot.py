@@ -292,9 +292,9 @@ async def on_message(msg):
 async def lect(ctx):
     pass
 
+
 @lect.command()
 async def start(ctx):
-
     if (role_check(ctx.author.roles, '總召') == False):
         await ctx.send('You can\'t use that command!')
         return
@@ -303,7 +303,7 @@ async def start(ctx):
     lecture_data = json.load(temp_file)
     temp_file.close()
 
-    if(lecture_data['status'] == '1'):
+    if (lecture_data['status'] == '1'):
         await ctx.send('The lecture has already started!')
         return
 
@@ -320,20 +320,18 @@ async def start(ctx):
 
     lecture_data['temp_sw'] = sw
 
-
     temp_file = open('jsons/lecture.json', mode='w', encoding='utf8')
     json.dump(lecture_data, temp_file)
     temp_file.close()
 
     msg_logs = await ctx.channel.history(limit=200).flatten()
     for msg in msg_logs:
-        if(msg.content[0] == '&'):
+        if (len(msg.content) > 0 and msg.content[0] == '&'):
             await msg.delete()
 
     # cd time from preventing member leave at once
-    random.seed(now_time_info('hour')*92384)
+    random.seed(now_time_info('hour') * 92384)
     await asyncio.sleep(random.randint(30, 180))
-
 
     # add score to the attendances
     voice_channel = discord.utils.get(ctx.guild.voice_channels, name='星期五晚上固定講座')
@@ -342,37 +340,41 @@ async def start(ctx):
         await coni_channel.send(f'mv!score mani {member.id} lecture_attend')
 
 
-
-#lecture ans check
+# lecture ans check
 @lect.command()
 async def ans_check(ctx, *, msg):
-    Ans = msg.content.split(' ')
+    Ans = msg.split(' ')
     msg_logs = await ctx.channel.history(limit=100).flatten()
-    MemberCrtMsg = [] # correct message
+    MemberCrtMsg = []  # correct message
     for msg in msg_logs:
-        if(msg.author.bot == 'False' and msg.content[0] == '&'):
+        if (len(msg.content) == 0):
+            continue
+
+        if (msg.author.bot == False and msg.content[0] == '&'):
             for ans in Ans:
-                if(msg.find(ans) != -1):
-                    MemberCrtMsg.insert(0, msg)
+                if (msg.content.find(ans) != -1):
+                    MemberCrtMsg.append(msg)
                     await msg.delete()
                     break
 
-    temp_file = open('jsons/lecture.json', mode='r', encoding='utf8')
-    l_data = json.load(temp_file) #lecture data
-    temp_file.close()
+    MemberCrtMsg.reverse()
 
+    temp_file = open('jsons/lecture.json', mode='r', encoding='utf8')
+    l_data = json.load(temp_file)  # lecture data
+    temp_file.close()
 
     Score = int(5)
     for crt_msg in MemberCrtMsg:
         mScore = float(Score) * float(l_data["temp_sw"])
         info.execute(f'SELECT Id, Score, Count FROM lecture WHERE Id={crt_msg.author.id}')
         data = info.fetchall()
-        if(len(data) == 0):
+        if (len(data) == 0):
             info.execute(f'INSERT INTO lecture VALUES({crt_msg.author.id}, {mScore}, 1);')
         else:
             old_Score = float(data[0][1])
             old_Count = int(data[0][2])
-            info.execute(f'UPDATE lecture SET Score={old_Score + mScore}, Count={old_Count + 1} WHERE Id={crt_msg.author.id};')
+            info.execute(
+                f'UPDATE lecture SET Score={old_Score + mScore}, Count={old_Count + 1} WHERE Id={crt_msg.author.id};')
 
         if (Score > 1):
             Score -= 1
@@ -382,7 +384,6 @@ async def ans_check(ctx, *, msg):
 
 @lect.command()
 async def end(ctx):
-
     if (role_check(ctx.author.roles, '總召') == False):
         await ctx.send('You can\'t use that command!')
         return
@@ -404,22 +405,28 @@ async def end(ctx):
     temp_file.close()
 
     # adding scores and show lecture final data
-    info.execute("SELECT * FROM lecture")
+    info.execute("SELECT * FROM lecture ORDER BY Score")
     data = info.fetchall()
-    if(len(data) == 0):
+    if (len(data) == 0):
         await ctx.send('There are no data to show!')
         return
     else:
         data_members = str()
         for member in data:
-            member_obj = await bot.fetch_user(member[0]) # member id
-            data_members += f'{member_obj.name}:: Score: {data[1]}, Answer Count: {data[2]}\n'
+            member_obj = await bot.fetch_user(member[0])  # member id
+            data_members += f'{member_obj.name}:: Score: {member[1]}, Answer Count: {member[2]}\n'
 
         embed = discord.Embed(title="Lecture Event Result", color=0x42fcff)
         embed.set_thumbnail(url="https://i.imgur.com/26skltl.png")
         embed.add_field(name="Lecture final info", value=data_members, inline=False)
         embed.set_footer(text=now_time_info("whole"))
         await ctx.send(embed=embed)
+
+    info.execute('DELETE FROM lecture')
+
+    info.connection.commit()
+
+
 # ===== group - lecture =====<<
 
 
