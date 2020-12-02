@@ -36,3 +36,5 @@ temp_file.close()
 temp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
 json.dump(quiz_data, temp_file)
 temp_file.close()
+
+fl.execute(f'INSERT INTO fluctlight VALUES({member.id}, 0, 0, 0, 0, 0, 0);')

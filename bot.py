@@ -3,6 +3,7 @@ from functions import *
 #import keep_alive
 import discord
 import asyncio
+import sqlite3
 import random
 import json
 import os
@@ -11,14 +12,29 @@ import os
 with open('jsons/setting.json', mode='r', encoding='utf8') as jfile:
     jdata = json.load(jfile)
 
+connection = sqlite3.connect('DataBase.db')
+info = connection.cursor()
+
 intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix='+', intents=intents)
+
+def db_setup():
+    info.execute("""CREATE TABLE IF NOT EXISTS event (
+          Id INTEGER);""")
+
+    info.execute("""CREATE TABLE IF NOT EXISTS lecture (
+          Id INTEGER,
+          Score REAL,
+          Count INTEGER);""")
+
+    info.connection.commit()
 
 
 @bot.event
 async def on_ready():
     print(">> Bot is online <<")
+    db_setup()
 
 
 async def main_autotask():
@@ -294,6 +310,16 @@ async def start(ctx):
     await ctx.send('@here, the lecture has started!')
 
     lecture_data['status'] = '1'
+    coni_channel = discord.utils.get(ctx.guild.text_channels, name='bot-coni')
+
+    def check(message):
+        return message.channel == coni_channel
+
+    await coni_channel.send('SQCS MVisualizer request_score_weight')
+    sw = (await bot.wait_for('message', check=check, timeout=30.0)).content.split(' ')[3]
+
+    lecture_data['temp_sw'] = sw
+
 
     temp_file = open('jsons/lecture.json', mode='w', encoding='utf8')
     json.dump(lecture_data, temp_file)
@@ -308,11 +334,12 @@ async def start(ctx):
     random.seed(now_time_info('hour')*92384)
     await asyncio.sleep(random.randint(30, 180))
 
+
     # add score to the attendances
     voice_channel = discord.utils.get(ctx.guild.voice_channels, name='星期五晚上固定講座')
     coni_channel = discord.utils.get(ctx.guild.text_channels, name='bot-coni')
     for member in voice_channel.members:
-        await coni_channel.send(f'mv!score mani {member.id} lecture')
+        await coni_channel.send(f'mv!score mani {member.id} lecture_attend')
 
 
 
@@ -334,33 +361,23 @@ async def ans_check(ctx, *, msg):
     l_data = json.load(temp_file) #lecture data
     temp_file.close()
 
-    temp_file = open('jsons/score_parameters.json', mode='r', encoding='utf8')
-    sp_data = json.load(temp_file)  # score parameters data
-    temp_file.close()
 
     Score = int(5)
     for crt_msg in MemberCrtMsg:
-        IdIndex = int(-1)
-        try:
-            IdIndex = l_data['crt_member_id'].index(str(crt_msg.author.id))
-        except:
-            pass
-
-        if(IdIndex > -1):
-            l_data['crt_member_times'][IdIndex] = str(int(l_data['crt_member_times'][IdIndex]) + 1)
-            l_data['crt_member_score'][IdIndex] = str(int(l_data['crt_member_score'][IdIndex]) + int(sp_data['point_weight'])*Score)
+        mScore = float(Score) * float(l_data["temp_sw"])
+        info.execute(f'SELECT Id, Score, Count FROM lecture WHERE Id={crt_msg.author.id}')
+        data = info.fetchall()
+        if(len(data) == 0):
+            info.execute(f'INSERT INTO lecture VALUES({crt_msg.author.id}, {mScore}, 1);')
         else:
-            l_data['crt_member_id'].append(str(crt_msg.author.id))
-            l_data['crt_member_times'].append('1')
-            l_data['crt_member_score'].append(str(int(sp_data['point_weight'])*Score))
-
+            old_Score = float(data[0][1])
+            old_Count = int(data[0][2])
+            info.execute(f'UPDATE lecture SET Score={old_Score + mScore}, Count={old_Count + 1} WHERE Id={crt_msg.author.id};')
 
         if (Score > 1):
             Score -= 1
 
-    temp_file = open('jsons/lecture.json', mode='w', encoding='utf8')
-    json.dump(l_data, temp_file)
-    temp_file.close()
+    info.connection.commit()
 
 
 @lect.command()
@@ -386,44 +403,56 @@ async def end(ctx):
     json.dump(lecture_data, temp_file)
     temp_file.close()
 
-    answerer = str()
+    # adding scores and show lecture final data
+    info.execute("SELECT * FROM lecture")
+    data = info.fetchall()
+    if(len(data) == 0):
+        await ctx.send('There are no data to show!')
+        return
+    else:
+        data_members = str()
+        for member in data:
+            member_obj = await bot.fetch_user(member[0]) # member id
+            data_members += f'{member_obj.name}:: Score: {data[1]}, Answer Count: {data[2]}\n'
 
-    temp_file = open('jsons/lecture.json', mode='r', encoding='utf8')
-    l_data = json.load(temp_file)  # lecture data
-    temp_file.close()
-
-    for i in range(len(l_data['crt_member_id'])):
-        member = (await ctx.guild.fetch_member(int(l_data['crt_member_id'][i]))).name
-        times = l_data['crt_member_times'][i]
-        score = l_data['crt_member_score'][i]
-        answerer += f'{member}: {times}(times), {score}(score)\n'
-
-    l_data['crt_member_id'].clear()
-    l_data['crt_member_times'].clear()
-    l_data['crt_member_score'].clear()
-
-
-    embed = discord.Embed(title="Lecture Event Result", color=0x42fcff)
-    embed.set_thumbnail(url="https://i.imgur.com/26skltl.png")
-    embed.add_field(name="Answerer", value=answerer, inline=False)
-    embed.set_footer(text=now_time_info("whole"))
-    await ctx.send(embed=embed)
-
-    temp_file = open('jsons/lecture.json', mode='w', encoding='utf8')
-    json.dump(l_data, temp_file)
-    temp_file.close()
+        embed = discord.Embed(title="Lecture Event Result", color=0x42fcff)
+        embed.set_thumbnail(url="https://i.imgur.com/26skltl.png")
+        embed.add_field(name="Lecture final info", value=data_members, inline=False)
+        embed.set_footer(text=now_time_info("whole"))
+        await ctx.send(embed=embed)
 # ===== group - lecture =====<<
 
-'''
-#bots communication event
+
+# bots communication event
 @bot.listen()
 async def on_message(ctx):
-    if(ctx.author.bot == 'False' and ctx.author == bot.user):
+    if(ctx.author.bot == 'False' or ctx.author == bot.user):
         return
 
-    MsgContent = str(ctx.content).split(' ')
-    if(MsgContent[0] == 'SQCS'):
-'''
+    coni_channel = discord.utils.get(ctx.guild.text_channels, name='bot-coni')
+
+    MsgCont = str(ctx.content).split(' ')
+    if(MsgCont[0] == 'MVisualizer'):
+        if(MsgCont[1] == 'SQCS'):
+            if(MsgCont[2] == 'receive_sw'):
+                temp_file = open('jsons/lecture.json', mode='r', encoding='utf8')
+                lect_data = json.load(temp_file)
+                temp_file.close()
+
+                lect_data['temp_sw'] = MsgCont[3]
+
+                temp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
+                json.dump(lect_data, temp_file)
+                temp_file.close()
+                return
+
+
+
+
+@bot.event
+async def on_disconnect():
+    print('Bot disconnected')
+    info.connection.close()
 
 #keep_alive.keep_alive()
 
