@@ -21,8 +21,6 @@ bot = commands.Bot(command_prefix='+', intents=intents)
 
 def db_setup():
 
-    info.execute("DROP TABLE event;")
-
     info.execute("""CREATE TABLE IF NOT EXISTS quiz (
           Id INTEGER);""")
 
@@ -44,7 +42,7 @@ async def on_ready():
 async def main_autotask():
     guild = bot.guilds[0]
     while(1):
-        temp_file = open('quiz.json', mode='r', encoding='utf8')
+        temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
         quiz_data = json.load(temp_file)
         temp_file.close()
 
@@ -162,8 +160,8 @@ async def quiz(ctx):
 
 
 # push back stand by answer
-@quiz.commands()
-async def push_back(ctx, msg):
+@quiz.command()
+async def st_push(ctx, msg):
     temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
     quiz_data = json.load(temp_file)
     temp_file.close()
