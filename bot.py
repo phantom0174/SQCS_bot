@@ -309,7 +309,7 @@ async def start(ctx):
         await ctx.send('The lecture has already started!')
         return
 
-    await ctx.send('@here, the lecture has started!')
+    await ctx.send('@everyone, the lecture has started!')
 
     lecture_data['status'] = '1'
     coni_channel = discord.utils.get(ctx.guild.text_channels, name='bot-coni')
@@ -372,16 +372,17 @@ async def ans_check(ctx, *, msg):
         data = info.fetchall()
         if (len(data) == 0):
             info.execute(f'INSERT INTO lecture VALUES({crt_msg.author.id}, {mScore}, 1);')
+            info.connection.commit()
         else:
             old_Score = float(data[0][1])
             old_Count = int(data[0][2])
             info.execute(
                 f'UPDATE lecture SET Score={old_Score + mScore}, Count={old_Count + 1} WHERE Id={crt_msg.author.id};')
+            info.connection.commit()
 
         if (Score > 1):
             Score -= 1
 
-    info.connection.commit()
 
 
 @lect.command()
@@ -409,7 +410,7 @@ async def end(ctx):
     temp_file.close()
 
     # adding scores and show lecture final data
-    info.execute("SELECT * FROM lecture ORDER BY Score")
+    info.execute("SELECT * FROM lecture ORDER BY Score DESC")
     data = info.fetchall()
     if (len(data) == 0):
         await ctx.send('There are no data to show!')
@@ -419,7 +420,7 @@ async def end(ctx):
         for member in data:
             member_obj = await bot.fetch_user(member[0])  # member id
             data_members += f'{member_obj.name}:: Score: {member[1]}, Answer Count: {member[2]}\n'
-            await coni_channel.send(f'mv!score mani {member[1]}')
+            await coni_channel.send(f'mv!score mani {member[0]} {member[1]}')
 
         embed = discord.Embed(title="Lecture Event Result", color=0x42fcff)
         embed.set_thumbnail(url="https://i.imgur.com/26skltl.png")
@@ -459,11 +460,10 @@ async def on_message(ctx):
                 return
 
 
-
-
 @bot.event
 async def on_disconnect():
     print('Bot disconnected')
+    info.connection.commit()
     info.connection.close()
 
 #keep_alive.keep_alive()
