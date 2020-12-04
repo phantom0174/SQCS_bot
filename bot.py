@@ -20,7 +20,10 @@ intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='+', intents=intents)
 
 def db_setup():
-    info.execute("""CREATE TABLE IF NOT EXISTS event (
+
+    info.execute("DROP TABLE event;")
+
+    info.execute("""CREATE TABLE IF NOT EXISTS quiz (
           Id INTEGER);""")
 
     info.execute("""CREATE TABLE IF NOT EXISTS lecture (
@@ -35,6 +38,7 @@ def db_setup():
 async def on_ready():
     print(">> Bot is online <<")
     db_setup()
+    await main_autotask()
 
 
 async def main_autotask():
@@ -384,6 +388,8 @@ async def ans_check(ctx, *, msg):
 
 @lect.command()
 async def end(ctx):
+    coni_channel = discord.utils.get(ctx.guild.text_channels, name='bot-coni')
+
     if (role_check(ctx.author.roles, '總召') == False):
         await ctx.send('You can\'t use that command!')
         return
@@ -415,6 +421,7 @@ async def end(ctx):
         for member in data:
             member_obj = await bot.fetch_user(member[0])  # member id
             data_members += f'{member_obj.name}:: Score: {member[1]}, Answer Count: {member[2]}\n'
+            await coni_channel.send(f'mv!score mani {member[1]}')
 
         embed = discord.Embed(title="Lecture Event Result", color=0x42fcff)
         embed.set_thumbnail(url="https://i.imgur.com/26skltl.png")
