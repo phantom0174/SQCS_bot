@@ -245,6 +245,8 @@ async def quiz_end(guild):
     embed.set_footer(text=now_time_info("whole"))
     await main_channel.send(embed=embed)
 
+    await _ToMV.send('update_guild_fluctlight')
+
 
 # event answer listen function
 @bot.listen()
@@ -278,7 +280,6 @@ async def on_message(msg):
         await msg.author.send('我收到你的答案了!')
         quiz_data["answered_member"].append(msg.author.id)
         if (msg.content[2:-2] == quiz_data["correct_ans"]):
-            coni_channel = discord.utils.get(msg.guild.text_channels, name='bot-coni')
             await _ToMV.send(f'quiz_crt {msg.author.id}')
             await quiz_data['correct_ans_member'].append(msg.author.id)
     else:
