@@ -1,6 +1,7 @@
 from discord.ext import commands
 from functions import *
 #import keep_alive
+import statistics
 import discord
 import asyncio
 import sqlite3
@@ -279,6 +280,7 @@ async def on_message(msg):
     if (msg.content[0:2] == '||' and msg.content[-2:] == '||'):
         await msg.author.send('我收到你的答案了!')
         quiz_data["answered_member"].append(msg.author.id)
+
         if (msg.content[2:-2] == quiz_data["correct_ans"]):
             await _ToMV.send(f'quiz_crt {msg.author.id}')
             await quiz_data['correct_ans_member'].append(msg.author.id)
@@ -314,10 +316,9 @@ async def start(ctx):
         await ctx.send('The lecture has already started!')
         return
 
-    await ctx.send('@everyone, the lecture has started!')
+    await ctx.send('@everyone，講座開始了！\n 於回答講師問題時請在答案前方加上"&"，回答正確即可加分。')
 
     lecture_data['status'] = '1'
-    coni_channel = discord.utils.get(ctx.guild.text_channels, name='bot-coni')
 
     def check(message):
         return message.channel == _ToMV
@@ -342,51 +343,57 @@ async def start(ctx):
 
     # add score to the attendances
     voice_channel = discord.utils.get(ctx.guild.voice_channels, name='星期五晚上固定講座')
-    coni_channel = discord.utils.get(ctx.guild.text_channels, name='bot-coni')
     for member in voice_channel.members:
-        await coni_channel.send(f'mv!score mani {member.id} lecture_attend')
+        await _ToMV.send(f'lecture_attend {member.id}')
 
 
 # lecture ans check
 @lect.command()
 async def ans_check(ctx, *, msg):
-    Ans = msg.split(' ')
+    CrtAns = msg.split(' ')
     msg_logs = await ctx.channel.history(limit=100).flatten()
     MemberCrtMsg = []  # correct message
+
     for msg in msg_logs:
+        await msg.delete()
         if (len(msg.content) == 0):
             continue
 
         if (msg.author.bot == False and msg.content[0] == '&'):
-            for ans in Ans:
+            for ans in CrtAns:
+                # correct answer is a subset of member answer
                 if (msg.content.find(ans) != -1):
                     MemberCrtMsg.append(msg)
-                    await msg.delete()
                     break
 
     MemberCrtMsg.reverse()
 
+
+    # add score to correct members
     temp_file = open('jsons/lecture.json', mode='r', encoding='utf8')
     l_data = json.load(temp_file)  # lecture data
     temp_file.close()
 
-    Score = int(5)
+    TScore = float(5)
     for crt_msg in MemberCrtMsg:
-        mScore = float(Score) * float(l_data["temp_sw"])
-        info.execute(f'SELECT Id, Score, Count FROM lecture WHERE Id={crt_msg.author.id}')
+        TargetId = crt_msg.author.id
+        mScore = TScore * float(l_data["temp_sw"])
+        info.execute(f'SELECT Id, Score, Count FROM lecture WHERE Id={TargetId}')
         data = info.fetchall()
+
         if (len(data) == 0):
-            info.execute(f'INSERT INTO lecture VALUES({crt_msg.author.id}, {mScore}, 1);')
-            info.connection.commit()
+            info.execute(f'INSERT INTO lecture VALUES({TargetId}, {mScore}, 1);')
         else:
             old_Score = float(data[0][1])
             old_Count = int(data[0][2])
-            info.execute(
-                f'UPDATE lecture SET Score={old_Score + mScore}, Count={old_Count + 1} WHERE Id={crt_msg.author.id};')
-            info.connection.commit()
 
-        if (Score > 1):
-            Score -= 1
+            info.execute(
+                f'UPDATE lecture SET Score={old_Score + mScore}, Count={old_Count + 1} WHERE Id={TargetId};')
+
+        if (TScore > 1):
+            TScore -= 1
+
+    info.connection.commit()
 
 
 
