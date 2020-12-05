@@ -36,6 +36,19 @@ def db_setup():
 
     info.connection.commit()
 
+def create_embed(Title, Color, FieldsName, Values):
+    embed = discord.Embed(title=Title, color=Color)
+    embed.set_thumbnail(url="https://i.imgur.com/26skltl.png")
+    if(len(FieldsName) != len(Values)):
+        embed.add_field(name="Error", value='N/A', inline=False)
+        return embed
+
+    for i in range(len(FieldsName)):
+        embed.add_field(name=FieldsName[i], value=Values[i], inline=False)
+
+    embed.set_footer(text=now_time_info('whole'))
+    return embed
+
 
 @bot.event
 async def on_ready():
@@ -240,11 +253,7 @@ async def quiz_end(guild):
 
     quiz_data['answered_member'].clear()
 
-    embed = discord.Embed(title="Quiz Event Result", color=0x42fcff)
-    embed.set_thumbnail(url="https://i.imgur.com/26skltl.png")
-    embed.add_field(name="Winner", value=winners, inline=False)
-    embed.set_footer(text=now_time_info("whole"))
-    await main_channel.send(embed=embed)
+    await main_channel.send(embed=create_embed('Quiz Event Result', 0x42fcff, ['Winner'], [winners]))
 
     await _ToMV.send('update_guild_fluctlight')
 
@@ -312,13 +321,13 @@ async def start(ctx):
     lecture_data = json.load(temp_file)
     temp_file.close()
 
-    if (lecture_data['status'] == '1'):
+    if (lecture_data['status'] == 'True'):
         await ctx.send('The lecture has already started!')
         return
 
     await ctx.send('@everyone，講座開始了！\n 於回答講師問題時請在答案前方加上"&"，回答正確即可加分。')
 
-    lecture_data['status'] = '1'
+    lecture_data['status'] = 'True'
 
     def check(message):
         return message.channel == _ToMV
@@ -409,13 +418,13 @@ async def end(ctx):
     lecture_data = json.load(temp_file)
     temp_file.close()
 
-    if (lecture_data['status'] == '0'):
+    if (lecture_data['status'] == 'False'):
         await ctx.send('The lecture has already ended!')
         return
 
     await ctx.send('@here, the lecture has ended!')
 
-    lecture_data['status'] = '0'
+    lecture_data['status'] = 'False'
 
     temp_file = open('jsons/lecture.json', mode='w', encoding='utf8')
     json.dump(lecture_data, temp_file)
@@ -432,16 +441,11 @@ async def end(ctx):
         for member in data:
             member_obj = await bot.fetch_user(member[0])  # member id
             data_members += f'{member_obj.name}:: Score: {member[1]}, Answer Count: {member[2]}\n'
-            await coni_channel.send(f'mv!score mani {member[0]} {member[1]}')
+            await _ToMV.send(f'lect_crt {member[0]} {member[1]}')
 
-        embed = discord.Embed(title="Lecture Event Result", color=0x42fcff)
-        embed.set_thumbnail(url="https://i.imgur.com/26skltl.png")
-        embed.add_field(name="Lecture final info", value=data_members, inline=False)
-        embed.set_footer(text=now_time_info("whole"))
-        await ctx.send(embed=embed)
+        await ctx.send(embed=create_embed('Lecture Event Result', 0x42fcff, ['Lecture final info'], [data_members]))
 
     info.execute('DELETE FROM lecture')
-
     info.connection.commit()
 
 
