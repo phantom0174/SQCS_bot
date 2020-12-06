@@ -95,6 +95,17 @@ async def ping(ctx):
     await ctx.send(f'{round(bot.latency * 1000)} (ms)')
 
 
+# delete message
+@bot.command()
+async def clear(ctx, msg):
+    number = int(msg) + 1
+    msg_logs = await ctx.channel.history(limit=number).flatten()
+    for msg in msg_logs:
+        await msg.delete()
+
+    await _Report.send(f'[Command]clear used by user {ctx.author.id}. {now_time_info("whole")}')
+
+
 # main group of picture
 @bot.group()
 async def pic(ctx):
