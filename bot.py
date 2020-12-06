@@ -23,6 +23,7 @@ bot = commands.Bot(command_prefix='+', intents=intents)
 
 global _ToSyn
 global _ToMV
+global _Report
 
 
 def db_setup():
@@ -53,9 +54,14 @@ def create_embed(Title, Color, FieldsName, Values):
 
 @bot.event
 async def on_ready():
+    global _ToSyn
+    global _ToMV
+    global _Report
+
     # bot communicate channels
     _ToSyn = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-and-syn')
     _ToMV = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-and-mv')
+    _Report = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-report')
 
     print(">> Bot is online <<")
     db_setup()
