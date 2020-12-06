@@ -45,9 +45,9 @@ def score_weight_update():
     para['point_weight'] = final_weight
 
 def role_check(roles, t_role):
-    Exist = bool(False)
     for role in roles:
-        if(role.name == t_role):
-            Exist = bool(True)
-            break
-    return Exist
+        for mrole in t_role:
+            if(role.name == mrole):
+                return True
+
+    return False
