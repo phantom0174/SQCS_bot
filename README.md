@@ -15,6 +15,7 @@
 
 ### Bot Info
  - Bot set by phantom0174
+ - This bot manages event-related tasks in DC guild.
  - If using relevent data, please cite the data source.
 
 ### Command list
