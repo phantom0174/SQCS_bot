@@ -20,9 +20,9 @@ intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix='+', intents=intents)
 
-# bot communicate channels
-_ToSyn = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-and-syn')
-_ToMV = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-and-mv')
+global _ToSyn
+global _ToMV
+
 
 def db_setup():
 
@@ -52,6 +52,10 @@ def create_embed(Title, Color, FieldsName, Values):
 
 @bot.event
 async def on_ready():
+    # bot communicate channels
+    _ToSyn = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-and-syn')
+    _ToMV = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-and-mv')
+
     print(">> Bot is online <<")
     db_setup()
     await GAU() #guild auto update
@@ -312,7 +316,7 @@ async def lect(ctx):
 
 
 @lect.command()
-async def start(ctx):
+async def start(ctx, *, msg):
     if (role_check(ctx.author.roles, '總召') == False):
         await ctx.send('You can\'t use that command!')
         return
@@ -321,13 +325,15 @@ async def start(ctx):
     lecture_data = json.load(temp_file)
     temp_file.close()
 
-    if (lecture_data['status'] == 'True'):
+    if (lecture_data['event_status'] == 'True'):
         await ctx.send('The lecture has already started!')
         return
 
+    day = msg.split(' ')[0]
+
     await ctx.send('@everyone，講座開始了！\n 於回答講師問題時請在答案前方加上"&"，回答正確即可加分。')
 
-    lecture_data['status'] = 'True'
+    lecture_data['event_status'] = 'True'
 
     def check(message):
         return message.channel == _ToMV
@@ -351,7 +357,12 @@ async def start(ctx):
     await asyncio.sleep(random.randint(30, 180))
 
     # add score to the attendances
-    voice_channel = discord.utils.get(ctx.guild.voice_channels, name='星期五晚上固定講座')
+
+    if(day == '5'):
+        voice_channel = discord.utils.get(ctx.guild.voice_channels, name='星期五晚上固定講座')
+    elif(day == '7'):
+        voice_channel = discord.utils.get(ctx.guild.voice_channels, name='量子電腦硬體')
+
     for member in voice_channel.members:
         await _ToMV.send(f'lecture_attend {member.id}')
 
@@ -364,11 +375,11 @@ async def ans_check(ctx, *, msg):
     MemberCrtMsg = []  # correct message
 
     for msg in msg_logs:
-        await msg.delete()
         if (len(msg.content) == 0):
             continue
 
         if (msg.author.bot == False and msg.content[0] == '&'):
+            await msg.delete()
             for ans in CrtAns:
                 # correct answer is a subset of member answer
                 if (msg.content.find(ans) != -1):
@@ -408,7 +419,6 @@ async def ans_check(ctx, *, msg):
 
 @lect.command()
 async def end(ctx):
-    coni_channel = discord.utils.get(ctx.guild.text_channels, name='bot-coni')
 
     if (role_check(ctx.author.roles, '總召') == False):
         await ctx.send('You can\'t use that command!')
@@ -418,13 +428,13 @@ async def end(ctx):
     lecture_data = json.load(temp_file)
     temp_file.close()
 
-    if (lecture_data['status'] == 'False'):
+    if (lecture_data['event_status'] == 'False'):
         await ctx.send('The lecture has already ended!')
         return
 
     await ctx.send('@here, the lecture has ended!')
 
-    lecture_data['status'] = 'False'
+    lecture_data['event_status'] = 'False'
 
     temp_file = open('jsons/lecture.json', mode='w', encoding='utf8')
     json.dump(lecture_data, temp_file)
