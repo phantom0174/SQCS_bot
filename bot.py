@@ -7,6 +7,7 @@ import asyncio
 import sqlite3
 import random
 import json
+import sys
 import os
 
 
@@ -482,6 +483,17 @@ async def on_message(ctx):
         temp_file.close()
         return
 
+
+@bot.command()
+async def safe_stop(ctx):
+    if (role_check(ctx.author.roles, '總召') == False):
+        await ctx.send('You can\'t use that command!')
+        return
+
+    print('The bot has stopped!')
+    info.connection.commit()
+    info.connection.close()
+    sys.exit(0)
 
 @bot.event
 async def on_disconnect():
