@@ -77,9 +77,10 @@ async def GAU():
 
         if(now_time_info('date') == 1 and now_time_info('hour') >= 6 and quiz_data['event_status'] == 'False'):
             await quiz_start(guild)
+            await _Report.send(f'[Auto]Quiz event start. {now_time_info("whole")}')
         elif(now_time_info('date') == 7 and now_time_info('hour') >= 11 and quiz_data['event_status'] == 'True'):
             await quiz_end(guild)
-
+            await _Report.send(f'[Auto]Quiz event end. {now_time_info("whole")}')
         if(now_time_info('date') >= 1 and now_time_info('date') <= 5 and quiz_data['event_status'] == 'True' and quiz_data['stand_by_ans'] == 'N/A'):
             member = await bot.fetch_user(610327503671656449)
             await member.send('My master, the correct answer hasn\'t been set yet!')
@@ -146,6 +147,8 @@ async def p_m(ctx, *, msg):
     json.dump(setting_data, temp_file)
     temp_file.close()
 
+    await _Report.send(f'[Command]Group pic - p_m used by member {ctx.author.id}. {now_time_info("whole")}')
+
 
 # picture_check
 @pic.command()
@@ -162,6 +165,8 @@ async def p_check(ctx):
 
     await ctx.send(pic_str)
 
+    await _Report.send(f'[Command]Group pic - p_check used by member {ctx.author.id}. {now_time_info("whole")}')
+
 
 # random picture
 @pic.command()
@@ -169,6 +174,8 @@ async def rpic(ctx):
     await ctx.message.delete()
     randPic = random.choice(jdata['pic'])
     await ctx.send(randPic)
+
+    await _Report.send(f'[Command]Group pic - rpic used by member {ctx.author.id}. {now_time_info("whole")}')
 
 
 # ===== group - picture =====<<
@@ -211,6 +218,8 @@ async def quiz_push(ctx, msg):
     temp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
     json.dump(quiz_data, temp_file)
     temp_file.close()
+
+    await _Report.send(f'[Command]Group quiz - quiz_push used by member {ctx.author.id}. {now_time_info("whole")}')
 
 
 # auto start quiz event
@@ -373,6 +382,8 @@ async def start(ctx, *, msg):
     for member in voice_channel.members:
         await _ToMV.send(f'lecture_attend {member.id}')
 
+    await _Report.send(f'[Command]Group lect - start used by member {ctx.author.id}. {now_time_info("whole")}')
+
 
 # lecture ans check
 @lect.command()
@@ -422,6 +433,8 @@ async def ans_check(ctx, *, msg):
 
     info.connection.commit()
 
+    await _Report.send(f'[Command]Group lect - ans_check used by member {ctx.author.id}. {now_time_info("whole")}')
+
 
 
 @lect.command()
@@ -465,6 +478,8 @@ async def end(ctx):
     info.execute('DELETE FROM lecture')
     info.connection.commit()
 
+    await _Report.send(f'[Command]Group lect - end used by member {ctx.author.id}. {now_time_info("whole")}')
+
 
 # ===== group - lecture =====<<
 
@@ -495,6 +510,8 @@ async def msg_re(ctx, *, msg):
     re_msg = msg.split('\n')
     for msg in re_msg:
         await ctx.send(msg)
+
+    await _Report.send(f'[Command]msg_re used by member {ctx.author.id}. {now_time_info("whole")}')
 
 
 @bot.command()
