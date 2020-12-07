@@ -85,7 +85,7 @@ async def GAU():
             member = await bot.fetch_user(610327503671656449)
             await member.send('My master, the correct answer hasn\'t been set yet!')
 
-        await asyncio.sleep(120)
+        await asyncio.sleep(600)
 
 
 
