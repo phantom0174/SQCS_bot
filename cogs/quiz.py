@@ -71,6 +71,8 @@ class Quiz(Cog_Extension):
         else:
             await msg.author.send('你的答案是錯誤的格式！')
 
+        info.connection.commit()
+
     # auto start quiz event
     async def quiz_start(self, guild):
         main_channel = discord.utils.get(guild.text_channels, name='懸賞區')
@@ -127,6 +129,9 @@ class Quiz(Cog_Extension):
 
         if winners == '':
             winners += 'None'
+
+        info.execute('DELETE FROM quiz;')
+        info.connection.commit()
 
         await main_channel.send(embed=create_embed('Quiz Event Result', 0x42fcff, ['Winner'], [winners]))
 
