@@ -1,8 +1,8 @@
+from core.classes import Cog_Extension
 from discord.ext import commands
 from functions import *
 import discord
 import json
-from core.classes import Cog_Extension
 
 
 class React(Cog_Extension):

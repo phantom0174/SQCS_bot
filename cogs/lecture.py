@@ -1,10 +1,10 @@
+from core.classes import Cog_Extension
 from discord.ext import commands
+from cogs.setup import *
 from functions import *
 import discord
 import asyncio
 import random
-from core.classes import Cog_Extension
-from cogs.setup import *
 
 
 class Lecture(Cog_Extension):
