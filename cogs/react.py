@@ -10,12 +10,13 @@ class React(Cog_Extension):
     # bots communication event
     @commands.Cog.listener()
     async def on_message(self, ctx):
-        if (ctx.author.bot == 'False' or ctx.author == self.bot.user or (ctx.channel != getChannel(self.bot, '_ToMV') or ctx.channel != getChannel(self.bot, '_ToSyn'))):
+        if ctx.author.bot == 'False' or ctx.author == self.bot.user or (
+                ctx.channel != getChannel('_ToMV') or ctx.channel != getChannel('_ToSyn')):
             return
 
         MsgCont = str(ctx.content).split(' ')
 
-        if (MsgCont[0] == 'sw' and ctx.channel == getChannel(self.bot, '_ToMV')):
+        if MsgCont[0] == 'sw' and ctx.channel == getChannel('_ToMV'):
             temp_file = open('jsons/lecture.json', mode='r', encoding='utf8')
             lect_data = json.load(temp_file)
             temp_file.close()
@@ -33,7 +34,7 @@ class React(Cog_Extension):
         for msg in re_msg:
             await ctx.send(msg)
 
-        await getChannel(self.bot, '_Report').send(f'[Command]msg_re used by member {ctx.author.id}. {now_time_info("whole")}')
+        await getChannel('_Report').send(f'[Command]msg_re used by member {ctx.author.id}. {now_time_info("whole")}')
 
 
 def setup(bot):

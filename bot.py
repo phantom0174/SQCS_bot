@@ -1,12 +1,11 @@
 from discord.ext import commands
 from cogs.setup import *
 from functions import *
-#import keep_alive
+# import keep_alive
 import discord
 import asyncio
 import sys
 import os
-
 
 intents = discord.Intents.all()
 
@@ -16,27 +15,29 @@ bot = commands.Bot(command_prefix='+', intents=intents)
 @bot.event
 async def on_ready():
     print(">> Bot is online <<")
-    await GAU() #guild auto update
+    await setChannel(bot)
+    await GAU()  # guild auto update
 
 
 async def GAU():
     guild = bot.guilds[0]
-    while(1):
+    while True:
         temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
         quiz_data = json.load(temp_file)
         temp_file.close()
 
-        if(now_time_info('date') == 1 and now_time_info('hour') >= 6 and quiz_data['event_status'] == 'False'):
+        if now_time_info('date') == 1 and now_time_info('hour') >= 6 and quiz_data['event_status'] == 'False':
             await quiz_start(guild)
-            await getChannel(bot, '_Report').send(f'[Auto]Quiz event start. {now_time_info("whole")}')
-        elif(now_time_info('date') == 7 and now_time_info('hour') >= 11 and quiz_data['event_status'] == 'True'):
+            await getChannel('_Report').send(f'[Auto]Quiz event start. {now_time_info("whole")}')
+        elif now_time_info('date') == 7 and now_time_info('hour') >= 11 and quiz_data['event_status'] == 'True':
             await quiz_end(guild)
-            await getChannel(bot, '_Report').send(f'[Auto]Quiz event end. {now_time_info("whole")}')
-        if(now_time_info('date') >= 1 and now_time_info('date') <= 5 and quiz_data['event_status'] == 'True' and quiz_data['stand_by_ans'] == 'N/A'):
+            await getChannel('_Report').send(f'[Auto]Quiz event end. {now_time_info("whole")}')
+        if (1 <= now_time_info('date') <= 5) and quiz_data['event_status'] == 'True' and quiz_data['stand_by_ans'] == 'N/A':
             member = await bot.fetch_user(610327503671656449)
             await member.send('My master, the correct answer hasn\'t been set yet!')
 
         await asyncio.sleep(600)
+
 
 # auto start quiz event
 async def quiz_start(guild):
@@ -62,6 +63,7 @@ async def quiz_start(guild):
     json.dump(quiz_data, temp_file)
     temp_file.close()
 
+
 # auto end quiz event
 async def quiz_end(guild):
     main_channel = discord.utils.get(guild.text_channels, name='懸賞區')
@@ -84,19 +86,19 @@ async def quiz_end(guild):
         member = await bot.fetch_user(winner)
         winners += f'{member.name}\n'
 
-    if (winners == ''):
+    if winners == '':
         winners += 'None'
 
     quiz_data['answered_member'].clear()
 
     await main_channel.send(embed=create_embed('Quiz Event Result', 0x42fcff, ['Winner'], [winners]))
 
-    await getChannel(bot, '_ToMV').send('update_guild_fluctlight')
+    await getChannel('_ToMV').send('update_guild_fluctlight')
 
 
 @bot.command()
 async def safe_stop(ctx):
-    if (role_check(ctx.author.roles, ['總召']) == False):
+    if not role_check(ctx.author.roles, ['總召']):
         await ctx.send('You can\'t use that command!')
         return
 
@@ -105,29 +107,44 @@ async def safe_stop(ctx):
     info.connection.close()
     sys.exit(0)
 
+
 @bot.event
 async def on_disconnect():
     print('Bot disconnected')
     info.connection.commit()
 
+
 @bot.command()
 async def load(ctx, msg):
-    bot.load_extension(f'cogs.{msg}')
+    try:
+        bot.load_extension(f'cogs.{msg}')
+        await ctx.send(f'Extension {msg} loaded.')
+    except:
+        await ctx.send(f'There are no extension called {msg}!')
+
 
 @bot.command()
 async def unload(ctx, msg):
+    try:
+        bot.unload_extension(f'cogs.{msg}')
+        await ctx.send(f'Extension {msg} unloaded.')
+    except:
+        await ctx.send(f'There are no extension called {msg}!')
 
-    bot.unload_extension(f'cogs.{msg}')
 
 @bot.command()
 async def reload(ctx, msg):
-    bot.reload_extension(f'cogs.{msg}')
+    try:
+        bot.reload_extension(f'cogs.{msg}')
+        await ctx.send(f'Extension {msg} reloaded.')
+    except:
+        await ctx.send(f'There are no extension called {msg}!')
 
 
 for filename in os.listdir('./cogs'):
-    if(filename.endswith('.py') and filename != 'setup.py'):
+    if filename.endswith('.py') and filename != 'setup.py':
         bot.load_extension(f'cogs.{filename[:-3]}')
 
-#keep_alive.keep_alive()
+# keep_alive.keep_alive()
 
 bot.run(os.environ.get("TOKEN"))

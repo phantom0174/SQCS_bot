@@ -15,7 +15,7 @@ class Lecture(Cog_Extension):
 
     @lect.command()
     async def start(self, ctx, *, msg):
-        if (role_check(ctx.author.roles, ['總召', 'Administrator']) == False):
+        if not role_check(ctx.author.roles, ['總召', 'Administrator']):
             await ctx.send('You can\'t use that command!')
             return
 
@@ -23,7 +23,7 @@ class Lecture(Cog_Extension):
         lecture_data = json.load(temp_file)
         temp_file.close()
 
-        if (lecture_data['event_status'] == 'True'):
+        if lecture_data['event_status'] == 'True':
             await ctx.send('The lecture has already started!')
             return
 
@@ -34,9 +34,9 @@ class Lecture(Cog_Extension):
         lecture_data['event_status'] = 'True'
 
         def check(message):
-            return message.channel == getChannel(self.bot, '_ToMV')
+            return message.channel == getChannel('_ToMV')
 
-        await getChannel(self.bot, '_ToMV').send('request_score_weight')
+        await getChannel('_ToMV').send('request_score_weight')
         sw = int((await self.bot.wait_for('message', check=check, timeout=30.0)).content)
 
         lecture_data['temp_sw'] = sw
@@ -47,7 +47,7 @@ class Lecture(Cog_Extension):
 
         msg_logs = await ctx.channel.history(limit=200).flatten()
         for msg in msg_logs:
-            if (len(msg.content) > 0 and msg.content[0] == '&'):
+            if len(msg.content) > 0 and msg.content[0] == '&':
                 await msg.delete()
 
         # cd time from preventing member leave at once
@@ -56,17 +56,19 @@ class Lecture(Cog_Extension):
 
         # add score to the attendances
 
-        if (day == '5'):
+        if day == '5':
             voice_channel = discord.utils.get(ctx.guild.voice_channels, name='星期五晚上固定講座')
-        elif (day == '7'):
+        elif day == '7':
             voice_channel = discord.utils.get(ctx.guild.voice_channels, name='量子電腦硬體')
 
         for member in voice_channel.members:
-            await getChannel(self.bot, '_ToMV').send(f'lecture_attend {member.id}')
+            await getChannel('_ToMV').send(f'lecture_attend {member.id}')
 
-        await getChannel(self.bot, '_Report').send(f'[Command]Group lect - start used by member {ctx.author.id}. {now_time_info("whole")}')
+        await getChannel('_Report').send(
+            f'[Command]Group lect - start used by member {ctx.author.id}. {now_time_info("whole")}')
 
-    # lecture ans check
+        # lecture ans check
+
     @lect.command()
     async def ans_check(self, ctx, *, msg):
         CrtAns = msg.split(' ')
@@ -74,14 +76,14 @@ class Lecture(Cog_Extension):
         MemberCrtMsg = []  # correct message
 
         for msg in msg_logs:
-            if (len(msg.content) == 0):
+            if len(msg.content) == 0:
                 continue
 
-            if (msg.author.bot == False and msg.content[0] == '&'):
+            if (not msg.author.bot) and msg.content[0] == '&':
                 await msg.delete()
                 for ans in CrtAns:
                     # correct answer is a subset of member answer
-                    if (msg.content.find(ans) != -1):
+                    if msg.content.find(ans) != -1:
                         MemberCrtMsg.append(msg)
                         break
 
@@ -99,7 +101,7 @@ class Lecture(Cog_Extension):
             info.execute(f'SELECT Id, Score, Count FROM lecture WHERE Id={TargetId}')
             data = info.fetchall()
 
-            if (len(data) == 0):
+            if len(data) == 0:
                 info.execute(f'INSERT INTO lecture VALUES({TargetId}, {mScore}, 1);')
             else:
                 old_Score = float(data[0][1])
@@ -108,17 +110,18 @@ class Lecture(Cog_Extension):
                 info.execute(
                     f'UPDATE lecture SET Score={old_Score + mScore}, Count={old_Count + 1} WHERE Id={TargetId};')
 
-            if (TScore > 1):
+            if TScore > 1:
                 TScore -= 1
 
         info.connection.commit()
 
-        await getChannel(self.bot, '_Report').send(f'[Command]Group lect - ans_check used by member {ctx.author.id}. {now_time_info("whole")}')
+        await getChannel('_Report').send(
+            f'[Command]Group lect - ans_check used by member {ctx.author.id}. {now_time_info("whole")}')
 
     @lect.command()
     async def end(self, ctx):
 
-        if (role_check(ctx.author.roles, ['總召', 'Administrator']) == False):
+        if not role_check(ctx.author.roles, ['總召', 'Administrator']):
             await ctx.send('You can\'t use that command!')
             return
 
@@ -126,7 +129,7 @@ class Lecture(Cog_Extension):
         lecture_data = json.load(temp_file)
         temp_file.close()
 
-        if (lecture_data['event_status'] == 'False'):
+        if lecture_data['event_status'] == 'False':
             await ctx.send('The lecture has already ended!')
             return
 
@@ -141,7 +144,7 @@ class Lecture(Cog_Extension):
         # adding scores and show lecture final data
         info.execute("SELECT * FROM lecture ORDER BY Score DESC")
         data = info.fetchall()
-        if (len(data) == 0):
+        if len(data) == 0:
             await ctx.send('There are no data to show!')
             return
         else:
@@ -149,15 +152,15 @@ class Lecture(Cog_Extension):
             for member in data:
                 member_obj = await self.bot.fetch_user(member[0])  # member id
                 data_members += f'{member_obj.name}:: Score: {member[1]}, Answer Count: {member[2]}\n'
-                await getChannel(self.bot, '_ToMV').send(f'lect_crt {member[0]} {member[1]}')
+                await getChannel('_ToMV').send(f'lect_crt {member[0]} {member[1]}')
 
             await ctx.send(embed=create_embed('Lecture Event Result', 0x42fcff, ['Lecture final info'], [data_members]))
 
         info.execute('DELETE FROM lecture')
         info.connection.commit()
 
-        await getChannel(self.bot, '_Report').send(f'[Command]Group lect - end used by member {ctx.author.id}. {now_time_info("whole")}')
-
+        await getChannel('_Report').send(
+            f'[Command]Group lect - end used by member {ctx.author.id}. {now_time_info("whole")}')
 
 
 def setup(bot):

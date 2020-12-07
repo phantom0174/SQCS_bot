@@ -4,9 +4,8 @@ import discord
 from core.classes import Cog_Extension
 from cogs.setup import *
 
+
 class Main(Cog_Extension):
-
-
     # ping
     @commands.command()
     async def ping(self, ctx):
@@ -20,14 +19,13 @@ class Main(Cog_Extension):
         for msg in msg_logs:
             await msg.delete()
 
-        await getChannel(self.bot, '_Report').send(f'[Command]clear used by user {ctx.author.id}. {now_time_info("whole")}')
+        await getChannel('_Report').send(f'[Command]clear used by user {ctx.author.id}. {now_time_info("whole")}')
 
     # member check
     @commands.command()
     async def m_check(self, ctx):
         for member in ctx.guild.members:
             print(member)
-
 
 
 def setup(bot):
