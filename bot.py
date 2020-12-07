@@ -118,7 +118,7 @@ async def pic(ctx):
 async def p_m(ctx, *, msg):
     await ctx.message.delete()
 
-    if (role_check(ctx.author.roles, ['總召', 'Administrator']) == False):
+    if (list_check(ctx.author.roles, ['總召', 'Administrator']) == False):
         await ctx.send('You can\'t use that command!')
         return
 
@@ -210,7 +210,7 @@ async def quiz(ctx):
 # push back stand by answer
 @quiz.command()
 async def quiz_push(ctx, msg):
-    if(role_check(ctx.author.roles, ['總召', 'Administrator']) == False):
+    if(list_check(ctx.author.roles, ['總召', 'Administrator']) == False):
         await ctx.send('You can\'t use this command!')
         return
 
@@ -344,7 +344,7 @@ async def lect(ctx):
 
 @lect.command()
 async def start(ctx, *, msg):
-    if (role_check(ctx.author.roles, ['總召', 'Administrator']) == False):
+    if (list_check(ctx.author.roles, ['總召', 'Administrator']) == False):
         await ctx.send('You can\'t use that command!')
         return
 
@@ -451,7 +451,7 @@ async def ans_check(ctx, *, msg):
 @lect.command()
 async def end(ctx):
 
-    if (role_check(ctx.author.roles, ['總召', 'Administrator']) == False):
+    if (list_check(ctx.author.roles, ['總召', 'Administrator']) == False):
         await ctx.send('You can\'t use that command!')
         return
 
@@ -527,7 +527,7 @@ async def msg_re(ctx, *, msg):
 
 @bot.command()
 async def safe_stop(ctx):
-    if (role_check(ctx.author.roles, ['總召']) == False):
+    if (list_check(ctx.author.roles, ['總召']) == False):
         await ctx.send('You can\'t use that command!')
         return
 

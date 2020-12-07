@@ -44,10 +44,9 @@ def score_weight_update():
 
     para['point_weight'] = final_weight
 
-def role_check(roles, t_role):
-    for role in roles:
-        for mrole in t_role:
-            if(role.name == mrole):
-                return True
+def list_check(main_list, target_list):
+    for main in main_list:
+        if((main in target_list) == True):
+            return True
 
     return False
