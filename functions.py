@@ -1,5 +1,6 @@
 from datetime import datetime, timezone, timedelta
 from math import *
+import discord
 import json
 
 def now_time_info(mode):
@@ -44,9 +45,31 @@ def score_weight_update():
 
     para['point_weight'] = final_weight
 
-def list_check(main_list, target_list):
-    for main in main_list:
-        if((main in target_list) == True):
-            return True
+def role_check(roles, target_roles):
+    for role in roles:
+        if(role.name in target_roles):
+          return True
 
     return False
+
+
+def create_embed(Title, Color, FieldsName, Values):
+    embed = discord.Embed(title=Title, color=Color)
+    embed.set_thumbnail(url="https://i.imgur.com/26skltl.png")
+    if(len(FieldsName) != len(Values)):
+        embed.add_field(name="Error", value='N/A', inline=False)
+        return embed
+
+    for i in range(len(FieldsName)):
+        embed.add_field(name=FieldsName[i], value=Values[i], inline=False)
+
+    embed.set_footer(text=now_time_info('whole'))
+    return embed
+
+def getChannel(bot, target):
+    if(target == '_ToSyn'):
+        return discord.utils.get(bot.guilds[1].text_channels, name='sqcs-and-syn')
+    elif(target == '_ToMV'):
+        return discord.utils.get(bot.guilds[1].text_channels, name='sqcs-and-mv')
+    elif(target == '_Report'):
+        return discord.utils.get(bot.guilds[1].text_channels, name='sqcs-report')

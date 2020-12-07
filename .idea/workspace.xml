@@ -24,8 +24,13 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../PIL" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../Code-Bot" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Coding\Github\SQCS_bot\cogs" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration name="bot" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
@@ -67,20 +72,21 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
-    <state x="387" y="174" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1606664371672">
+    <state x="387" y="174" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1607326494689">
       <screen x="0" y="31" width="1280" height="689" />
     </state>
+    <state x="387" y="174" key="#com.intellij.fileTypes.FileTypeChooser/0.31.1280.689/1920.30.1920.1050@0.31.1280.689" timestamp="1607326494689" />
     <state x="387" y="174" key="#com.intellij.fileTypes.FileTypeChooser/0.31.1280.689@0.31.1280.689" timestamp="1606664371672" />
     <state x="371" y="121" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1606278772655">
       <screen x="0" y="31" width="1280" height="689" />
     </state>
     <state x="371" y="121" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.31.1280.689@0.31.1280.689" timestamp="1606278772655" />
-    <state x="493" y="145" key="FileChooserDialogImpl" timestamp="1607315749656">
+    <state x="493" y="145" key="FileChooserDialogImpl" timestamp="1607324667486">
       <screen x="0" y="31" width="1280" height="689" />
     </state>
     <state x="493" y="145" key="FileChooserDialogImpl/0.31.1280.689/1920.30.1920.1050@0.31.1280.689" timestamp="1607315749656" />
     <state x="2660" y="204" key="FileChooserDialogImpl/0.31.1280.689/1920.30.1920.1050@1920.30.1920.1050" timestamp="1606904989089" />
-    <state x="493" y="145" key="FileChooserDialogImpl/0.31.1280.689@0.31.1280.689" timestamp="1607056077985" />
+    <state x="493" y="145" key="FileChooserDialogImpl/0.31.1280.689@0.31.1280.689" timestamp="1607324667486" />
     <state width="1259" height="166" key="GridCell.Tab.0.bottom" timestamp="1605510779081">
       <screen x="0" y="31" width="1280" height="689" />
     </state>
