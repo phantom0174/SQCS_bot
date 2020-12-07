@@ -11,6 +11,7 @@
 - 2020/11/29: MVisualizer via score API functions set.
 - 2020/12/04: Bot communication guild set, lecture function work normally.
 - 2020/12/06: Set up event log feature.
+- 2020/12/07: Bot Cog-lized.
 
 
 ### Bot Info

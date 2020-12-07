@@ -35,6 +35,7 @@ async def GAU():
             temp = qz.Quiz(bot)
             await temp.quiz_end(guild)
             await getChannel('_Report').send(f'[Auto]Quiz event end. {now_time_info("whole")}')
+
         if (1 <= now_time_info('date') <= 5) and quiz_data['event_status'] == 'True' and quiz_data['stand_by_ans'] == 'N/A':
             member = await bot.fetch_user(610327503671656449)
             await member.send('My master, the correct answer hasn\'t been set yet!')
