@@ -73,69 +73,73 @@ class Quiz(Cog_Extension):
 
         info.connection.commit()
 
-    # auto start quiz event
-    async def quiz_start(self, guild):
-        main_channel = discord.utils.get(guild.text_channels, name='懸賞區')
-        cmd_channel = discord.utils.get(guild.text_channels, name='◉總指令區')
 
-        temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
-        quiz_data = json.load(temp_file)
-        temp_file.close()
+# auto start quiz event
+async def quiz_start(bot):
+    guild = bot.guilds[0]
+    main_channel = discord.utils.get(guild.text_channels, name='懸賞區')
+    cmd_channel = discord.utils.get(guild.text_channels, name='◉總指令區')
 
-        quiz_data['event_status'] = "True"
-        quiz_data['correct_ans'] = quiz_data['stand_by_ans']
-        quiz_data['stand_by_ans'] = 'N/A'
+    temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
+    quiz_data = json.load(temp_file)
+    temp_file.close()
 
-        await cmd_channel.send(
-            f'Quiz Event status set to {quiz_data["event_status"]}, correct answer set to {quiz_data["correct_ans"]}!')
+    quiz_data['event_status'] = "True"
+    quiz_data['correct_ans'] = quiz_data['stand_by_ans']
+    quiz_data['stand_by_ans'] = 'N/A'
 
-        await main_channel.send('@everyone，有一個新的懸賞活動開始了，請確認你的答案是隱蔽模式！\n (請在答案的前方與後方各加上"||"的符號)')
-        await main_channel.send(f'活動開始於 {now_time_info("whole")}')
-        await main_channel.set_permissions(guild.default_role, send_messages=True)
+    await cmd_channel.send(
+        f'Quiz Event status set to {quiz_data["event_status"]}, correct answer set to {quiz_data["correct_ans"]}!')
 
-        temp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
-        json.dump(quiz_data, temp_file)
-        temp_file.close()
+    await main_channel.send('@everyone，有一個新的懸賞活動開始了，請確認你的答案是隱蔽模式！\n (請在答案的前方與後方各加上"||"的符號)')
+    await main_channel.send(f'活動開始於 {now_time_info("whole")}')
+    await main_channel.set_permissions(guild.default_role, send_messages=True)
 
-    # auto end quiz event
-    async def quiz_end(self, guild):
-        main_channel = discord.utils.get(guild.text_channels, name='懸賞區')
-        cmd_channel = discord.utils.get(guild.text_channels, name='◉總指令區')
+    temp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
+    json.dump(quiz_data, temp_file)
+    temp_file.close()
 
-        temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
-        quiz_data = json.load(temp_file)
-        temp_file.close()
 
-        quiz_data['event_status'] = "False"
-        quiz_data['correct_ans'] = "N/A"
+# auto end quiz event
+async def quiz_end(bot):
+    guild = bot.guilds[0]
+    main_channel = discord.utils.get(guild.text_channels, name='懸賞區')
+    cmd_channel = discord.utils.get(guild.text_channels, name='◉總指令區')
 
-        await cmd_channel.send(
-            f'Quiz Event status set to {quiz_data["event_status"]}, correct answer set to {quiz_data["correct_ans"]}!')
-        await main_channel.set_permissions(guild.default_role, send_messages=False)
-        await main_channel.send(f'活動結束於 {now_time_info("whole")}')
+    temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
+    quiz_data = json.load(temp_file)
+    temp_file.close()
 
-        temp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
-        json.dump(quiz_data, temp_file)
-        temp_file.close()
+    quiz_data['event_status'] = "False"
+    quiz_data['correct_ans'] = "N/A"
 
-        # list the winners
-        info.execute('SELECT * FROM quiz WHERE Crt=1;')
-        data = info.fetchall()
+    await cmd_channel.send(
+        f'Quiz Event status set to {quiz_data["event_status"]}, correct answer set to {quiz_data["correct_ans"]}!')
+    await main_channel.set_permissions(guild.default_role, send_messages=False)
+    await main_channel.send(f'活動結束於 {now_time_info("whole")}')
 
-        winners = str()
-        for winner in data:
-            member = await self.bot.fetch_user(winner[0])
-            winners += f'{member.name}\n'
+    temp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
+    json.dump(quiz_data, temp_file)
+    temp_file.close()
 
-        if winners == '':
-            winners += 'None'
+    # list the winners
+    info.execute('SELECT * FROM quiz WHERE Crt=1;')
+    data = info.fetchall()
 
-        info.execute('DELETE FROM quiz;')
-        info.connection.commit()
+    winners = str()
+    for winner in data:
+        member = await bot.fetch_user(winner[0])
+        winners += f'{member.name}\n'
 
-        await main_channel.send(embed=create_embed('Quiz Event Result', 0x42fcff, ['Winner'], [winners]))
+    if winners == '':
+        winners += 'None'
 
-        await getChannel('_ToMV').send('update_guild_fluctlight')
+    info.execute('DELETE FROM quiz;')
+    info.connection.commit()
+
+    await main_channel.send(embed=create_embed('Quiz Event Result', 0x42fcff, ['Winner'], [winners]))
+
+    await getChannel('_ToMV').send('update_guild_fluctlight')
 
 
 def setup(bot):

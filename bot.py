@@ -1,7 +1,7 @@
 from discord.ext import commands
 from cogs.setup import *
 from functions import *
-import cogs.quiz as qz
+from cogs.quiz import quiz_start, quiz_end
 # import keep_alive
 import discord
 import asyncio
@@ -21,19 +21,16 @@ async def on_ready():
 
 
 async def GAU():
-    guild = bot.guilds[0]
     while True:
         temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
         quiz_data = json.load(temp_file)
         temp_file.close()
 
         if now_time_info('date') == 1 and now_time_info('hour') >= 6 and quiz_data['event_status'] == 'False':
-            temp = qz.Quiz(bot)
-            await temp.quiz_start(guild)
+            await quiz_start(bot)
             await getChannel('_Report').send(f'[Auto]Quiz event start. {now_time_info("whole")}')
         elif now_time_info('date') == 7 and now_time_info('hour') >= 11 and quiz_data['event_status'] == 'True':
-            temp = qz.Quiz(bot)
-            await temp.quiz_end(guild)
+            await quiz_end(bot)
             await getChannel('_Report').send(f'[Auto]Quiz event end. {now_time_info("whole")}')
 
         if (1 <= now_time_info('date') <= 5) and quiz_data['event_status'] == 'True' and quiz_data['stand_by_ans'] == 'N/A':
