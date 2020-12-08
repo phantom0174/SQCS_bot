@@ -1,5 +1,5 @@
 from discord.ext import commands
-from cogs.setup import *
+from core.setup import *
 from functions import *
 from cogs.quiz import quiz_start, quiz_end
 # import keep_alive
