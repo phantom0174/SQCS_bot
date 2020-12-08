@@ -7,7 +7,7 @@ with open('./jsons/setting.json', mode='r', encoding='utf8') as jfile:
 connection = sqlite3.connect('DataBase.db')
 info = connection.cursor()
 
-info.execute('DROP TABLE quiz;')
+# info.execute('DROP TABLE quiz;')
 
 info.execute("""CREATE TABLE IF NOT EXISTS quiz (
       Id INTEGER,

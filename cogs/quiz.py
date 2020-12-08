@@ -68,6 +68,7 @@ class Quiz(Cog_Extension):
             if msg.content[2:-2] == quiz_data["correct_ans"]:
                 await getChannel('_ToMV').send(f'quiz_crt {msg.author.id}')
                 info.execute(f'UPDATE quiz SET Crt=1 WHERE Id={msg.author.id};')
+
         else:
             await msg.author.send('你的答案是錯誤的格式！')
 
