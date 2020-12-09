@@ -5,6 +5,7 @@ from functions import *
 # import keep_alive
 import discord
 import asyncio
+import sqlitebck # can only use on console
 import sys
 import os
 
@@ -35,6 +36,23 @@ async def GAU():
         if (1 <= now_time_info('date') <= 5) and quiz_data['event_status'] == 'True' and quiz_data['stand_by_ans'] == 'N/A':
             member = await bot.fetch_user(610327503671656449)
             await member.send('My master, the correct answer hasn\'t been set yet!')
+
+        # db backup
+        temp_file = open('jsons/dyn_setting.json', mode='r', encoding='utf8')
+        dyn = json.load(temp_file)
+        temp_file.close()
+
+        if dyn['ldbh'] != now_time_info('hour'):
+            file_name = 'db_backup/' + str(now_time_info('hour')) + '_backup.db'
+            bck_db_conn = sqlite3.connect(file_name)
+            sqlitebck.copy(connection, bck_db_conn)
+
+            dyn['ldbh'] = now_time_info('hour')
+
+            temp_file = open('jsons/dyn_setting.json', mode='w', encoding='utf8')
+            json.dump(dyn, temp_file)
+            temp_file.close()
+
 
         await asyncio.sleep(600)
 
