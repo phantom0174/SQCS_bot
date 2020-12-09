@@ -58,11 +58,11 @@ class Quiz(Cog_Extension):
         data = info.fetchall()
 
         if len(data) != 0:
-            await msg.author.send('你已經傳送過答案了，請不要重複傳送！')
+            await msg.author.send(':no_entry_sign: 你已經傳送過答案了，請不要重複傳送！')
             return
 
         if msg.content[0:2] == '||' and msg.content[-2:] == '||':
-            await msg.author.send('我收到你的答案了!')
+            await msg.author.send(':white_check_mark: 我收到你的答案了!')
             info.execute(f'INSERT INTO quiz VALUES({msg.author.id}, 0);')
 
             if msg.content[2:-2] == quiz_data["correct_ans"]:
@@ -70,7 +70,7 @@ class Quiz(Cog_Extension):
                 info.execute(f'UPDATE quiz SET Crt=1 WHERE Id={msg.author.id};')
 
         else:
-            await msg.author.send('你的答案是錯誤的格式！')
+            await msg.author.send(':exclamation: 你的答案是錯誤的格式！')
 
         info.connection.commit()
 
@@ -92,7 +92,7 @@ async def quiz_start(bot):
     await cmd_channel.send(
         f'Quiz Event status set to {quiz_data["event_status"]}, correct answer set to {quiz_data["correct_ans"]}!')
 
-    await main_channel.send('@everyone，有一個新的懸賞活動開始了，請確認你的答案是隱蔽模式！\n (請在答案的前方與後方各加上"||"的符號)')
+    await main_channel.send(':loud_speaker: @everyone，有一個新的懸賞活動開始了，請確認你的答案是隱蔽模式！\n :exclamation: (請在答案的前方與後方各加上"||"的符號)')
     await main_channel.send(f'活動開始於 {now_time_info("whole")}')
     await main_channel.set_permissions(guild.default_role, send_messages=True)
 
@@ -117,7 +117,7 @@ async def quiz_end(bot):
     await cmd_channel.send(
         f'Quiz Event status set to {quiz_data["event_status"]}, correct answer set to {quiz_data["correct_ans"]}!')
     await main_channel.set_permissions(guild.default_role, send_messages=False)
-    await main_channel.send(f'活動結束於 {now_time_info("whole")}')
+    await main_channel.send(f':stop_watch: 活動結束於 {now_time_info("whole")}')
 
     temp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
     json.dump(quiz_data, temp_file)

@@ -1,7 +1,7 @@
+from cogs.quiz import quiz_start, quiz_end
 from discord.ext import commands
 from core.setup import *
 from functions import *
-from cogs.quiz import quiz_start, quiz_end
 # import keep_alive
 import discord
 import asyncio
@@ -9,7 +9,6 @@ import sys
 import os
 
 intents = discord.Intents.all()
-
 bot = commands.Bot(command_prefix='+', intents=intents)
 
 

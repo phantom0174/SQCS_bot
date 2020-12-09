@@ -20,37 +20,6 @@ def now_time_info(mode):
         return int(dt2.isoweekday())
 
 
-def weight_main_function(a):
-    return float(1 / 2 + 3 / (2 * (1 + exp(-5 * a + log(2)))))
-
-
-def score_weight_update():
-    temp_file = open('score_parameters.json', mode='r', encoding='utf8')
-    para = json.load(temp_file)
-    temp_file.close()
-
-    temp_file = open('score_log.json', mode='r', encoding='utf8')
-    log = json.load(temp_file)
-    temp_file.close()
-
-    sll = int(len(log['logs']))  # score logs length
-
-    ScoreSum = float(0)
-    for i in range(sll - 1):
-        ScoreSum += log['logs'][i]
-
-    AverageScore = ScoreSum / float(sll - 1)
-    para['average_point'] = str(int(AverageScore))
-
-    ScoreAverageDifference = float(log['logs'][sll - 1]) - AverageScore
-    MaxMinScoreDifference = float(para['maxium_point']) - float(para['minium_point'])
-
-    para_a = ScoreAverageDifference / MaxMinScoreDifference
-    final_weight = weight_main_function(para_a)
-
-    para['point_weight'] = final_weight
-
-
 def role_check(roles, target_roles):
     for role in roles:
         if role.name in target_roles:
