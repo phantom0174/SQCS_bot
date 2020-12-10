@@ -16,7 +16,7 @@ class Quiz(Cog_Extension):
     @quiz.command()
     async def quiz_push(self, ctx, msg):
         if not role_check(ctx.author.roles, ['總召', 'Administrator']):
-            await ctx.send('You can\'t use this command!')
+            await ctx.send(':no_entry_sign: You can\'t use this command!')
             return
 
         temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
@@ -24,12 +24,12 @@ class Quiz(Cog_Extension):
         temp_file.close()
 
         if quiz_data['stand_by_ans'] != 'N/A':
-            await ctx.send(f'The stand-by answer had already been set as {quiz_data["stand_by_ans"]}!')
+            await ctx.send(f':exclamation: The stand-by answer had already been set as {quiz_data["stand_by_ans"]}!')
             return
 
         quiz_data['stand_by_ans'] = msg
 
-        await ctx.send(f'The stand-by answer has been set as {quiz_data["stand_by_ans"]}!')
+        await ctx.send(f':white_check_mark: The stand-by answer has been set as {quiz_data["stand_by_ans"]}!')
 
         temp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
         json.dump(quiz_data, temp_file)
@@ -117,7 +117,7 @@ async def quiz_end(bot):
     await cmd_channel.send(
         f'Quiz Event status set to {quiz_data["event_status"]}, correct answer set to {quiz_data["correct_ans"]}!')
     await main_channel.set_permissions(guild.default_role, send_messages=False)
-    await main_channel.send(f':stop_watch: 活動結束於 {now_time_info("whole")}')
+    await main_channel.send(f':stopwatch: 活動結束於 {now_time_info("whole")}')
 
     temp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
     json.dump(quiz_data, temp_file)
@@ -138,7 +138,7 @@ async def quiz_end(bot):
     info.execute('DELETE FROM quiz;')
     info.connection.commit()
 
-    await main_channel.send(embed=create_embed('Quiz Event Result', 0x42fcff, ['Winner'], [winners]))
+    await main_channel.send(embed=create_embed(':scroll: Quiz Event Result', 0x42fcff, ['Winner'], [winners]))
 
     await getChannel('_ToMV').send('update_guild_fluctlight')
 

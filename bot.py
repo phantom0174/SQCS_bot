@@ -6,6 +6,7 @@ from functions import *
 import discord
 import asyncio
 import sqlitebck # can only use on console
+import json
 import sys
 import os
 
@@ -35,7 +36,7 @@ async def GAU():
 
         if (1 <= now_time_info('date') <= 5) and quiz_data['event_status'] == 'True' and quiz_data['stand_by_ans'] == 'N/A':
             member = await bot.fetch_user(610327503671656449)
-            await member.send('My master, the correct answer hasn\'t been set yet!')
+            await member.send(':four_leaf_clover: My master, the correct answer hasn\'t been set yet!')
 
         # db backup
         temp_file = open('jsons/dyn_setting.json', mode='r', encoding='utf8')
@@ -60,9 +61,10 @@ async def GAU():
 @bot.command()
 async def safe_stop(ctx):
     if not role_check(ctx.author.roles, ['總召']):
-        await ctx.send('You can\'t use that command!')
+        await ctx.send(':no_entry_sign: You can\'t use that command!')
         return
 
+    await ctx.send(':white_check_mark: The bot has stopped!')
     print('The bot has stopped!')
     info.connection.commit()
     info.connection.close()
@@ -79,27 +81,27 @@ async def on_disconnect():
 async def load(ctx, msg):
     try:
         bot.load_extension(f'cogs.{msg}')
-        await ctx.send(f'Extension {msg} loaded.')
+        await ctx.send(f':white_check_mark: Extension {msg} loaded.')
     except:
-        await ctx.send(f'There are no extension called {msg}!')
+        await ctx.send(f':exclamation: There are no extension called {msg}!')
 
 
 @bot.command()
 async def unload(ctx, msg):
     try:
         bot.unload_extension(f'cogs.{msg}')
-        await ctx.send(f'Extension {msg} unloaded.')
+        await ctx.send(f':white_check_mark: Extension {msg} unloaded.')
     except:
-        await ctx.send(f'There are no extension called {msg}!')
+        await ctx.send(f':exclamation: There are no extension called {msg}!')
 
 
 @bot.command()
 async def reload(ctx, msg):
     try:
         bot.reload_extension(f'cogs.{msg}')
-        await ctx.send(f'Extension {msg} reloaded.')
+        await ctx.send(f':white_check_mark: Extension {msg} reloaded.')
     except:
-        await ctx.send(f'There are no extension called {msg}!')
+        await ctx.send(f':exclamation: There are no extension called {msg}!')
 
 
 for filename in os.listdir('./cogs'):

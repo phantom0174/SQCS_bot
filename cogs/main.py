@@ -9,7 +9,7 @@ class Main(Cog_Extension):
     # ping
     @commands.command()
     async def ping(self, ctx):
-        await ctx.send(f'{round(self.bot.latency * 1000)} (ms)')
+        await ctx.send(f':stopwatch: {round(self.bot.latency * 1000)} (ms)')
 
     # delete message
     @commands.command()

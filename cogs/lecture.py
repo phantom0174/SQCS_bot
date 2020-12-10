@@ -16,7 +16,7 @@ class Lecture(Cog_Extension):
     @lect.command()
     async def start(self, ctx, *, msg):
         if not role_check(ctx.author.roles, ['總召', 'Administrator']):
-            await ctx.send('You can\'t use that command!')
+            await ctx.send(':no_entry_sign: You can\'t use that command!')
             return
 
         temp_file = open('jsons/lecture.json', mode='r', encoding='utf8')
@@ -24,12 +24,12 @@ class Lecture(Cog_Extension):
         temp_file.close()
 
         if lecture_data['event_status'] == 'True':
-            await ctx.send('The lecture has already started!')
+            await ctx.send(':exclamation: The lecture has already started!')
             return
 
         day = msg.split(' ')[0]
 
-        await ctx.send('@everyone，講座開始了！\n 於回答講師問題時請在答案前方加上"&"，回答正確即可加分。')
+        await ctx.send(':loud_speaker: @everyone，講座開始了！\n :bulb: 於回答講師問題時請在答案前方加上"&"，回答正確即可加分。')
 
         lecture_data['event_status'] = 'True'
 
@@ -122,7 +122,7 @@ class Lecture(Cog_Extension):
     async def end(self, ctx):
 
         if not role_check(ctx.author.roles, ['總召', 'Administrator']):
-            await ctx.send('You can\'t use that command!')
+            await ctx.send(':no_entry_sign: You can\'t use that command!')
             return
 
         temp_file = open('jsons/lecture.json', mode='r', encoding='utf8')
@@ -130,10 +130,10 @@ class Lecture(Cog_Extension):
         temp_file.close()
 
         if lecture_data['event_status'] == 'False':
-            await ctx.send('The lecture has already ended!')
+            await ctx.send(':exclamation: The lecture has already ended!')
             return
 
-        await ctx.send('@here, the lecture has ended!')
+        await ctx.send(':loud_speaker: @here, 講座結束了!\n :partying_face: 感謝大家今天的參與!')
 
         lecture_data['event_status'] = 'False'
 
@@ -142,19 +142,30 @@ class Lecture(Cog_Extension):
         temp_file.close()
 
         # adding scores and show lecture final data
-        info.execute("SELECT * FROM lecture ORDER BY Score DESC")
+        info.execute("SELECT * FROM lecture ORDER BY Score ASC")
         data = info.fetchall()
         if len(data) == 0:
-            await ctx.send('There are no data to show!')
+            await ctx.send(':exclamation: There are no data to show!')
             return
         else:
             data_members = str()
+            ranking = int(1)
             for member in data:
-                member_obj = await self.bot.fetch_user(member[0])  # member id
-                data_members += f'{member_obj.name}:: Score: {member[1]}, Answer Count: {member[2]}\n'
-                await getChannel('_ToMV').send(f'lect_crt {member[0]} {member[1]}')
+                if ranking == 1:
+                    medal = ':first_place:'
+                elif ranking == 2:
+                    medal = ':second_place:'
+                elif ranking == 3:
+                    medal = ':third_place:'
+                else:
+                    medal = ':medal:'
 
-            await ctx.send(embed=create_embed('Lecture Event Result', 0x42fcff, ['Lecture final info'], [data_members]))
+                member_obj = await self.bot.guilds[0].fetch_member(member[0])  # member id
+                data_members += f'{medal}{member_obj.nick}:: Score: {member[1]}, Answer Count: {member[2]}\n'
+                await getChannel('_ToMV').send(f'lect_crt {member[0]} {member[1]}')
+                ranking += 1
+
+            await ctx.send(embed=create_embed(':scroll: Lecture Event Result', 0x42fcff, ['Lecture final info'], [data_members]))
 
         info.execute('DELETE FROM lecture')
         info.connection.commit()
