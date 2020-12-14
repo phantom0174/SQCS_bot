@@ -112,12 +112,13 @@ async def quiz_end(bot):
     temp_file.close()
 
     quiz_data['event_status'] = "False"
-    quiz_data['correct_ans'] = "N/A"
 
     await cmd_channel.send(
         f'Quiz Event status set to {quiz_data["event_status"]}, correct answer set to {quiz_data["correct_ans"]}!')
     await main_channel.set_permissions(guild.default_role, send_messages=False)
-    await main_channel.send(f':stopwatch: 活動結束於 {now_time_info("whole")}')
+    await main_channel.send(f':loudspeaker: @everyone，懸賞活動結束了！這周的正確答案是 {quiz_data["correct_ans"]}。\n :stopwatch: 活動結束於 {now_time_info("whole")}')
+
+    quiz_data['correct_ans'] = "N/A"
 
     temp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
     json.dump(quiz_data, temp_file)

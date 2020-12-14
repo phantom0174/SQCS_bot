@@ -99,11 +99,16 @@ async def unload(ctx, msg):
 
 @bot.command()
 async def reload(ctx, msg):
-    try:
-        bot.reload_extension(f'cogs.{msg}')
-        await ctx.send(f':white_check_mark: Extension {msg} reloaded.')
-    except:
-        await ctx.send(f':exclamation: There are no extension called {msg}!')
+    if(msg != '*'):
+        try:
+            bot.reload_extension(f'cogs.{msg}')
+            await ctx.send(f':white_check_mark: Extension {msg} reloaded.')
+        except:
+            await ctx.send(f':exclamation: There are no extension called {msg}!')
+    else:
+        for filename in os.listdir('./cogs'):
+            if filename.endswith('.py'):
+                bot.reload_extension(f'cogs.{filename[:-3]}')
 
 
 for filename in os.listdir('./cogs'):
