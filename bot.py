@@ -31,7 +31,7 @@ async def GAU():
         if now_time_info('date') == 1 and now_time_info('hour') >= 6 and quiz_data['event_status'] == 'False':
             await quiz_start(bot)
             await getChannel('_Report').send(f'[Auto]Quiz event start. {now_time_info("whole")}')
-        elif now_time_info('date') == 7 and now_time_info('hour') >= 11 and quiz_data['event_status'] == 'True':
+        elif now_time_info('date') == 7 and now_time_info('hour') >= 23 and quiz_data['event_status'] == 'True':
             await quiz_end(bot)
             await getChannel('_Report').send(f'[Auto]Quiz event end. {now_time_info("whole")}')
 

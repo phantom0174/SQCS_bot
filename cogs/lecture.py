@@ -66,7 +66,7 @@ class Lecture(Cog_Extension):
             await ctx.send(':no_entry_sign: You can\'t use that command!')
             return
 
-        info.execute(f'SELECT STATUS FROM lect_list WHERE Week={day};')
+        info.execute(f'SELECT STATUS FROM lecture_list WHERE Week={day};')
         data = info.fetchall()[0]
 
         if data[0] == 1:
@@ -75,7 +75,7 @@ class Lecture(Cog_Extension):
 
         await ctx.send(':loudspeaker: @everyone，講座開始了！\n :bulb: 於回答講師問題時請在答案前方加上"&"，回答正確即可加分。')
 
-        info.execute(f'UPDATE lect_list SET Status=1 WHERE Week={day};')
+        info.execute(f'UPDATE lecture_list SET Status=1 WHERE Week={day};')
 
         def check(message):
             return message.channel == getChannel('_ToMV')
@@ -103,7 +103,7 @@ class Lecture(Cog_Extension):
         await asyncio.sleep(random.randint(30, 180))
 
         # add score to the attendances
-        info.execute(f'SELECT Name FROM lect_list WHERE Week={day};')
+        info.execute(f'SELECT Name FROM lecture_list WHERE Week={day};')
         channel_name = info.fetchall()[0][0]
 
         voice_channel = discord.utils.get(ctx.guild.voice_channels, name=channel_name)
@@ -173,7 +173,7 @@ class Lecture(Cog_Extension):
             await ctx.send(':no_entry_sign: You can\'t use that command!')
             return
 
-        info.execute(f'SELECT Status FROM lect_list WHERE Week={day};')
+        info.execute(f'SELECT Status FROM lecture_list WHERE Week={day};')
         data = info.fetchall()[0]
 
         if data[0] == 0:
@@ -182,7 +182,7 @@ class Lecture(Cog_Extension):
 
         await ctx.send(':loudspeaker: @here, 講座結束了!\n :partying_face: 感謝大家今天的參與!')
 
-        info.execute(f'UPDATE lect_list SET Status=0 WHERE Week={day};')
+        info.execute(f'UPDATE lecture_list SET Status=0 WHERE Week={day};')
 
         # adding scores and show lecture final data
         info.execute("SELECT * FROM lecture ORDER BY Score ASC")
