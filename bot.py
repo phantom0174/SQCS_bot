@@ -6,6 +6,7 @@ from functions import *
 import discord
 import asyncio
 import sqlitebck # can only use on console
+import sqlite3
 import json
 import sys
 import os
@@ -46,6 +47,7 @@ async def GAU():
         if dyn['ldbh'] != now_time_info('hour'):
             file_name = 'db_backup/' + str(now_time_info('hour')) + '_backup.db'
             bck_db_conn = sqlite3.connect(file_name)
+            await asyncio.sleep(10)
             sqlitebck.copy(connection, bck_db_conn)
 
             dyn['ldbh'] = now_time_info('hour')

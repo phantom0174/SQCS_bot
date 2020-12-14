@@ -42,7 +42,7 @@ def create_embed(Title, Color, FieldsName, Values):
     return embed
 
 
-def setChannel(bot):
+async def setChannel(bot):
     global _ToSyn
     global _ToMV
     global _Report

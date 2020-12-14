@@ -92,7 +92,7 @@ async def quiz_start(bot):
     await cmd_channel.send(
         f'Quiz Event status set to {quiz_data["event_status"]}, correct answer set to {quiz_data["correct_ans"]}!')
 
-    await main_channel.send(':loud_speaker: @everyone，有一個新的懸賞活動開始了，請確認你的答案是隱蔽模式！\n :exclamation: (請在答案的前方與後方各加上"||"的符號)')
+    await main_channel.send(':loudspeaker: @everyone，有一個新的懸賞活動開始了，請確認你的答案是隱蔽模式！\n :exclamation: (請在答案的前方與後方各加上"||"的符號)')
     await main_channel.send(f'活動開始於 {now_time_info("whole")}')
     await main_channel.set_permissions(guild.default_role, send_messages=True)
 

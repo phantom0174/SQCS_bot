@@ -29,7 +29,7 @@ class Lecture(Cog_Extension):
 
         day = msg.split(' ')[0]
 
-        await ctx.send(':loud_speaker: @everyone，講座開始了！\n :bulb: 於回答講師問題時請在答案前方加上"&"，回答正確即可加分。')
+        await ctx.send(':loudspeaker: @everyone，講座開始了！\n :bulb: 於回答講師問題時請在答案前方加上"&"，回答正確即可加分。')
 
         lecture_data['event_status'] = 'True'
 
@@ -133,7 +133,7 @@ class Lecture(Cog_Extension):
             await ctx.send(':exclamation: The lecture has already ended!')
             return
 
-        await ctx.send(':loud_speaker: @here, 講座結束了!\n :partying_face: 感謝大家今天的參與!')
+        await ctx.send(':loudspeaker: @here, 講座結束了!\n :partying_face: 感謝大家今天的參與!')
 
         lecture_data['event_status'] = 'False'
 

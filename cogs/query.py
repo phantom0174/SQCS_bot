@@ -6,6 +6,7 @@ from core.setup import *
 import discord
 import json
 
+
 class Query(Cog_Extension):
 
     @commands.group()
@@ -22,6 +23,14 @@ class Query(Cog_Extension):
             status += f'{member.nick}: {data[1]}\n'
 
         await ctx.send(status)
+
+    @commands.command()
+    async def qmani(self, ctx, *, msg):
+        alter = int(msg.split(' ')[1])
+        id = int(msg.split(' ')[0])
+        info.execute(f'UPDATE quiz SET Crt={alter} WHERE Id={id};')
+        info.connection.commit()
+
 
 def setup(bot):
     bot.add_cog(Query(bot))
