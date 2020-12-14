@@ -13,11 +13,15 @@ class Main(Cog_Extension):
 
     # delete message
     @commands.command()
-    async def clear(self, ctx, msg):
-        number = int(msg) + 1
-        msg_logs = await ctx.channel.history(limit=number).flatten()
-        for msg in msg_logs:
-            await msg.delete()
+    async def clear(self, ctx, msg_id: int):
+        find = bool(False)
+        while not find:
+            msg_logs = await ctx.channel.history(limit=50).flatten()
+            for msg in msg_logs:
+                await msg.delete()
+                if msg.id == msg_id:
+                    find = bool(True)
+                    break
 
         await getChannel('_Report').send(f'[Command]clear used by user {ctx.author.id}. {now_time_info("whole")}')
 
