@@ -12,6 +12,8 @@
 - 2020/12/04: Bot communication guild set, lecture function work normally.
 - 2020/12/06: Set up event log feature.
 - 2020/12/07: Bot Cog-lized.
+- 2020/12/13: Emoji Added.
+- 2020/12/14: Fix repl update.
 
 
 ### Bot Info
