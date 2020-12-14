@@ -14,6 +14,48 @@ class Lecture(Cog_Extension):
         pass
 
     @lect.command()
+    async def list(self, ctx):
+        info.execute('SELECT * FROM lecture_list;')
+        data = info.fetchall()
+
+        lect_list = str()
+        for lect_info in data:
+            lect_list += f'Name: {lect_list[0]}, Week: {lect_info[1]}\n'
+
+        if lect_list == '':
+            lect_list = 'No data.'
+
+        await ctx.send(lect_list)
+        await getChannel('_Report').send(
+            f'[Command]Group lect - list used by member {ctx.author.id}. {now_time_info("whole")}')
+
+    @lect.commmands()
+    async def mani(self, ctx, *, msg):
+        mode = msg.split(' ')[0]
+        if mode == 1:
+            if len(msg.split(' ')) < 2:
+                await ctx.send('Not enough parameters!')
+                return
+
+            lect_name = msg.split(' ')[1]
+            lect_week = msg.split(' ')[2]
+            info.execute(f'INSERT INTO lecture_list VALUES("{lect_name}", {lect_week});')
+            await ctx.send(f'Lecture {lect_name}, on week {lect_week} has been pushed!')
+        elif mode == 2:
+            delete_lect = msg.split(' ')[1]
+
+            try:
+                info.execute(f'DELETE FROM lecture_list WHERE Name={delete_lect};')
+                await ctx.send(f'Lecture {delete_lect} has been removed!')
+            except:
+                await ctx.send(f'There are no lecture named {delete_lect}!')
+                return
+
+        info.connection.commit()
+        await getChannel('_Report').send(
+            f'[Command]Group lect - mani used by member {ctx.author.id}. {now_time_info("whole")}')
+
+    @lect.command()
     async def start(self, ctx, *, msg):
         if not role_check(ctx.author.roles, ['總召', 'Administrator']):
             await ctx.send(':no_entry_sign: You can\'t use that command!')

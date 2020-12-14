@@ -18,4 +18,8 @@ info.execute("""CREATE TABLE IF NOT EXISTS lecture (
       Score REAL,
       Count INTEGER);""")
 
+info.execute("""CREATE TABLE IF NOT EXISTS lecture_list (
+      Name TEXT,
+      Week INTEGER);""")
+
 info.connection.commit()
