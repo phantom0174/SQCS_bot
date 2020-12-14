@@ -20,6 +20,7 @@ info.execute("""CREATE TABLE IF NOT EXISTS lecture (
 
 info.execute("""CREATE TABLE IF NOT EXISTS lecture_list (
       Name TEXT,
-      Week INTEGER);""")
+      Week INTEGER,
+      Status INTEGER);""")
 
 info.connection.commit()

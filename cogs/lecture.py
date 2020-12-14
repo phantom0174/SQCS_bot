@@ -20,7 +20,7 @@ class Lecture(Cog_Extension):
 
         lect_list = str()
         for lect_info in data:
-            lect_list += f'Name: {lect_list[0]}, Week: {lect_info[1]}\n'
+            lect_list += f'Name: {lect_info[0]}, Week: {lect_info[1]}\n'
 
         if lect_list == '':
             lect_list = 'No data.'
@@ -29,19 +29,24 @@ class Lecture(Cog_Extension):
         await getChannel('_Report').send(
             f'[Command]Group lect - list used by member {ctx.author.id}. {now_time_info("whole")}')
 
-    @lect.commmands()
+    @lect.command()
     async def mani(self, ctx, *, msg):
+
+        if not role_check(ctx.author.roles, ['總召', 'Administrator']):
+            await ctx.send(':no_entry_sign: You can\'t use that command!')
+            return
+
         mode = msg.split(' ')[0]
-        if mode == 1:
+        if mode == '1':
             if len(msg.split(' ')) < 2:
                 await ctx.send('Not enough parameters!')
                 return
 
             lect_name = msg.split(' ')[1]
             lect_week = msg.split(' ')[2]
-            info.execute(f'INSERT INTO lecture_list VALUES("{lect_name}", {lect_week});')
+            info.execute(f'INSERT INTO lecture_list VALUES("{lect_name}", {lect_week}, 0);')
             await ctx.send(f'Lecture {lect_name}, on week {lect_week} has been pushed!')
-        elif mode == 2:
+        elif mode == '0':
             delete_lect = msg.split(' ')[1]
 
             try:
@@ -56,35 +61,36 @@ class Lecture(Cog_Extension):
             f'[Command]Group lect - mani used by member {ctx.author.id}. {now_time_info("whole")}')
 
     @lect.command()
-    async def start(self, ctx, *, msg):
+    async def start(self, ctx, day: int):
         if not role_check(ctx.author.roles, ['總召', 'Administrator']):
             await ctx.send(':no_entry_sign: You can\'t use that command!')
             return
 
-        temp_file = open('jsons/lecture.json', mode='r', encoding='utf8')
-        lecture_data = json.load(temp_file)
-        temp_file.close()
+        info.execute(f'SELECT STATUS FROM lect_list WHERE Week={day};')
+        data = info.fetchall()[0]
 
-        if lecture_data['event_status'] == 'True':
+        if data[0] == 1:
             await ctx.send(':exclamation: The lecture has already started!')
             return
 
-        day = msg.split(' ')[0]
-
         await ctx.send(':loudspeaker: @everyone，講座開始了！\n :bulb: 於回答講師問題時請在答案前方加上"&"，回答正確即可加分。')
 
-        lecture_data['event_status'] = 'True'
+        info.execute(f'UPDATE lect_list SET Status=1 WHERE Week={day};')
 
         def check(message):
             return message.channel == getChannel('_ToMV')
 
         await getChannel('_ToMV').send('request_score_weight')
-        sw = int((await self.bot.wait_for('message', check=check, timeout=30.0)).content)
+        temp_weight = float((await self.bot.wait_for('message', check=check, timeout=30.0)).content)
 
-        lecture_data['temp_sw'] = sw
+        temp_file = open('jsons/lecture.json', mode='r', encoding='utf8')
+        lect_data = json.load(temp_file)
+        temp_file.close()
+
+        lect_data['temp_sw'] = temp_weight
 
         temp_file = open('jsons/lecture.json', mode='w', encoding='utf8')
-        json.dump(lecture_data, temp_file)
+        json.dump(lect_data, temp_file)
         temp_file.close()
 
         msg_logs = await ctx.channel.history(limit=200).flatten()
@@ -97,15 +103,15 @@ class Lecture(Cog_Extension):
         await asyncio.sleep(random.randint(30, 180))
 
         # add score to the attendances
+        info.execute(f'SELECT Name FROM lect_list WHERE Week={day};')
+        channel_name = info.fetchall()[0][0]
 
-        if day == '5':
-            voice_channel = discord.utils.get(ctx.guild.voice_channels, name='星期五晚上固定講座')
-        elif day == '7':
-            voice_channel = discord.utils.get(ctx.guild.voice_channels, name='量子電腦硬體')
+        voice_channel = discord.utils.get(ctx.guild.voice_channels, name=channel_name)
 
         for member in voice_channel.members:
             await getChannel('_ToMV').send(f'lecture_attend {member.id}')
 
+        info.connection.commit()
         await getChannel('_Report').send(
             f'[Command]Group lect - start used by member {ctx.author.id}. {now_time_info("whole")}')
 
@@ -161,27 +167,22 @@ class Lecture(Cog_Extension):
             f'[Command]Group lect - ans_check used by member {ctx.author.id}. {now_time_info("whole")}')
 
     @lect.command()
-    async def end(self, ctx):
+    async def end(self, ctx, day: int):
 
         if not role_check(ctx.author.roles, ['總召', 'Administrator']):
             await ctx.send(':no_entry_sign: You can\'t use that command!')
             return
 
-        temp_file = open('jsons/lecture.json', mode='r', encoding='utf8')
-        lecture_data = json.load(temp_file)
-        temp_file.close()
+        info.execute(f'SELECT Status FROM lect_list WHERE Week={day};')
+        data = info.fetchall()[0]
 
-        if lecture_data['event_status'] == 'False':
+        if data[0] == 0:
             await ctx.send(':exclamation: The lecture has already ended!')
             return
 
         await ctx.send(':loudspeaker: @here, 講座結束了!\n :partying_face: 感謝大家今天的參與!')
 
-        lecture_data['event_status'] = 'False'
-
-        temp_file = open('jsons/lecture.json', mode='w', encoding='utf8')
-        json.dump(lecture_data, temp_file)
-        temp_file.close()
+        info.execute(f'UPDATE lect_list SET Status=0 WHERE Week={day};')
 
         # adding scores and show lecture final data
         info.execute("SELECT * FROM lecture ORDER BY Score ASC")
