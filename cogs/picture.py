@@ -14,12 +14,8 @@ class Picture(Cog_Extension):
 
     # picture_manipulation
     @pic.command()
+    @commands.has_any_role('總召', 'Administrator')
     async def p_m(self, ctx, *, msg):
-        await ctx.message.delete()
-
-        if not role_check(ctx.author.roles, ['總召', 'Administrator']):
-            await ctx.send('You can\'t use that command!')
-            return
 
         if len(msg.split(' ')) > 2:
             await ctx.send('Too many arguments!')

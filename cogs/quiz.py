@@ -14,10 +14,8 @@ class Quiz(Cog_Extension):
 
     # push back stand by answer
     @quiz.command()
+    @commands.has_any_role('總召', 'Administrator')
     async def quiz_push(self, ctx, msg):
-        if not role_check(ctx.author.roles, ['總召', 'Administrator']):
-            await ctx.send(':no_entry_sign: You can\'t use this command!')
-            return
 
         temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
         quiz_data = json.load(temp_file)

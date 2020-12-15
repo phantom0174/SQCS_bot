@@ -27,6 +27,7 @@ class Main(Cog_Extension):
 
     # member check
     @commands.command()
+    @commands.has_any_role('總召', 'Administrator')
     async def m_check(self, ctx):
         for member in ctx.guild.members:
             print(member)

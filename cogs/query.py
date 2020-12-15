@@ -14,6 +14,7 @@ class Query(Cog_Extension):
         pass
 
     @query.command()
+    @commands.has_any_role('總召', 'Administrator')
     async def quiz(self, ctx):
         info.execute('SELECT * FROM quiz;')
 
@@ -25,6 +26,7 @@ class Query(Cog_Extension):
         await ctx.send(status)
 
     @commands.command()
+    @commands.has_any_role('總召', 'Administrator')
     async def qmani(self, ctx, *, msg):
         alter = int(msg.split(' ')[1])
         id = int(msg.split(' ')[0])

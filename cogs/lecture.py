@@ -14,6 +14,7 @@ class Lecture(Cog_Extension):
         pass
 
     @lect.command()
+    @commands.has_any_role('總召', 'Administrator')
     async def list(self, ctx):
         info.execute('SELECT * FROM lecture_list;')
         data = info.fetchall()
@@ -30,11 +31,8 @@ class Lecture(Cog_Extension):
             f'[Command]Group lect - list used by member {ctx.author.id}. {now_time_info("whole")}')
 
     @lect.command()
+    @commands.has_any_role('總召', 'Administrator')
     async def mani(self, ctx, *, msg):
-
-        if not role_check(ctx.author.roles, ['總召', 'Administrator']):
-            await ctx.send(':no_entry_sign: You can\'t use that command!')
-            return
 
         mode = msg.split(' ')[0]
         if mode == '1':
@@ -61,10 +59,8 @@ class Lecture(Cog_Extension):
             f'[Command]Group lect - mani used by member {ctx.author.id}. {now_time_info("whole")}')
 
     @lect.command()
+    @commands.has_any_role('總召', 'Administrator')
     async def start(self, ctx, day: int):
-        if not role_check(ctx.author.roles, ['總召', 'Administrator']):
-            await ctx.send(':no_entry_sign: You can\'t use that command!')
-            return
 
         info.execute(f'SELECT STATUS FROM lecture_list WHERE Week={day};')
         data = info.fetchall()[0]
@@ -118,6 +114,7 @@ class Lecture(Cog_Extension):
         # lecture ans check
 
     @lect.command()
+    @commands.has_any_role('總召', 'Administrator')
     async def ans_check(self, ctx, *, msg):
         CrtAns = msg.split(' ')
         msg_logs = await ctx.channel.history(limit=100).flatten()
@@ -167,11 +164,8 @@ class Lecture(Cog_Extension):
             f'[Command]Group lect - ans_check used by member {ctx.author.id}. {now_time_info("whole")}')
 
     @lect.command()
+    @commands.has_any_role('總召', 'Administrator')
     async def end(self, ctx, day: int):
-
-        if not role_check(ctx.author.roles, ['總召', 'Administrator']):
-            await ctx.send(':no_entry_sign: You can\'t use that command!')
-            return
 
         info.execute(f'SELECT Status FROM lecture_list WHERE Week={day};')
         data = info.fetchall()[0]
