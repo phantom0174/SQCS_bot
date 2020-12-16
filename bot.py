@@ -1,4 +1,3 @@
-
 from cogs.quiz import quiz_start, quiz_end
 from discord.ext import commands
 from core.setup import *

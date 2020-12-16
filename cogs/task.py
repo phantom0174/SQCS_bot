@@ -19,6 +19,7 @@ class Task(Cog_Extension):
 
     @tasks.loop(minutes=10)
     async def quiz_auto(self):
+        await self.bot.wait_until_ready()
         temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
         quiz_data = json.load(temp_file)
         temp_file.close()
@@ -37,6 +38,7 @@ class Task(Cog_Extension):
 
     @tasks.loop(minutes=10)
     async def db_backup(self):
+        await self.bot.wait_until_ready()
         temp_file = open('jsons/dyn_setting.json', mode='r', encoding='utf8')
         dyn = json.load(temp_file)
         temp_file.close()
@@ -52,3 +54,7 @@ class Task(Cog_Extension):
             temp_file = open('jsons/dyn_setting.json', mode='w', encoding='utf8')
             json.dump(dyn, temp_file)
             temp_file.close()
+
+
+def setup(bot):
+    bot.add_cog(Task(bot))
