@@ -1,3 +1,4 @@
+
 from cogs.quiz import quiz_start, quiz_end
 from discord.ext import commands
 from core.setup import *
@@ -9,8 +10,6 @@ import sqlite3
 import json
 import sys
 import os
-from core.task import *
-
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='+', intents=intents)
 
@@ -19,7 +18,6 @@ bot = commands.Bot(command_prefix='+', intents=intents)
 async def on_ready():
     print(">> Bot is online <<")
     await setChannel(bot)
-    await GAU(bot)  # guild auto update
 
 
 @bot.command()
