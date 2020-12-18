@@ -51,7 +51,7 @@ class Picture(Cog_Extension):
         with open('jsons/setting.json', mode='w', encoding='utf8') as temp_file:
             json.dump(setting_data, temp_file)
 
-        await func.getChannel('_Report').send(
+        await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group pic - p_m used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
     # picture_check
@@ -69,7 +69,7 @@ class Picture(Cog_Extension):
 
         await ctx.send(pic_str)
 
-        await func.getChannel('_Report').send(
+        await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group pic - p_check used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
     # random picture
@@ -79,7 +79,7 @@ class Picture(Cog_Extension):
         randPic = random.choice(jdata['pic'])
         await ctx.send(randPic)
 
-        await func.getChannel('_Report').send(
+        await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group pic - rpic used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
 

@@ -16,7 +16,6 @@ bot = commands.Bot(command_prefix='+', intents=intents)
 @bot.event
 async def on_ready():
     print(">> Bot is online <<")
-    await func.setChannel(bot)
 
 
 @bot.command()

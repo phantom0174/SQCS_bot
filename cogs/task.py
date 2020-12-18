@@ -26,10 +26,10 @@ class Task(Cog_Extension):
 
         if func.now_time_info('date') == 1 and func.now_time_info('hour') >= 6 and quiz_data['event_status'] == 'False':
             await quiz_start(self.bot)
-            await func.getChannel('_Report').send(f'[Auto]Quiz event start. {func.now_time_info("whole")}')
+            await func.getChannel(self.bot, '_Report').send(f'[Auto]Quiz event start. {func.now_time_info("whole")}')
         elif func.now_time_info('date') == 7 and func.now_time_info('hour') >= 23 and quiz_data['event_status'] == 'True':
             await quiz_end(self.bot)
-            await func.getChannel('_Report').send(f'[Auto]Quiz event end. {func.now_time_info("whole")}')
+            await func.getChannel(self.bot, '_Report').send(f'[Auto]Quiz event end. {func.now_time_info("whole")}')
 
         if (1 <= func.now_time_info('date') <= 5) and quiz_data['event_status'] == 'True' and quiz_data[
             'stand_by_ans'] == 'N/A':

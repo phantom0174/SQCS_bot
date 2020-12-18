@@ -12,12 +12,12 @@ class React(Cog_Extension):
     @commands.Cog.listener()
     async def on_message(self, ctx):
         if ctx.author.bot == 'False' or ctx.author == self.bot.user or (
-                ctx.channel != func.getChannel('_ToMV') or ctx.channel != func.getChannel('_ToSyn')):
+                ctx.channel != func.getChannel(self.bot, '_ToMV') or ctx.channel != func.getChannel(self.bot, '_ToSyn')):
             return
 
         MsgCont = str(ctx.content).split(' ')
 
-        if MsgCont[0] == 'sw' and ctx.channel == func.getChannel('_ToMV'):
+        if MsgCont[0] == 'sw' and ctx.channel == func.getChannel(self.bot, '_ToMV'):
             with open('jsons/lecture.json', mode='r', encoding='utf8') as temp_file:
                 lect_data = json.load(temp_file)
 
@@ -32,7 +32,7 @@ class React(Cog_Extension):
         for msg in re_msg:
             await ctx.send(msg)
 
-        await func.getChannel('_Report').send(f'[Command]msg_re used by member {ctx.author.id}. {func.now_time_info("whole")}')
+        await func.getChannel(self.bot, '_Report').send(f'[Command]msg_re used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
 
 def setup(bot):

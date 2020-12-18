@@ -3,10 +3,6 @@ from math import *
 import discord
 import json
 
-global _ToSyn
-global _ToMV
-global _Report
-
 
 def now_time_info(mode):
     dt1 = datetime.utcnow().replace(tzinfo=timezone.utc)
@@ -42,24 +38,10 @@ def create_embed(Title, Color, FieldsName, Values):
     return embed
 
 
-async def setChannel(bot):
-    global _ToSyn
-    global _ToMV
-    global _Report
-
-    _ToSyn = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-and-syn')
-    _ToMV = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-and-mv')
-    _Report = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-report')
-
-
-def getChannel(target):
-    global _ToSyn
-    global _ToMV
-    global _Report
-
+def getChannel(bot, target):
     if target == '_ToSyn':
-        return _ToSyn
-    elif target == '_ToMV':
-        return _ToMV
-    elif target == '_Report':
-        return _Report
+        return discord.utils.get(bot.guilds[1].text_channels, name='sqcs-and-syn')
+    if target == '_ToMV':
+        return discord.utils.get(bot.guilds[1].text_channels, name='sqcs-and-mv')
+    if target == '_Report':
+        return discord.utils.get(bot.guilds[1].text_channels, name='sqcs-report')

@@ -31,7 +31,7 @@ class Quiz(Cog_Extension):
         with open('jsons/quiz.json', mode='w', encoding='utf8') as temp_file:
             json.dump(quiz_data, temp_file)
 
-        await func.getChannel('_Report').send(
+        await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group quiz - quiz_push used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
     # event answer listen function
@@ -61,7 +61,7 @@ class Quiz(Cog_Extension):
             info.execute('INSERT INTO quiz VALUES(?, 0);', (msg.author.id))
 
             if msg.content[2:-2] == quiz_data["correct_ans"]:
-                await func.getChannel('_ToMV').send(f'quiz_crt {msg.author.id}')
+                await func.getChannel(self.bot, '_ToMV').send(f'quiz_crt {msg.author.id}')
                 info.execute('UPDATE quiz SET Crt=1 WHERE Id=?;', (msg.author.id))
 
         else:
@@ -132,7 +132,7 @@ async def quiz_end(bot):
 
     await main_channel.send(embed=func.create_embed(':scroll: Quiz Event Result', 0x42fcff, ['Winner'], [winners]))
 
-    await func.getChannel('_ToMV').send('update_guild_fluctlight')
+    await func.getChannel(bot, '_ToMV').send('update_guild_fluctlight')
 
 
 def setup(bot):

@@ -23,7 +23,7 @@ class Main(Cog_Extension):
                     find = bool(True)
                     break
 
-        await func.getChannel('_Report').send(f'[Command]clear used by user {ctx.author.id}. {func.now_time_info("whole")}')
+        await func.getChannel(self.bot, '_Report').send(f'[Command]clear used by user {ctx.author.id}. {func.now_time_info("whole")}')
 
     # member check
     @commands.command()

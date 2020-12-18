@@ -28,7 +28,7 @@ class Lecture(Cog_Extension):
             lect_list = 'No data.'
 
         await ctx.send(lect_list)
-        await func.getChannel('_Report').send(
+        await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group lect - list used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
     @lect.command()
@@ -56,7 +56,7 @@ class Lecture(Cog_Extension):
                 return
 
         info.connection.commit()
-        await func.getChannel('_Report').send(
+        await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group lect - mani used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
     @lect.command()
@@ -75,9 +75,9 @@ class Lecture(Cog_Extension):
         info.execute('UPDATE lecture_list SET Status=1 WHERE Week=?;', (day))
 
         def check(message):
-            return message.channel == func.getChannel('_ToMV')
+            return message.channel == func.getChannel(self.bot, '_ToMV')
 
-        await func.getChannel('_ToMV').send('request_score_weight')
+        await func.getChannel(self.bot, '_ToMV').send('request_score_weight')
         temp_weight = float((await self.bot.wait_for('message', check=check, timeout=30.0)).content)
 
         with open('jsons/lecture.json', mode='r', encoding='utf8') as temp_file:
@@ -104,10 +104,10 @@ class Lecture(Cog_Extension):
         voice_channel = discord.utils.get(ctx.guild.voice_channels, name=channel_name)
 
         for member in voice_channel.members:
-            await func.getChannel('_ToMV').send(f'lecture_attend {member.id}')
+            await func.getChannel(self.bot, '_ToMV').send(f'lecture_attend {member.id}')
 
         info.connection.commit()
-        await func.getChannel('_Report').send(
+        await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group lect - start used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
         # lecture ans check
@@ -157,7 +157,7 @@ class Lecture(Cog_Extension):
 
         info.connection.commit()
 
-        await func.getChannel('_Report').send(
+        await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group lect - ans_check used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
     @lect.command()
@@ -196,7 +196,7 @@ class Lecture(Cog_Extension):
 
                 member_obj = await self.bot.guilds[0].fetch_member(member[0])  # member id
                 data_members += f'{medal}{member_obj.nick}:: Score: {member[1]}, Answer Count: {member[2]}\n'
-                await func.getChannel('_ToMV').send(f'lect_crt {member[0]} {member[1]}')
+                await func.getChannel(self.bot, '_ToMV').send(f'lect_crt {member[0]} {member[1]}')
                 ranking += 1
 
             await ctx.send(embed=func.create_embed(':scroll: Lecture Event Result', 0x42fcff, ['Lecture final info'], [data_members]))
@@ -204,7 +204,7 @@ class Lecture(Cog_Extension):
         info.execute('DELETE FROM lecture')
         info.connection.commit()
 
-        await func.getChannel('_Report').send(
+        await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group lect - end used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
 
