@@ -119,16 +119,16 @@ class Lecture(Cog_Extension):
         msg_logs = await ctx.channel.history(limit=100).flatten()
         MemberCrtMsg = []  # correct message
 
-        for msg in msg_logs:
-            if len(msg.content) == 0:
+        for log in msg_logs:
+            if len(log.content) == 0:
                 continue
 
-            if (not msg.author.bot) and msg.content[0] == '&':
-                await msg.delete()
+            if (not log.author.bot) and log.content[0] == '&':
+                await log.delete()
                 for ans in CrtAns:
                     # correct answer is a subset of member answer
-                    if msg.content.find(ans) != -1:
-                        MemberCrtMsg.append(msg)
+                    if log.content.find(ans) != -1:
+                        MemberCrtMsg.append(log)
                         break
 
         MemberCrtMsg.reverse()
@@ -181,25 +181,25 @@ class Lecture(Cog_Extension):
         if len(data) == 0:
             await ctx.send(':exclamation: There are no data to show!')
             return
-        else:
-            data_members = str()
-            ranking = int(1)
-            for member in data:
-                if ranking == 1:
-                    medal = ':first_place:'
-                elif ranking == 2:
-                    medal = ':second_place:'
-                elif ranking == 3:
-                    medal = ':third_place:'
-                else:
-                    medal = ':medal:'
 
-                member_obj = await self.bot.guilds[0].fetch_member(member[0])  # member id
-                data_members += f'{medal}{member_obj.nick}:: Score: {member[1]}, Answer Count: {member[2]}\n'
-                await func.getChannel(self.bot, '_ToMV').send(f'lect_crt {member[0]} {member[1]}')
-                ranking += 1
+        data_members = str()
+        ranking = int(1)
+        for member in data:
+            if ranking == 1:
+                medal = ':first_place:'
+            elif ranking == 2:
+                medal = ':second_place:'
+            elif ranking == 3:
+                medal = ':third_place:'
+            else:
+                medal = ':medal:'
 
-            await ctx.send(embed=func.create_embed(':scroll: Lecture Event Result', 0x42fcff, ['Lecture final info'], [data_members]))
+            member_obj = await self.bot.guilds[0].fetch_member(member[0])  # member id
+            data_members += f'{medal}{member_obj.nick}:: Score: {member[1]}, Answer Count: {member[2]}\n'
+            await func.getChannel(self.bot, '_ToMV').send(f'lect_crt {member[0]} {member[1]}')
+            ranking += 1
+
+        await ctx.send(embed=func.create_embed(':scroll: Lecture Event Result', 0x42fcff, ['Lecture final info'], [data_members]))
 
         info.execute('DELETE FROM lecture')
         info.connection.commit()

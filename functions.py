@@ -10,9 +10,9 @@ def now_time_info(mode):
 
     if mode == 'whole':
         return str(dt2.strftime("%Y-%m-%d %H:%M:%S"))
-    elif mode == 'hour':
+    if mode == 'hour':
         return int(dt2.strftime("%H"))
-    elif mode == 'date':
+    if mode == 'date':
         return int(dt2.isoweekday())
 
 
@@ -31,8 +31,8 @@ def create_embed(Title, Color, FieldsName, Values):
         embed.add_field(name="Error", value='N/A', inline=False)
         return embed
 
-    for i in range(len(FieldsName)):
-        embed.add_field(name=FieldsName[i], value=Values[i], inline=False)
+    for (fn, vl) in zip(FieldsName, Values):
+        embed.add_field(name=fn, value=vl, inline=False)
 
     embed.set_footer(text=now_time_info('whole'))
     return embed

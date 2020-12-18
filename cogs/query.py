@@ -26,9 +26,7 @@ class Query(Cog_Extension):
 
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def qmani(self, ctx, *, msg):
-        alter = int(msg.split(' ')[1])
-        id = int(msg.split(' ')[0])
+    async def qmani(self, ctx, id: int, alter: int):
         info.execute('UPDATE quiz SET Crt=? WHERE Id=?;', (alter, id))
         info.connection.commit()
 
