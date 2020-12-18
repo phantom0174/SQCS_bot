@@ -33,8 +33,8 @@ class Quiz(Cog_Extension):
         json.dump(quiz_data, temp_file)
         temp_file.close()
 
-        await getChannel('_Report').send(
-            f'[Command]Group quiz - quiz_push used by member {ctx.author.id}. {now_time_info("whole")}')
+        await func.getChannel('_Report').send(
+            f'[Command]Group quiz - quiz_push used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
     # event answer listen function
     @commands.Cog.listener()
@@ -64,7 +64,7 @@ class Quiz(Cog_Extension):
             info.execute(f'INSERT INTO quiz VALUES({msg.author.id}, 0);')
 
             if msg.content[2:-2] == quiz_data["correct_ans"]:
-                await getChannel('_ToMV').send(f'quiz_crt {msg.author.id}')
+                await func.getChannel('_ToMV').send(f'quiz_crt {msg.author.id}')
                 info.execute(f'UPDATE quiz SET Crt=1 WHERE Id={msg.author.id};')
 
         else:
@@ -91,7 +91,7 @@ async def quiz_start(bot):
         f'Quiz Event status set to {quiz_data["event_status"]}, correct answer set to {quiz_data["correct_ans"]}!')
 
     await main_channel.send(':loudspeaker: @everyone，有一個新的懸賞活動開始了，請確認你的答案是隱蔽模式！\n :exclamation: (請在答案的前方與後方各加上"||"的符號)')
-    await main_channel.send(f'活動開始於 {now_time_info("whole")}')
+    await main_channel.send(f'活動開始於 {func.now_time_info("whole")}')
     await main_channel.set_permissions(guild.default_role, send_messages=True)
 
     temp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
@@ -114,7 +114,7 @@ async def quiz_end(bot):
     await cmd_channel.send(
         f'Quiz Event status set to {quiz_data["event_status"]}, correct answer set to {quiz_data["correct_ans"]}!')
     await main_channel.set_permissions(guild.default_role, send_messages=False)
-    await main_channel.send(f':loudspeaker: @everyone，懸賞活動結束了！這周的正確答案是 {quiz_data["correct_ans"]}。\n :stopwatch: 活動結束於 {now_time_info("whole")}')
+    await main_channel.send(f':loudspeaker: @everyone，懸賞活動結束了！這周的正確答案是 {quiz_data["correct_ans"]}。\n :stopwatch: 活動結束於 {func.now_time_info("whole")}')
 
     quiz_data['correct_ans'] = "N/A"
 
@@ -137,9 +137,9 @@ async def quiz_end(bot):
     info.execute('DELETE FROM quiz;')
     info.connection.commit()
 
-    await main_channel.send(embed=create_embed(':scroll: Quiz Event Result', 0x42fcff, ['Winner'], [winners]))
+    await main_channel.send(embed=func.create_embed(':scroll: Quiz Event Result', 0x42fcff, ['Winner'], [winners]))
 
-    await getChannel('_ToMV').send('update_guild_fluctlight')
+    await func.getChannel('_ToMV').send('update_guild_fluctlight')
 
 
 def setup(bot):
