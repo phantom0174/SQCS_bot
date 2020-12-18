@@ -17,9 +17,8 @@ class Quiz(Cog_Extension):
     @commands.has_any_role('總召', 'Administrator')
     async def quiz_push(self, ctx, msg):
 
-        temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
-        quiz_data = json.load(temp_file)
-        temp_file.close()
+        with open('jsons/quiz.json', mode='r', encoding='utf8') as temp_file:
+            quiz_data = json.load(temp_file)
 
         if quiz_data['stand_by_ans'] != 'N/A':
             await ctx.send(f':exclamation: The stand-by answer had already been set as {quiz_data["stand_by_ans"]}!')
@@ -29,9 +28,8 @@ class Quiz(Cog_Extension):
 
         await ctx.send(f':white_check_mark: The stand-by answer has been set as {quiz_data["stand_by_ans"]}!')
 
-        temp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
-        json.dump(quiz_data, temp_file)
-        temp_file.close()
+        with open('jsons/quiz.json', mode='w', encoding='utf8') as temp_file:
+            json.dump(quiz_data, temp_file)
 
         await func.getChannel('_Report').send(
             f'[Command]Group quiz - quiz_push used by member {ctx.author.id}. {func.now_time_info("whole")}')
@@ -43,16 +41,15 @@ class Quiz(Cog_Extension):
         if msg.author == self.bot.user or msg.channel != main_channel or msg.content[0] == '~':
             return
 
-        temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
-        quiz_data = json.load(temp_file)
-        temp_file.close()
+        with open('jsons/quiz.json', mode='r', encoding='utf8') as temp_file:
+            quiz_data = json.load(temp_file)
 
         if quiz_data["event_status"] == 'False':
             return
 
         await msg.delete()
 
-        info.execute(f'SELECT * FROM quiz WHERE Id={msg.author.id};')
+        info.execute('SELECT * FROM quiz WHERE Id=?;', (msg.author.id))
         data = info.fetchall()
 
         if len(data) != 0:
@@ -61,11 +58,11 @@ class Quiz(Cog_Extension):
 
         if msg.content[0:2] == '||' and msg.content[-2:] == '||':
             await msg.author.send(':white_check_mark: 我收到你的答案了!')
-            info.execute(f'INSERT INTO quiz VALUES({msg.author.id}, 0);')
+            info.execute('INSERT INTO quiz VALUES(?, 0);', (msg.author.id))
 
             if msg.content[2:-2] == quiz_data["correct_ans"]:
                 await func.getChannel('_ToMV').send(f'quiz_crt {msg.author.id}')
-                info.execute(f'UPDATE quiz SET Crt=1 WHERE Id={msg.author.id};')
+                info.execute('UPDATE quiz SET Crt=1 WHERE Id=?;', (msg.author.id))
 
         else:
             await msg.author.send(':exclamation: 你的答案是錯誤的格式！')
@@ -79,9 +76,8 @@ async def quiz_start(bot):
     main_channel = discord.utils.get(guild.text_channels, name='懸賞區')
     cmd_channel = discord.utils.get(guild.text_channels, name='◉總指令區')
 
-    temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
-    quiz_data = json.load(temp_file)
-    temp_file.close()
+    with open('jsons/quiz.json', mode='r', encoding='utf8') as temp_file:
+        quiz_data = json.load(temp_file)
 
     quiz_data['event_status'] = "True"
     quiz_data['correct_ans'] = quiz_data['stand_by_ans']
@@ -94,9 +90,8 @@ async def quiz_start(bot):
     await main_channel.send(f'活動開始於 {func.now_time_info("whole")}')
     await main_channel.set_permissions(guild.default_role, send_messages=True)
 
-    temp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
-    json.dump(quiz_data, temp_file)
-    temp_file.close()
+    with open('jsons/quiz.json', mode='w', encoding='utf8') as temp_file:
+        json.dump(quiz_data, temp_file)
 
 
 # auto end quiz event
@@ -105,9 +100,8 @@ async def quiz_end(bot):
     main_channel = discord.utils.get(guild.text_channels, name='懸賞區')
     cmd_channel = discord.utils.get(guild.text_channels, name='◉總指令區')
 
-    temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
-    quiz_data = json.load(temp_file)
-    temp_file.close()
+    with open('jsons/quiz.json', mode='r', encoding='utf8') as temp_file:
+        quiz_data = json.load(temp_file)
 
     quiz_data['event_status'] = "False"
 
@@ -118,9 +112,8 @@ async def quiz_end(bot):
 
     quiz_data['correct_ans'] = "N/A"
 
-    temp_file = open('jsons/quiz.json', mode='w', encoding='utf8')
-    json.dump(quiz_data, temp_file)
-    temp_file.close()
+    with open('jsons/quiz.json', mode='w', encoding='utf8') as temp_file:
+        json.dump(quiz_data, temp_file)
 
     # list the winners
     info.execute('SELECT * FROM quiz WHERE Crt=1;')

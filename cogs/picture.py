@@ -28,9 +28,8 @@ class Picture(Cog_Extension):
 
         await msg.delete()
 
-        temp_file = open('jsons/setting.json', mode='r', encoding='utf8')
-        setting_data = json.load(temp_file)
-        temp_file.close()
+        with open('jsons/setting.json', mode='r', encoding='utf8') as temp_file:
+            setting_data = json.load(temp_file)
 
         mode = msg.split(' ')[0]
         m_object = msg.split(' ')[1]
@@ -49,10 +48,8 @@ class Picture(Cog_Extension):
         else:
             await ctx.send('Mode argument error!')
 
-        print(setting_data)
-        temp_file = open('jsons/setting.json', mode='w', encoding='utf8')
-        json.dump(setting_data, temp_file)
-        temp_file.close()
+        with open('jsons/setting.json', mode='w', encoding='utf8') as temp_file:
+            json.dump(setting_data, temp_file)
 
         await func.getChannel('_Report').send(
             f'[Command]Group pic - p_m used by member {ctx.author.id}. {func.now_time_info("whole")}')
@@ -61,9 +58,9 @@ class Picture(Cog_Extension):
     @pic.command()
     async def p_check(self, ctx):
         await ctx.message.delete()
-        temp_file = open('jsons/setting.json', mode='r', encoding='utf8')
-        setting_data = json.load(temp_file)
-        temp_file.close()
+
+        with open('jsons/setting.json', mode='r', encoding='utf8') as temp_file:
+            setting_data = json.load(temp_file)
 
         pic_str = str()
 

@@ -29,7 +29,7 @@ class Query(Cog_Extension):
     async def qmani(self, ctx, *, msg):
         alter = int(msg.split(' ')[1])
         id = int(msg.split(' ')[0])
-        info.execute(f'UPDATE quiz SET Crt={alter} WHERE Id={id};')
+        info.execute('UPDATE quiz SET Crt=? WHERE Id=?;', (alter, id))
         info.connection.commit()
 
 
