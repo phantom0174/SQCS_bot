@@ -4,6 +4,7 @@ from core.setup import info, jdata
 import functions as func
 import discord
 import random
+import json
 
 
 class Picture(Cog_Extension):
@@ -53,8 +54,8 @@ class Picture(Cog_Extension):
         json.dump(setting_data, temp_file)
         temp_file.close()
 
-        await getChannel('_Report').send(
-            f'[Command]Group pic - p_m used by member {ctx.author.id}. {now_time_info("whole")}')
+        await func.getChannel('_Report').send(
+            f'[Command]Group pic - p_m used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
     # picture_check
     @pic.command()
@@ -71,8 +72,8 @@ class Picture(Cog_Extension):
 
         await ctx.send(pic_str)
 
-        await getChannel('_Report').send(
-            f'[Command]Group pic - p_check used by member {ctx.author.id}. {now_time_info("whole")}')
+        await func.getChannel('_Report').send(
+            f'[Command]Group pic - p_check used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
     # random picture
     @pic.command()
@@ -81,8 +82,8 @@ class Picture(Cog_Extension):
         randPic = random.choice(jdata['pic'])
         await ctx.send(randPic)
 
-        await getChannel('_Report').send(
-            f'[Command]Group pic - rpic used by member {ctx.author.id}. {now_time_info("whole")}')
+        await func.getChannel('_Report').send(
+            f'[Command]Group pic - rpic used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
 
 def setup(bot):
