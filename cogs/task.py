@@ -20,9 +20,9 @@ class Task(Cog_Extension):
     @tasks.loop(minutes=10)
     async def quiz_auto(self):
         await self.bot.wait_until_ready()
-        temp_file = open('jsons/quiz.json', mode='r', encoding='utf8')
-        quiz_data = json.load(temp_file)
-        temp_file.close()
+
+        with open('jsons/quiz.json', mode='r', encoding='utf8') as temp_file:
+            quiz_data = json.load(temp_file)
 
         if func.now_time_info('date') == 1 and func.now_time_info('hour') >= 6 and quiz_data['event_status'] == 'False':
             await quiz_start(self.bot)
@@ -39,9 +39,9 @@ class Task(Cog_Extension):
     @tasks.loop(minutes=10)
     async def db_backup(self):
         await self.bot.wait_until_ready()
-        temp_file = open('jsons/dyn_setting.json', mode='r', encoding='utf8')
-        dyn = json.load(temp_file)
-        temp_file.close()
+
+        with open('jsons/dyn_setting.json', mode='r', encoding='utf8') as temp_file:
+            dyn = json.load(temp_file)
 
         if dyn['ldbh'] != func.now_time_info('hour'):
             file_name = 'db_backup/' + str(func.now_time_info('hour')) + '_backup.db'
@@ -51,9 +51,8 @@ class Task(Cog_Extension):
 
             dyn['ldbh'] = func.now_time_info('hour')
 
-            temp_file = open('jsons/dyn_setting.json', mode='w', encoding='utf8')
-            json.dump(dyn, temp_file)
-            temp_file.close()
+            with open('jsons/dyn_setting.json', mode='w', encoding='utf8') as temp_file:
+                json.dump(dyn, temp_file)
 
 
 def setup(bot):

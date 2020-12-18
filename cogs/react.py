@@ -18,16 +18,13 @@ class React(Cog_Extension):
         MsgCont = str(ctx.content).split(' ')
 
         if MsgCont[0] == 'sw' and ctx.channel == func.getChannel('_ToMV'):
-            temp_file = open('jsons/lecture.json', mode='r', encoding='utf8')
-            lect_data = json.load(temp_file)
-            temp_file.close()
+            with open('jsons/lecture.json', mode='r', encoding='utf8') as temp_file:
+                lect_data = json.load(temp_file)
 
             lect_data['temp_sw'] = MsgCont[1]
 
-            temp_file = open('jsons/lecture.json', mode='w', encoding='utf8')
-            json.dump(lect_data, temp_file)
-            temp_file.close()
-            return
+            with open('jsons/lecture.json', mode='w', encoding='utf8') as temp_file:
+                json.dump(lect_data, temp_file)
 
     @commands.command()
     async def msg_re(self, ctx, *, msg):
