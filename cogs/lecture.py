@@ -1,10 +1,11 @@
 from core.classes import Cog_Extension
 from discord.ext import commands
-from core.setup import *
-from functions import *
+from core.setup import info, jdata
+import functions as func
 import discord
 import asyncio
 import random
+import json
 
 
 class Lecture(Cog_Extension):
@@ -27,8 +28,8 @@ class Lecture(Cog_Extension):
             lect_list = 'No data.'
 
         await ctx.send(lect_list)
-        await getChannel('_Report').send(
-            f'[Command]Group lect - list used by member {ctx.author.id}. {now_time_info("whole")}')
+        await func.getChannel('_Report').send(
+            f'[Command]Group lect - list used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
@@ -55,8 +56,8 @@ class Lecture(Cog_Extension):
                 return
 
         info.connection.commit()
-        await getChannel('_Report').send(
-            f'[Command]Group lect - mani used by member {ctx.author.id}. {now_time_info("whole")}')
+        await func.getChannel('_Report').send(
+            f'[Command]Group lect - mani used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
@@ -74,9 +75,9 @@ class Lecture(Cog_Extension):
         info.execute(f'UPDATE lecture_list SET Status=1 WHERE Week={day};')
 
         def check(message):
-            return message.channel == getChannel('_ToMV')
+            return message.channel == func.getChannel('_ToMV')
 
-        await getChannel('_ToMV').send('request_score_weight')
+        await func.getChannel('_ToMV').send('request_score_weight')
         temp_weight = float((await self.bot.wait_for('message', check=check, timeout=30.0)).content)
 
         temp_file = open('jsons/lecture.json', mode='r', encoding='utf8')
@@ -95,7 +96,7 @@ class Lecture(Cog_Extension):
                 await msg.delete()
 
         # cd time from preventing member leave at once
-        random.seed(now_time_info('hour') * 92384)
+        random.seed(func.now_time_info('hour') * 92384)
         await asyncio.sleep(random.randint(30, 180))
 
         # add score to the attendances
@@ -105,11 +106,11 @@ class Lecture(Cog_Extension):
         voice_channel = discord.utils.get(ctx.guild.voice_channels, name=channel_name)
 
         for member in voice_channel.members:
-            await getChannel('_ToMV').send(f'lecture_attend {member.id}')
+            await func.getChannel('_ToMV').send(f'lecture_attend {member.id}')
 
         info.connection.commit()
-        await getChannel('_Report').send(
-            f'[Command]Group lect - start used by member {ctx.author.id}. {now_time_info("whole")}')
+        await func.getChannel('_Report').send(
+            f'[Command]Group lect - start used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
         # lecture ans check
 
@@ -160,8 +161,8 @@ class Lecture(Cog_Extension):
 
         info.connection.commit()
 
-        await getChannel('_Report').send(
-            f'[Command]Group lect - ans_check used by member {ctx.author.id}. {now_time_info("whole")}')
+        await func.getChannel('_Report').send(
+            f'[Command]Group lect - ans_check used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
@@ -199,16 +200,16 @@ class Lecture(Cog_Extension):
 
                 member_obj = await self.bot.guilds[0].fetch_member(member[0])  # member id
                 data_members += f'{medal}{member_obj.nick}:: Score: {member[1]}, Answer Count: {member[2]}\n'
-                await getChannel('_ToMV').send(f'lect_crt {member[0]} {member[1]}')
+                await func.getChannel('_ToMV').send(f'lect_crt {member[0]} {member[1]}')
                 ranking += 1
 
-            await ctx.send(embed=create_embed(':scroll: Lecture Event Result', 0x42fcff, ['Lecture final info'], [data_members]))
+            await ctx.send(embed=func.create_embed(':scroll: Lecture Event Result', 0x42fcff, ['Lecture final info'], [data_members]))
 
         info.execute('DELETE FROM lecture')
         info.connection.commit()
 
-        await getChannel('_Report').send(
-            f'[Command]Group lect - end used by member {ctx.author.id}. {now_time_info("whole")}')
+        await func.getChannel('_Report').send(
+            f'[Command]Group lect - end used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
 
 def setup(bot):

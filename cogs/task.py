@@ -1,5 +1,5 @@
-from core.setup import *
-from functions import *
+from core.setup import info, jdata
+import functions as func
 from cogs.quiz import quiz_start, quiz_end
 import discord
 import asyncio

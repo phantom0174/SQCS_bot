@@ -1,7 +1,7 @@
 from cogs.quiz import quiz_start, quiz_end
 from discord.ext import commands
-from core.setup import *
-from functions import *
+from core.setup import info, jdata
+import functions as func
 # import keep_alive
 import discord
 import asyncio
