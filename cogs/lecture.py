@@ -43,13 +43,13 @@ class Lecture(Cog_Extension):
 
             lect_name = msg.split(' ')[1]
             lect_week = msg.split(' ')[2]
-            info.execute(f'INSERT INTO lecture_list VALUES("{lect_name}", {lect_week}, 0);')
+            info.execute('INSERT INTO lecture_list VALUES(?, ?, 0);', (lect_name, lect_week))
             await ctx.send(f'Lecture {lect_name}, on week {lect_week} has been pushed!')
         elif mode == '0':
             delete_lect = msg.split(' ')[1]
 
             try:
-                info.execute(f'DELETE FROM lecture_list WHERE Name={delete_lect};')
+                info.execute('DELETE FROM lecture_list WHERE Name=?;', (delete_lect))
                 await ctx.send(f'Lecture {delete_lect} has been removed!')
             except:
                 await ctx.send(f'There are no lecture named {delete_lect}!')
@@ -63,7 +63,7 @@ class Lecture(Cog_Extension):
     @commands.has_any_role('總召', 'Administrator')
     async def start(self, ctx, day: int):
 
-        info.execute(f'SELECT STATUS FROM lecture_list WHERE Week={day};')
+        info.execute('SELECT STATUS FROM lecture_list WHERE Week=?;', (day))
         data = info.fetchall()[0]
 
         if data[0] == 1:
@@ -72,7 +72,7 @@ class Lecture(Cog_Extension):
 
         await ctx.send(':loudspeaker: @everyone，講座開始了！\n :bulb: 於回答講師問題時請在答案前方加上"&"，回答正確即可加分。')
 
-        info.execute(f'UPDATE lecture_list SET Status=1 WHERE Week={day};')
+        info.execute('UPDATE lecture_list SET Status=1 WHERE Week=?;', (day))
 
         def check(message):
             return message.channel == func.getChannel('_ToMV')
@@ -80,15 +80,13 @@ class Lecture(Cog_Extension):
         await func.getChannel('_ToMV').send('request_score_weight')
         temp_weight = float((await self.bot.wait_for('message', check=check, timeout=30.0)).content)
 
-        temp_file = open('jsons/lecture.json', mode='r', encoding='utf8')
-        lect_data = json.load(temp_file)
-        temp_file.close()
+        with open('jsons/lecture.json', mode='r', encoding='utf8') as temp_file:
+            lect_data = json.load(temp_file)
 
         lect_data['temp_sw'] = temp_weight
 
-        temp_file = open('jsons/lecture.json', mode='w', encoding='utf8')
-        json.dump(lect_data, temp_file)
-        temp_file.close()
+        with open('jsons/lecture.json', mode='w', encoding='utf8') as temp_file:
+            json.dump(lect_data, temp_file)
 
         msg_logs = await ctx.channel.history(limit=200).flatten()
         for msg in msg_logs:
@@ -100,7 +98,7 @@ class Lecture(Cog_Extension):
         await asyncio.sleep(random.randint(30, 180))
 
         # add score to the attendances
-        info.execute(f'SELECT Name FROM lecture_list WHERE Week={day};')
+        info.execute('SELECT Name FROM lecture_list WHERE Week=?;', (day))
         channel_name = info.fetchall()[0][0]
 
         voice_channel = discord.utils.get(ctx.guild.voice_channels, name=channel_name)
@@ -136,25 +134,23 @@ class Lecture(Cog_Extension):
         MemberCrtMsg.reverse()
 
         # add score to correct members
-        temp_file = open('jsons/lecture.json', mode='r', encoding='utf8')
-        l_data = json.load(temp_file)  # lecture data
-        temp_file.close()
+        with open('jsons/lecture.json', mode='r', encoding='utf8') as temp_file:
+            l_data = json.load(temp_file)  # lecture data
 
         TScore = float(5)
         for crt_msg in MemberCrtMsg:
             TargetId = crt_msg.author.id
             mScore = TScore * float(l_data["temp_sw"])
-            info.execute(f'SELECT Id, Score, Count FROM lecture WHERE Id={TargetId}')
+            info.execute('SELECT Id, Score, Count FROM lecture WHERE Id=?;', (TargetId))
             data = info.fetchall()
 
             if len(data) == 0:
-                info.execute(f'INSERT INTO lecture VALUES({TargetId}, {mScore}, 1);')
+                info.execute('INSERT INTO lecture VALUES(?, ?, 1);', (TargetId, mScore))
             else:
                 old_Score = float(data[0][1])
                 old_Count = int(data[0][2])
 
-                info.execute(
-                    f'UPDATE lecture SET Score={old_Score + mScore}, Count={old_Count + 1} WHERE Id={TargetId};')
+                info.execute('UPDATE lecture SET Score=?, Count=? WHERE Id=?;', (old_Score + mScore, old_Count + 1, TargetId))
 
             if TScore > 1:
                 TScore -= 1
@@ -168,7 +164,7 @@ class Lecture(Cog_Extension):
     @commands.has_any_role('總召', 'Administrator')
     async def end(self, ctx, day: int):
 
-        info.execute(f'SELECT Status FROM lecture_list WHERE Week={day};')
+        info.execute('SELECT Status FROM lecture_list WHERE Week=?;', (day))
         data = info.fetchall()[0]
 
         if data[0] == 0:
@@ -177,7 +173,7 @@ class Lecture(Cog_Extension):
 
         await ctx.send(':loudspeaker: @here, 講座結束了!\n :partying_face: 感謝大家今天的參與!')
 
-        info.execute(f'UPDATE lecture_list SET Status=0 WHERE Week={day};')
+        info.execute('UPDATE lecture_list SET Status=0 WHERE Week=?;', (day))
 
         # adding scores and show lecture final data
         info.execute("SELECT * FROM lecture ORDER BY Score ASC")
