@@ -1,26 +1,14 @@
 import json
-import sqlite3
+import pymongo
+from pymongo import MongoClient
+import os
+
+
+# database setup
+password = os.environ.get("PW")
+account = os.environ.get("ACCOUNT")
+link = f"mongodb+srv://{account}:{password}@light-cube-cluster.5wswq.mongodb.net/sqcs?retryWrites=true&w=majority"
+client = MongoClient(link)["sqcs-bot"]
 
 with open('./jsons/setting.json', mode='r', encoding='utf8') as jfile:
     jdata = json.load(jfile)
-
-connection = sqlite3.connect('DataBase.db')
-info = connection.cursor()
-
-# info.execute('DROP TABLE quiz;')
-
-info.execute("""CREATE TABLE IF NOT EXISTS quiz (
-      Id INTEGER,
-      Crt INTEGER);""")
-
-info.execute("""CREATE TABLE IF NOT EXISTS lecture (
-      Id INTEGER,
-      Score REAL,
-      Count INTEGER);""")
-
-info.execute("""CREATE TABLE IF NOT EXISTS lecture_list (
-      Name TEXT,
-      Week INTEGER,
-      Status INTEGER);""")
-
-info.connection.commit()

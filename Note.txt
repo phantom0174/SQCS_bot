@@ -9,47 +9,17 @@ temp_file = open('quiz.json', mode='w', encoding='utf8')
 json.dump(quiz_data, temp_file)
 temp_file.close()
 
-# sqlite 懶人包 ->>
+cluster collections
+quiz:
+Id INTEGER
+Crt INTEGER
 
-# Create new table
-CREATE TABLE comments (
-	post_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	name TEXT NOT NULL,
-	email TEXT NOT NULL,
-	website_url TEXT NULL,
-	comment TEXT NOT NULL );
+lecture:
+Id INTEGER
+Score REAL
+Count INTEGER
 
-# Basic selector
-SELECT post_id, name, email, website_url, comment
-FROM comments;
-
-# Change values of row
-UPDATE comments
-SET email = 'zyx@email.com'
-WHERE name = 'Shivam Mamgain';
-
-
-# Add row to table
-INSERT INTO comments ( name, email, website_url, comment )
-VALUES ( 'Shivam Mamgain', 'xyz@gmail.com',
-'shivammg.blogspot.com', 'Great tutorial for beginners.' );
-
-
-# Delete row
-DELETE FROM comments
-WHERE post_id = 9;
-
-# Add column to table
-ALTER TABLE comments
-ADD COLUMN username TEXT;
-
-# Rename table
-ALTER TABLE comments
-RENAME TO Coms;
-
-# Rename table
-ALTER TABLE comments
-RENAME COLUMN <column> TO Coms;
-
-# Delete whole table
-DROP TABLE Coms;
+lecture list:
+Name TEXT
+Week INTEGER
+Status INTEGER

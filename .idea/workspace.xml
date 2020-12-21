@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a2c41741-fa8c-4512-aef2-bbf655cfc924" name="Default Changelist" comment="" />
+    <list default="true" id="a2c41741-fa8c-4512-aef2-bbf655cfc924" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Note.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Note.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/query.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/query.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/setup.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -122,9 +127,9 @@
     </state>
     <state x="406" y="249" width="630" height="284" key="org.intellij.images.editor.actions.BackgroundImageDialog/0.31.1280.689/1920.30.1920.1050@0.31.1280.689" timestamp="1607440272699" />
     <state x="2529" y="362" key="org.intellij.images.editor.actions.BackgroundImageDialog/0.31.1280.689/1920.30.1920.1050@1920.30.1920.1050" timestamp="1607439745359" />
-    <state x="303" y="41" width="672" height="678" key="search.everywhere.popup" timestamp="1607909905792">
+    <state x="303" y="41" width="672" height="678" key="search.everywhere.popup" timestamp="1608517769115">
       <screen x="0" y="31" width="1280" height="689" />
     </state>
-    <state x="303" y="41" width="672" height="678" key="search.everywhere.popup/0.31.1280.689@0.31.1280.689" timestamp="1607909905792" />
+    <state x="303" y="41" width="672" height="678" key="search.everywhere.popup/0.31.1280.689@0.31.1280.689" timestamp="1608517769115" />
   </component>
 </project>
