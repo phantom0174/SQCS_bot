@@ -1,14 +1,16 @@
 from cogs.quiz import quiz_start, quiz_end
 from discord.ext import commands
-from core.setup import info, jdata
+from core.setup import jdata, client
 import functions as func
-# import keep_alive
 import discord
 import asyncio
 import sqlite3
 import json
 import sys
 import os
+# import keep_alive
+
+
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='+', intents=intents)
 
@@ -58,16 +60,12 @@ async def reload(ctx, msg):
 async def safe_stop(ctx):
 
     await ctx.send(':white_check_mark: The bot has stopped!')
-    print('The bot has stopped!')
-    info.connection.commit()
-    info.connection.close()
     sys.exit(0)
 
 
 @bot.event
 async def on_disconnect():
     print('Bot disconnected')
-    info.connection.commit()
 
 
 for filename in os.listdir('./cogs'):

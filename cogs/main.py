@@ -1,6 +1,6 @@
 from core.classes import Cog_Extension
 from discord.ext import commands
-from core.setup import info, jdata
+from core.setup import jdata, client
 import functions as func
 import discord
 

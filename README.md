@@ -14,6 +14,7 @@
 - 2020/12/07: Bot Cog-lized.
 - 2020/12/13: Emoji Added.
 - 2020/12/14: Fix repl update.
+- 2020/12/21: Move database to MongoDB.
 
 
 ### Bot Info
