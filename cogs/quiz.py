@@ -63,10 +63,13 @@ class Quiz(Cog_Extension):
             quiz_cursor.insert_one(member_quiz_info)
 
             if msg.content[2:-2] == quiz_data["correct_ans"]:
+                quiz_cursor.update_one({"_id": msg.author.id}, {"$set": {"correct": 1}})
 
+                # add score to member fluctlight
                 fl_client = MongoClient(link)["LightCube"]
                 fl_cursor = fl_client["light-cube-info"]
-                fl_cursor.update_one({"_id": msg.author.id}, {"$set": {"correct": 1}})
+
+                fl_cursor.update_one({"_id": msg.author.id}, {"$inc": {"score": quiz_data["quiz_score"] * quiz_data["score_weight"]}})
 
                 if fl_cursor.find_one({"_id": msg.author.id})["week_active"] == 0:
                     fl_cursor.update_one({"_id": msg.author.id}, {"$set": {"week_active": 1}})
@@ -91,9 +94,16 @@ async def quiz_start(bot):
     await cmd_channel.send(
         f'Quiz Event status set to {quiz_data["event_status"]}, correct answer set to {quiz_data["correct_ans"]}!')
 
-    await main_channel.send(':loudspeaker: @everyone，有一個新的懸賞活動開始了，請確認你的答案是隱蔽模式！\n :exclamation: (請在答案的前方與後方各加上"||"的符號)')
+    await main_channel.send(':loudspeaker: @everyone，有一個新的懸賞活動開始了，請確認你的答案是隱蔽模式！\n:exclamation: (請在答案的前方與後方各加上"||"的符號)')
     await main_channel.send(f'活動開始於 {func.now_time_info("whole")}')
     await main_channel.set_permissions(guild.default_role, send_messages=True)
+
+    # get score parameters
+    mvisualizer_client = MongoClient(link)["mvisualizer"]
+    score_cursor = mvisualizer_client["score_parameters"]
+    data = score_cursor.find_one({"_id": 0})
+    quiz_data["quiz_score"] = data["quiz_point"]
+    quiz_data["score_weight"] = data["score_weight"]
 
     with open('jsons/quiz.json', mode='w', encoding='utf8') as temp_file:
         json.dump(quiz_data, temp_file)

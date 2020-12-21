@@ -41,7 +41,7 @@ class Lecture(Cog_Extension):
         lecture_list_cursor = client["lecture_list"]
 
         if mode == '1':
-            if len(msg.split(' ')) < 2:
+            if len(msg.split(' ')) < 3:
                 await ctx.send('Not enough parameters!')
                 return
 
@@ -80,9 +80,9 @@ class Lecture(Cog_Extension):
 
         lecture_list_cursor.update({"_id": week}, {"$set": {"status": 1}})
 
-        mv_client = MongoClient(link)['mvisualizer']
+        mvisualizer_client = MongoClient(link)['mvisualizer']
+        score_cursor = mvisualizer_client["score_parameters"]
 
-        score_cursor = mv_client["score_parameters"]
         temp_score_weight = score_cursor.find_one({})["weight"]
         lect_attend_score = score_cursor.find_one({})["lecture_attend_point"]
 
