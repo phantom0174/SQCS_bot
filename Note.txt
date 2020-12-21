@@ -10,14 +10,8 @@ json.dump(quiz_data, temp_file)
 temp_file.close()
 
 
-fluctlight:
 
-
-
-
-
-
-cluster collections
+# cluster collections
 quiz:
 Id INTEGER
 Crt INTEGER

@@ -1,6 +1,6 @@
 from core.classes import Cog_Extension
 from discord.ext import commands
-from core.setup import info, jdata
+from core.setup import jdata, client, link
 import functions as func
 import discord
 import asyncio
@@ -17,17 +17,17 @@ class Lecture(Cog_Extension):
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def list(self, ctx):
-        info.execute('SELECT * FROM lecture_list;')
-        data = info.fetchall()
+        lecture_cursor = client["lecture_event"]
+        data = lecture_cursor.find({})
 
-        lect_list = str()
-        for lect_info in data:
-            lect_list += f'Name: {lect_info[0]}, Week: {lect_info[1]}\n'
+        lecture_list = str()
+        for item in data:
+            lecture_list += f'Name: {item["name"]}, Week: {item["_id"]}\n'
 
-        if lect_list == '':
-            lect_list = 'No data.'
+        if data is None:
+            lecture_list = 'No data.'
 
-        await ctx.send(lect_list)
+        await ctx.send(lecture_list)
         await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group lect - list used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
@@ -36,32 +36,38 @@ class Lecture(Cog_Extension):
     async def mani(self, ctx, *, msg):
 
         mode = msg.split(' ')[0]
+        lecture_cursor = client["lecture_event"]
+
         if mode == '1':
             if len(msg.split(' ')) < 2:
                 await ctx.send('Not enough parameters!')
                 return
 
-            lect_name = msg.split(' ')[1]
-            lect_week = msg.split(' ')[2]
-            info.execute('INSERT INTO lecture_list VALUES(?, ?, 0);', (lect_name, lect_week))
-            await ctx.send(f'Lecture {lect_name}, on week {lect_week} has been pushed!')
+            lecture_name = msg.split(' ')[1]
+            lecture_week = int(msg.split(' ')[2])
+
+            lecture_info = {"_id": lecture_week, "name": lecture_name}
+            lecture_cursor.insert_one(lecture_info)
+
+            await ctx.send(f'Lecture {lecture_name}, on week {lecture_week} has been pushed!')
         elif mode == '0':
-            delete_lect = msg.split(' ')[1]
+            delete_lecture_name = msg.split(' ')[1]
 
             try:
-                info.execute('DELETE FROM lecture_list WHERE Name=?;', (delete_lect))
-                await ctx.send(f'Lecture {delete_lect} has been removed!')
+                lecture_cursor.delete_one({"name": delete_lecture_name})
+                await ctx.send(f'Lecture {delete_lecture_name} has been removed!')
             except:
-                await ctx.send(f'There are no lecture named {delete_lect}!')
+                await ctx.send(f'There are no lecture named {delete_lecture_name}!')
                 return
 
-        info.connection.commit()
         await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group lect - mani used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def start(self, ctx, day: int):
+
+        lecture_cursor =
 
         info.execute('SELECT STATUS FROM lecture_list WHERE Week=?;', (day))
         data = info.fetchall()[0]
