@@ -38,7 +38,7 @@ class Quiz(Cog_Extension):
     # event answer listen function
     @commands.Cog.listener()
     async def on_message(self, msg):
-        main_channel = discord.utils.get(self.bot.guilds[0].text_channels, name='懸賞區')
+        main_channel = discord.utils.get(self.bot.guilds[0].text_channels, name='💎懸賞區')
         if msg.author == self.bot.user or msg.channel != main_channel or msg.content[0] == '~':
             return
 
@@ -78,8 +78,8 @@ class Quiz(Cog_Extension):
 # auto start quiz event
 async def quiz_start(bot):
     guild = bot.guilds[0]
-    main_channel = discord.utils.get(guild.text_channels, name='懸賞區')
-    cmd_channel = discord.utils.get(guild.text_channels, name='◉總指令區')
+    main_channel = discord.utils.get(guild.text_channels, name='💎懸賞區')
+    cmd_channel = discord.utils.get(guild.text_channels, name='總指令區')
 
     with open('jsons/quiz.json', mode='r', encoding='utf8') as temp_file:
         quiz_data = json.load(temp_file)
@@ -102,8 +102,8 @@ async def quiz_start(bot):
 # auto end quiz event
 async def quiz_end(bot):
     guild = bot.guilds[0]
-    main_channel = discord.utils.get(guild.text_channels, name='懸賞區')
-    cmd_channel = discord.utils.get(guild.text_channels, name='◉總指令區')
+    main_channel = discord.utils.get(guild.text_channels, name='💎懸賞區')
+    cmd_channel = discord.utils.get(guild.text_channels, name='總指令區')
 
     with open('jsons/quiz.json', mode='r', encoding='utf8') as temp_file:
         quiz_data = json.load(temp_file)
@@ -121,22 +121,22 @@ async def quiz_end(bot):
         json.dump(quiz_data, temp_file)
 
     # list the winners
-    info.execute('SELECT * FROM quiz WHERE Crt=1;')
-    data = info.fetchall()
+    quiz_cursor = client["quiz_event"]
+    data = quiz_cursor.find({"correct": 1})
 
     winners = str()
     for winner in data:
-        member = await bot.fetch_user(winner[0])
-        winners += f'{member.name}\n'
+        winner_name = (await bot.guilds[0].fetch_member(winner["_id"])).nick
+        if winner_name is None:
+            winner_name = (await bot.fetch_user(winner["_id"])).name
+        winners += f'{winner_name}\n'
 
     if winners == '':
-        winners += 'None'
+        winners = 'None'
 
-    info.execute('DELETE FROM quiz;')
-    info.connection.commit()
+    quiz_cursor.delete_many({})
 
     await main_channel.send(embed=func.create_embed(':scroll: Quiz Event Result', 0x42fcff, ['Winner'], [winners]))
-
     await func.getChannel(bot, '_ToMV').send('update_guild_fluctlight')
 
 
