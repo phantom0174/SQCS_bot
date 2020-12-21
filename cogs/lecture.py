@@ -1,3 +1,4 @@
+from pymongo import MongoClient
 from core.classes import Cog_Extension
 from discord.ext import commands
 from core.setup import jdata, client, link
@@ -6,6 +7,7 @@ import discord
 import asyncio
 import random
 import json
+import pymongo
 
 
 class Lecture(Cog_Extension):
@@ -17,8 +19,8 @@ class Lecture(Cog_Extension):
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def list(self, ctx):
-        lecture_cursor = client["lecture_event"]
-        data = lecture_cursor.find({})
+        lecture_list_cursor = client["lecture_list"]
+        data = lecture_list_cursor.find({})
 
         lecture_list = str()
         for item in data:
@@ -36,7 +38,7 @@ class Lecture(Cog_Extension):
     async def mani(self, ctx, *, msg):
 
         mode = msg.split(' ')[0]
-        lecture_cursor = client["lecture_event"]
+        lecture_list_cursor = client["lecture_list"]
 
         if mode == '1':
             if len(msg.split(' ')) < 2:
@@ -46,15 +48,15 @@ class Lecture(Cog_Extension):
             lecture_name = msg.split(' ')[1]
             lecture_week = int(msg.split(' ')[2])
 
-            lecture_info = {"_id": lecture_week, "name": lecture_name}
-            lecture_cursor.insert_one(lecture_info)
+            lecture_info = {"_id": lecture_week, "name": lecture_name, "status": 0}
+            lecture_list_cursor.insert_one(lecture_info)
 
             await ctx.send(f'Lecture {lecture_name}, on week {lecture_week} has been pushed!')
         elif mode == '0':
             delete_lecture_name = msg.split(' ')[1]
 
             try:
-                lecture_cursor.delete_one({"name": delete_lecture_name})
+                lecture_list_cursor.delete_one({"name": delete_lecture_name})
                 await ctx.send(f'Lecture {delete_lecture_name} has been removed!')
             except:
                 await ctx.send(f'There are no lecture named {delete_lecture_name}!')
@@ -65,31 +67,29 @@ class Lecture(Cog_Extension):
 
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def start(self, ctx, day: int):
+    async def start(self, ctx, week: int):
 
-        lecture_cursor =
+        lecture_list_cursor = client["lecture_list"]
+        data = lecture_list_cursor.find_one({"_id": week})
 
-        info.execute('SELECT STATUS FROM lecture_list WHERE Week=?;', (day))
-        data = info.fetchall()[0]
-
-        if data[0] == 1:
+        if data["status"] == 1:
             await ctx.send(':exclamation: The lecture has already started!')
             return
 
-        await ctx.send(':loudspeaker: @everyone，講座開始了！\n :bulb: 於回答講師問題時請在答案前方加上"&"，回答正確即可加分。')
+        await ctx.send(':loudspeaker: @everyone，講座開始了！\n:bulb: 於回答講師問題時請在答案前方加上"&"，回答正確即可加分。')
 
-        info.execute('UPDATE lecture_list SET Status=1 WHERE Week=?;', (day))
+        lecture_list_cursor.update({"_id": week}, {"$set": {"status": 1}})
 
-        def check(message):
-            return message.channel == func.getChannel(self.bot, '_ToMV')
+        mv_client = MongoClient(link)['mvisualizer']
 
-        await func.getChannel(self.bot, '_ToMV').send('request_score_weight')
-        temp_weight = float((await self.bot.wait_for('message', check=check, timeout=30.0)).content)
+        score_cursor = mv_client["score_parameters"]
+        temp_score_weight = score_cursor.find_one({})["weight"]
+        lect_attend_score = score_cursor.find_one({})["lecture_attend_point"]
 
         with open('jsons/lecture.json', mode='r', encoding='utf8') as temp_file:
             lect_data = json.load(temp_file)
 
-        lect_data['temp_sw'] = temp_weight
+        lect_data['temp_sw'] = temp_score_weight
 
         with open('jsons/lecture.json', mode='w', encoding='utf8') as temp_file:
             json.dump(lect_data, temp_file)
@@ -104,26 +104,25 @@ class Lecture(Cog_Extension):
         await asyncio.sleep(random.randint(30, 180))
 
         # add score to the attendances
-        info.execute('SELECT Name FROM lecture_list WHERE Week=?;', (day))
-        channel_name = info.fetchall()[0][0]
+        fl_client = MongoClient(link)["LightCube"]
+        fl_cursor = fl_client["light-cube-info"]
 
+        channel_name = lecture_list_cursor.find_one({"_id": week})["name"]
         voice_channel = discord.utils.get(ctx.guild.voice_channels, name=channel_name)
 
         for member in voice_channel.members:
-            await func.getChannel(self.bot, '_ToMV').send(f'lecture_attend {member.id}')
+            fl_cursor.update_one({"_id": member.id}, {"$inc": {"score": lect_attend_score * temp_score_weight}})
 
-        info.connection.commit()
         await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group lect - start used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
-        # lecture ans check
-
+    # lecture ans check
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def ans_check(self, ctx, *, msg):
-        CrtAns = msg.split(' ')
+        correct_answer = msg.split(' ')
         msg_logs = await ctx.channel.history(limit=100).flatten()
-        MemberCrtMsg = []  # correct message
+        correct_msgs = []  # correct message
 
         for log in msg_logs:
             if len(log.content) == 0:
@@ -131,60 +130,62 @@ class Lecture(Cog_Extension):
 
             if (not log.author.bot) and log.content[0] == '&':
                 await log.delete()
-                for ans in CrtAns:
+                for ans in correct_answer:
                     # correct answer is a subset of member answer
                     if log.content.find(ans) != -1:
-                        MemberCrtMsg.append(log)
+                        correct_msgs.append(log)
                         break
 
-        MemberCrtMsg.reverse()
+        correct_msgs.reverse()
 
         # add score to correct members
+        lecture_event_cursor = client["lecture_event"]
+
         with open('jsons/lecture.json', mode='r', encoding='utf8') as temp_file:
             l_data = json.load(temp_file)  # lecture data
 
         TScore = float(5)
-        for crt_msg in MemberCrtMsg:
+        for crt_msg in correct_msgs:
             TargetId = crt_msg.author.id
             mScore = TScore * float(l_data["temp_sw"])
-            info.execute('SELECT Id, Score, Count FROM lecture WHERE Id=?;', (TargetId))
-            data = info.fetchall()
 
-            if len(data) == 0:
-                info.execute('INSERT INTO lecture VALUES(?, ?, 1);', (TargetId, mScore))
+            data = lecture_event_cursor.find_one({"_id": TargetId})
+
+            if data is None:
+                member_info = {"_id": TargetId, "score": mScore, "count": 1}
+                lecture_event_cursor.insert_one(member_info)
             else:
-                old_Score = float(data[0][1])
-                old_Count = int(data[0][2])
-
-                info.execute('UPDATE lecture SET Score=?, Count=? WHERE Id=?;', (old_Score + mScore, old_Count + 1, TargetId))
+                lecture_event_cursor.update_one({"_id": TargetId}, {"$inc": {"score": mScore, "count": 1}})
 
             if TScore > 1:
                 TScore -= 1
-
-        info.connection.commit()
 
         await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group lect - ans_check used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def end(self, ctx, day: int):
+    async def end(self, ctx, week: int):
 
-        info.execute('SELECT Status FROM lecture_list WHERE Week=?;', (day))
-        data = info.fetchall()[0]
+        lecture_list_cursor = client["lecture_list"]
+        data = lecture_list_cursor.find_one({"_id": week})
 
-        if data[0] == 0:
+        if data["status"] == 0:
             await ctx.send(':exclamation: The lecture has already ended!')
             return
 
-        await ctx.send(':loudspeaker: @here, 講座結束了!\n :partying_face: 感謝大家今天的參與!')
+        await ctx.send(':loudspeaker: @here, 講座結束了!\n:partying_face: 感謝大家今天的參與!')
 
-        info.execute('UPDATE lecture_list SET Status=0 WHERE Week=?;', (day))
+        lecture_list_cursor.update_one({"_id": week}, {"$set": {"status": 0}})
 
         # adding scores and show lecture final data
-        info.execute("SELECT * FROM lecture ORDER BY Score ASC")
-        data = info.fetchall()
-        if len(data) == 0:
+        fl_client = MongoClient(link)["LightCube"]
+        fl_cursor = fl_client["light-cube-info"]
+
+        lecture_event_cursor = client["lecture_event"]
+        data = lecture_event_cursor.find({}).sort("score", pymongo.DESCENDING)
+
+        if data is None:
             await ctx.send(':exclamation: There are no data to show!')
             return
 
@@ -200,15 +201,22 @@ class Lecture(Cog_Extension):
             else:
                 medal = ':medal:'
 
-            member_obj = await self.bot.guilds[0].fetch_member(member[0])  # member id
-            data_members += f'{medal}{member_obj.nick}:: Score: {member[1]}, Answer Count: {member[2]}\n'
-            await func.getChannel(self.bot, '_ToMV').send(f'lect_crt {member[0]} {member[1]}')
+            member_name = (await self.bot.guilds[0].fetch_member[member["_id"]]).nick
+            if member_name is None:
+                member_name = (await self.bot.fetch_user[member["_id"]]).name
+
+            data_members += f'{medal}{member_name}:: Score: {member["score"]}, Answer Count: {member["count"]}\n'
+
+            fl_cursor.update_one({"_id": member["_id"]}, {"$inc": {"score": member["score"]}})
+
+            if fl_cursor.find_one({"_id": member["_id"]})["week_active"] is 0:
+                fl_cursor.update_one({"_id": member["_id"]}, {"$set": {"week_active": 1}})
+
             ranking += 1
 
         await ctx.send(embed=func.create_embed(':scroll: Lecture Event Result', 0x42fcff, ['Lecture final info'], [data_members]))
 
-        info.execute('DELETE FROM lecture')
-        info.connection.commit()
+        lecture_event_cursor.delete({})
 
         await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group lect - end used by member {ctx.author.id}. {func.now_time_info("whole")}')
