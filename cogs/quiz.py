@@ -1,9 +1,10 @@
 from core.classes import Cog_Extension
 from discord.ext import commands
-from core.setup import info, jdata
+from core.setup import jdata, client, link
 import functions as func
 import discord
 import json
+from pymongo import MongoClient
 
 
 class Quiz(Cog_Extension):
@@ -49,25 +50,29 @@ class Quiz(Cog_Extension):
 
         await msg.delete()
 
-        info.execute('SELECT * FROM quiz WHERE Id=?;', (msg.author.id))
-        data = info.fetchall()
+        quiz_cursor = client["quiz_event"]
+        data = quiz_cursor.find({})
 
-        if len(data) != 0:
+        if data is not None:
             await msg.author.send(':no_entry_sign: 你已經傳送過答案了，請不要重複傳送！')
             return
 
         if msg.content[0:2] == '||' and msg.content[-2:] == '||':
             await msg.author.send(':white_check_mark: 我收到你的答案了!')
-            info.execute('INSERT INTO quiz VALUES(?, 0);', (msg.author.id))
+            member_quiz_info = {"_id": msg.author.id, "correct": 0}
+            quiz_cursor.insert_one(member_quiz_info)
 
             if msg.content[2:-2] == quiz_data["correct_ans"]:
-                await func.getChannel(self.bot, '_ToMV').send(f'quiz_crt {msg.author.id}')
-                info.execute('UPDATE quiz SET Crt=1 WHERE Id=?;', (msg.author.id))
+
+                fl_client = MongoClient(link)["LightCube"]
+                fl_cursor = fl_client["light-cube-info"]
+                fl_cursor.update_one({"_id": msg.author.id}, {"$set": {"correct": 1}})
+
+                if fl_cursor.find_one({"_id": msg.author.id})["week_active"] is 0:
+                    fl_cursor.update_one({"_id": msg.author.id}, {"$set": {"week_active": 1}})
 
         else:
             await msg.author.send(':exclamation: 你的答案是錯誤的格式！')
-
-        info.connection.commit()
 
 
 # auto start quiz event

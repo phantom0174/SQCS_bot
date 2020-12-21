@@ -9,6 +9,14 @@ temp_file = open('quiz.json', mode='w', encoding='utf8')
 json.dump(quiz_data, temp_file)
 temp_file.close()
 
+
+fluctlight:
+
+
+
+
+
+
 cluster collections
 quiz:
 Id INTEGER

@@ -22,7 +22,7 @@ class Query(Cog_Extension):
         status = str()
         for item in data:
             member_name = (await self.bot.guilds[0].fetch_member(item["_id"])).nick
-            if member_name == None:
+            if member_name is None:
                 member_name = (await self.bot.fetch_member(item["_id"])).name
 
             status += f'{member_name}: {item["correct"]}\n'
