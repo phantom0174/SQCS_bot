@@ -1,7 +1,7 @@
 from core.classes import Cog_Extension
 from discord.ext import commands
 from core.setup import jdata, client, link
-import functions as func
+import core.functions as func
 import discord
 import json
 from pymongo import MongoClient
@@ -68,7 +68,7 @@ class Quiz(Cog_Extension):
                 fl_cursor = fl_client["light-cube-info"]
                 fl_cursor.update_one({"_id": msg.author.id}, {"$set": {"correct": 1}})
 
-                if fl_cursor.find_one({"_id": msg.author.id})["week_active"] is 0:
+                if fl_cursor.find_one({"_id": msg.author.id})["week_active"] == 0:
                     fl_cursor.update_one({"_id": msg.author.id}, {"$set": {"week_active": 1}})
 
         else:

@@ -2,7 +2,7 @@ from pymongo import MongoClient
 from core.classes import Cog_Extension
 from discord.ext import commands
 from core.setup import jdata, client, link
-import functions as func
+import core.functions as func
 import discord
 import asyncio
 import random
@@ -209,7 +209,7 @@ class Lecture(Cog_Extension):
 
             fl_cursor.update_one({"_id": member["_id"]}, {"$inc": {"score": member["score"]}})
 
-            if fl_cursor.find_one({"_id": member["_id"]})["week_active"] is 0:
+            if fl_cursor.find_one({"_id": member["_id"]})["week_active"] == 0:
                 fl_cursor.update_one({"_id": member["_id"]}, {"$set": {"week_active": 1}})
 
             ranking += 1

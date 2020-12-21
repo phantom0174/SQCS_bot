@@ -1,5 +1,5 @@
 from core.setup import jdata, client
-import functions as func
+import core.functions as func
 from cogs.quiz import quiz_start, quiz_end
 import discord
 import asyncio

@@ -1,7 +1,7 @@
 from cogs.quiz import quiz_start, quiz_end
 from discord.ext import commands
 from core.setup import jdata, client
-import functions as func
+import core.functions as func
 import discord
 import asyncio
 import sqlite3
