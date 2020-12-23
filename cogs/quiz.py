@@ -5,7 +5,7 @@ import core.functions as func
 import discord
 import json
 from pymongo import MongoClient
-
+import core.score_related_module as srm
 
 class Quiz(Cog_Extension):
 
@@ -51,7 +51,7 @@ class Quiz(Cog_Extension):
         await msg.delete()
 
         quiz_cursor = client["quiz_event"]
-        data = quiz_cursor.find({})
+        data = quiz_cursor.find_one({"_id": msg.author.id})
 
         if data is not None:
             await msg.author.send(':no_entry_sign: 你已經傳送過答案了，請不要重複傳送！')
@@ -71,8 +71,7 @@ class Quiz(Cog_Extension):
 
                 fl_cursor.update_one({"_id": msg.author.id}, {"$inc": {"score": quiz_data["quiz_score"] * quiz_data["score_weight"]}})
 
-                if fl_cursor.find_one({"_id": msg.author.id})["week_active"] == 0:
-                    fl_cursor.update_one({"_id": msg.author.id}, {"$set": {"week_active": 1}})
+                await srm.score_related_attribute_update(self.bot, msg.author.id)
 
         else:
             await msg.author.send(':exclamation: 你的答案是錯誤的格式！')

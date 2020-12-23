@@ -8,6 +8,7 @@ import asyncio
 import random
 import json
 import pymongo
+import core.score_related_module as srm
 
 
 class Lecture(Cog_Extension):
@@ -112,6 +113,7 @@ class Lecture(Cog_Extension):
 
         for member in voice_channel.members:
             fl_cursor.update_one({"_id": member.id}, {"$inc": {"score": lect_attend_score * temp_score_weight}})
+            await srm.score_related_attribute_update(self.bot, member.id)
 
         await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group lect - start used by member {ctx.author.id}. {func.now_time_info("whole")}')
@@ -156,6 +158,7 @@ class Lecture(Cog_Extension):
                 lecture_event_cursor.insert_one(member_info)
             else:
                 lecture_event_cursor.update_one({"_id": TargetId}, {"$inc": {"score": mScore, "count": 1}})
+                await srm.score_related_attribute_update(self.bot, TargetId)
 
             if TScore > 1:
                 TScore -= 1
