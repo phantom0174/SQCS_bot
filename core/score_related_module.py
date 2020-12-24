@@ -7,8 +7,7 @@ import discord
 import asyncio
 
 
-# a full integration of updating member's score-related attributes
-async def score_related_attribute_update(bot, member_id):
+async def acitve_log_update(bot, member_id):
     fluctlight_client = MongoClient(link)["LightCube"]
     fluctlight_cursor = fluctlight_client["light-cube-info"]
 
@@ -17,7 +16,8 @@ async def score_related_attribute_update(bot, member_id):
     if data["week_active"] == 0:
         fluctlight_cursor.update_one({"_id": member_id}, {"$set": {"week_active": 1}})
 
-    # rank update
+
+async def rank_update(bot, member_id):
     player_info_cursor = fluctlight_client["player-info"]
 
     data = player_info_cursor.find_one({"_id": member_id})
