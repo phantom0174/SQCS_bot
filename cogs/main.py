@@ -32,6 +32,17 @@ class Main(Cog_Extension):
         for member in ctx.guild.members:
             print(member)
 
+    @commands.command()
+    @commands.has_any_role('總召', 'Administrator')
+    async def name_find(self, ctx, search_name: str):
+        for member in ctx.guild.members:
+            member_name = member.nick
+            if member_name is None:
+                member_name = member.name
+
+            if member_name.find(search_name):
+                await ctx.send(f'{member_name} {member.id}')
+
 
 def setup(bot):
     bot.add_cog(Main(bot))

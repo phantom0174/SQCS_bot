@@ -5,7 +5,7 @@ import core.functions as func
 import discord
 import json
 from pymongo import MongoClient
-import core.score_related_module as srm
+import core.score_module as sm
 
 class Quiz(Cog_Extension):
 
@@ -71,7 +71,7 @@ class Quiz(Cog_Extension):
 
                 fl_cursor.update_one({"_id": msg.author.id}, {"$inc": {"score": quiz_data["quiz_score"] * quiz_data["score_weight"]}})
 
-                await srm.score_related_attribute_update(self.bot, msg.author.id)
+                await sm.active_log_update(self.bot, msg.author.id)
 
         else:
             await msg.author.send(':exclamation: 你的答案是錯誤的格式！')

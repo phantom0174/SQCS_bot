@@ -8,7 +8,7 @@ import asyncio
 import random
 import json
 import pymongo
-import core.score_related_module as srm
+import core.score_module as sm
 
 
 class Lecture(Cog_Extension):
@@ -84,8 +84,8 @@ class Lecture(Cog_Extension):
         mvisualizer_client = MongoClient(link)['mvisualizer']
         score_cursor = mvisualizer_client["score_parameters"]
 
-        temp_score_weight = score_cursor.find_one({})["weight"]
-        lect_attend_score = score_cursor.find_one({})["lecture_attend_point"]
+        temp_score_weight = score_cursor.find_one({"_id": 0})["score_weight"]
+        lect_attend_score = score_cursor.find_one({"_id": 0})["lecture_attend_point"]
 
         with open('jsons/lecture.json', mode='r', encoding='utf8') as temp_file:
             lect_data = json.load(temp_file)
@@ -113,7 +113,7 @@ class Lecture(Cog_Extension):
 
         for member in voice_channel.members:
             fl_cursor.update_one({"_id": member.id}, {"$inc": {"score": lect_attend_score * temp_score_weight}})
-            await srm.score_related_attribute_update(self.bot, member.id)
+            await sm.active_log_update(self.bot, member.id)
 
         await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group lect - start used by member {ctx.author.id}. {func.now_time_info("whole")}')
@@ -158,7 +158,8 @@ class Lecture(Cog_Extension):
                 lecture_event_cursor.insert_one(member_info)
             else:
                 lecture_event_cursor.update_one({"_id": TargetId}, {"$inc": {"score": mScore, "count": 1}})
-                await srm.score_related_attribute_update(self.bot, TargetId)
+
+            await sm.active_log_update(self.bot, TargetId)
 
             if TScore > 1:
                 TScore -= 1
@@ -186,7 +187,7 @@ class Lecture(Cog_Extension):
         fl_cursor = fl_client["light-cube-info"]
 
         lecture_event_cursor = client["lecture_event"]
-        data = lecture_event_cursor.find({}).sort("score", pymongo.DESCENDING)
+        data = lecture_event_cursor.find({}).sort("score", -1)
 
         if data is None:
             await ctx.send(':exclamation: There are no data to show!')
@@ -204,22 +205,20 @@ class Lecture(Cog_Extension):
             else:
                 medal = ':medal:'
 
-            member_name = (await self.bot.guilds[0].fetch_member[member["_id"]]).nick
+            member_name = (await ctx.guild.fetch_member(member["_id"])).nick
             if member_name is None:
-                member_name = (await self.bot.fetch_user[member["_id"]]).name
+                member_name = (await ctx.guild.fetch_member[member["_id"]]).name
 
             data_members += f'{medal}{member_name}:: Score: {member["score"]}, Answer Count: {member["count"]}\n'
 
             fl_cursor.update_one({"_id": member["_id"]}, {"$inc": {"score": member["score"]}})
-
-            if fl_cursor.find_one({"_id": member["_id"]})["week_active"] == 0:
-                fl_cursor.update_one({"_id": member["_id"]}, {"$set": {"week_active": 1}})
+            await sm.active_log_update(self.bot, member["_id"])
 
             ranking += 1
 
         await ctx.send(embed=func.create_embed(':scroll: Lecture Event Result', 0x42fcff, ['Lecture final info'], [data_members]))
 
-        lecture_event_cursor.delete({})
+        lecture_event_cursor.delete_many({})
 
         await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group lect - end used by member {ctx.author.id}. {func.now_time_info("whole")}')

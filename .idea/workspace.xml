@@ -21,7 +21,12 @@
   <component name="ChangeListManager">
     <list default="true" id="a2c41741-fa8c-4512-aef2-bbf655cfc924" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/score_related_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/score_related_module.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/lecture.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/lecture.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/quiz.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/quiz.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/task.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/task.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/rank_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/rank_module.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/score_related_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/score_module.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,6 +42,14 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="ProjectId" id="1kMW16VsQJLpOmcMhoXtY7DaKo2" />
   <component name="ProjectLevelVcsManager">
@@ -114,57 +127,5 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-  </component>
-  <component name="WindowStateProjectService">
-    <state x="267" y="54" key="#Inspections" timestamp="1607338118384">
-      <screen x="0" y="31" width="1280" height="689" />
-    </state>
-    <state x="267" y="54" key="#Inspections/0.31.1280.689@0.31.1280.689" timestamp="1607338118384" />
-    <state x="387" y="174" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1607530289365">
-      <screen x="0" y="31" width="1280" height="689" />
-    </state>
-    <state x="387" y="174" key="#com.intellij.fileTypes.FileTypeChooser/0.31.1280.689/1920.30.1920.1050@0.31.1280.689" timestamp="1607326494689" />
-    <state x="387" y="174" key="#com.intellij.fileTypes.FileTypeChooser/0.31.1280.689@0.31.1280.689" timestamp="1607530289365" />
-    <state x="371" y="121" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1608105208205">
-      <screen x="0" y="31" width="1280" height="689" />
-    </state>
-    <state x="371" y="121" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.31.1280.689@0.31.1280.689" timestamp="1608105208205" />
-    <state x="2660" y="204" key="FileChooserDialogImpl" timestamp="1607439728204">
-      <screen x="1920" y="30" width="1920" height="1050" />
-    </state>
-    <state x="493" y="145" key="FileChooserDialogImpl/0.31.1280.689/1920.30.1920.1050@0.31.1280.689" timestamp="1607315749656" />
-    <state x="2660" y="204" key="FileChooserDialogImpl/0.31.1280.689/1920.30.1920.1050@1920.30.1920.1050" timestamp="1607439728204" />
-    <state x="493" y="145" key="FileChooserDialogImpl/0.31.1280.689@0.31.1280.689" timestamp="1607324667486" />
-    <state width="1259" height="166" key="GridCell.Tab.0.bottom" timestamp="1605510779081">
-      <screen x="0" y="31" width="1280" height="689" />
-    </state>
-    <state width="1259" height="166" key="GridCell.Tab.0.bottom/0.31.1280.689@0.31.1280.689" timestamp="1605510779081" />
-    <state width="1259" height="166" key="GridCell.Tab.0.center" timestamp="1605510779081">
-      <screen x="0" y="31" width="1280" height="689" />
-    </state>
-    <state width="1259" height="166" key="GridCell.Tab.0.center/0.31.1280.689@0.31.1280.689" timestamp="1605510779081" />
-    <state width="1259" height="166" key="GridCell.Tab.0.left" timestamp="1605510779081">
-      <screen x="0" y="31" width="1280" height="689" />
-    </state>
-    <state width="1259" height="166" key="GridCell.Tab.0.left/0.31.1280.689@0.31.1280.689" timestamp="1605510779081" />
-    <state width="1259" height="166" key="GridCell.Tab.0.right" timestamp="1605510779081">
-      <screen x="0" y="31" width="1280" height="689" />
-    </state>
-    <state width="1259" height="166" key="GridCell.Tab.0.right/0.31.1280.689@0.31.1280.689" timestamp="1605510779081" />
-    <state x="2373" y="197" key="SettingsEditor" timestamp="1607440327945">
-      <screen x="1920" y="30" width="1920" height="1050" />
-    </state>
-    <state x="121" y="30" key="SettingsEditor/0.31.1280.689/1920.30.1920.1050@0.31.1280.689" timestamp="1607440274277" />
-    <state x="2373" y="197" key="SettingsEditor/0.31.1280.689/1920.30.1920.1050@1920.30.1920.1050" timestamp="1607440327945" />
-    <state x="135" y="30" key="SettingsEditor/0.31.1280.689@0.31.1280.689" timestamp="1606493683733" />
-    <state x="406" y="249" width="630" height="284" key="org.intellij.images.editor.actions.BackgroundImageDialog" timestamp="1607440272699">
-      <screen x="0" y="31" width="1280" height="689" />
-    </state>
-    <state x="406" y="249" width="630" height="284" key="org.intellij.images.editor.actions.BackgroundImageDialog/0.31.1280.689/1920.30.1920.1050@0.31.1280.689" timestamp="1607440272699" />
-    <state x="2529" y="362" key="org.intellij.images.editor.actions.BackgroundImageDialog/0.31.1280.689/1920.30.1920.1050@1920.30.1920.1050" timestamp="1607439745359" />
-    <state x="303" y="41" width="672" height="678" key="search.everywhere.popup" timestamp="1608517769115">
-      <screen x="0" y="31" width="1280" height="689" />
-    </state>
-    <state x="303" y="41" width="672" height="678" key="search.everywhere.popup/0.31.1280.689@0.31.1280.689" timestamp="1608517769115" />
   </component>
 </project>

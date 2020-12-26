@@ -14,6 +14,7 @@ class Task(Cog_Extension):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.quiz_auto.start()
+        self.nick_auto.start()
 
     @tasks.loop(minutes=10)
     async def quiz_auto(self):
@@ -33,6 +34,17 @@ class Task(Cog_Extension):
             'stand_by_ans'] == 'N/A':
             member = await self.bot.fetch_user(610327503671656449)
             await member.send(':four_leaf_clover: My master, the correct answer hasn\'t been set yet!')
+
+    @tasks.loop(hours=6)
+    async def nick_auto(self):
+        await self.bot.wait_until_ready()
+
+        if 6 <= func.now_time_info('hour') <= 18:
+            members = self.bot.guilds[0].members
+
+            for member in members:
+                if member.nick is None:
+                    await member.send('為讓伺服器正常運作，請趕快設定暱稱！')
 
 
 def setup(bot):
