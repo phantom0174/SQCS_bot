@@ -1,8 +1,10 @@
 from core.classes import Cog_Extension
 from discord.ext import commands
-from core.setup import jdata, client
+from core.setup import jdata, client, link
 import core.functions as func
 import discord
+from pymongo import MongoClient
+import core.score_module as sm
 
 
 class Main(Cog_Extension):
@@ -34,14 +36,21 @@ class Main(Cog_Extension):
 
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def name_find(self, ctx, search_name: str):
+    async def findid(self, ctx, search_name: str):
         for member in ctx.guild.members:
-            member_name = member.nick
-            if member_name is None:
-                member_name = member.name
+            if member.name == search_name:
+                await ctx.send(f'{member.name} {member.id}')
 
-            if member_name.find(search_name):
-                await ctx.send(f'{member_name} {member.id}')
+    @commands.command()
+    @commands.has_any_role('總召', 'Administrator')
+    async def mibu(self, ctx, member_id: int):
+        fluctlight_client = MongoClient(link)["LightCube"]
+        fluctlight_cursor = fluctlight_client["light-cube-info"]
+
+        fluctlight_cursor.update_one({"_id": member_id}, {"$inc": {"score": 5}})
+        await sm.active_log_update(self.bot, member_id)
+
+        await ctx.send('ok!')
 
 
 def setup(bot):
