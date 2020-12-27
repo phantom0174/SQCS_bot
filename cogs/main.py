@@ -25,7 +25,8 @@ class Main(Cog_Extension):
                     find = bool(True)
                     break
 
-        await func.getChannel(self.bot, '_Report').send(f'[Command]clear used by user {ctx.author.id}. {func.now_time_info("whole")}')
+        await func.getChannel(self.bot, '_Report').send(
+            f'[Command]clear used by user {ctx.author.id}. {func.now_time_info("whole")}')
 
     # member check
     @commands.command()
@@ -36,7 +37,7 @@ class Main(Cog_Extension):
 
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def findid(self, ctx, search_name):
+    async def findname(self, ctx, search_name):
         for member in ctx.guild.members:
             member_name = member.nick
             if member_name is None:
@@ -47,11 +48,24 @@ class Main(Cog_Extension):
 
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def mibu(self, ctx, member_id: int):
+    async def findid(self, ctx, search_id: int):
+        for member in ctx.guild.members:
+            if member.id != search_id:
+                continue
+
+            if member.name is None:
+                await ctx.send(f'{member.name} {member.id}')
+                return
+
+            await ctx.send(f'{member.nick} {member.id}')
+
+    @commands.command()
+    @commands.has_any_role('總召', 'Administrator')
+    async def mibu(self, ctx, member_id: int, delta_value: str):
         fluctlight_client = MongoClient(link)["LightCube"]
         fluctlight_cursor = fluctlight_client["light-cube-info"]
 
-        fluctlight_cursor.update_one({"_id": member_id}, {"$inc": {"score": 5}})
+        fluctlight_cursor.update_one({"_id": member_id}, {"$inc": {"score": float(delta_value)}})
         await sm.active_log_update(self.bot, member_id)
 
         await ctx.send('ok!')
