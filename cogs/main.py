@@ -36,10 +36,14 @@ class Main(Cog_Extension):
 
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def findid(self, ctx, search_name: str):
+    async def findid(self, ctx, search_name):
         for member in ctx.guild.members:
-            if member.name == search_name:
-                await ctx.send(f'{member.name} {member.id}')
+            member_name = member.nick
+            if member_name is None:
+                member_name = member.name
+
+            if member_name.find(search_name) != -1:
+                await ctx.send(f'{member_name} {member.id}')
 
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
