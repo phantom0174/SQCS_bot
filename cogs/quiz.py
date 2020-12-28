@@ -7,6 +7,7 @@ import json
 from pymongo import MongoClient
 import core.score_module as sm
 
+
 class Quiz(Cog_Extension):
 
     @commands.group()
@@ -16,21 +17,17 @@ class Quiz(Cog_Extension):
     # push back stand by answer
     @quiz.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def quiz_push(self, ctx, msg):
+    async def quiz_push(self, ctx, insert_answer: str):
+        quiz_data_cursor = client["quiz_data"]
 
-        with open('jsons/quiz.json', mode='r', encoding='utf8') as temp_file:
-            quiz_data = json.load(temp_file)
+        stand_by_answer = quiz_data_cursor.find_one({"_id": 0})["stand_by_answer"]
 
-        if quiz_data['stand_by_ans'] != 'N/A':
-            await ctx.send(f':exclamation: The stand-by answer had already been set as {quiz_data["stand_by_ans"]}!')
+        if stand_by_answer != 'N/A':
+            await ctx.send(f':exclamation: The stand-by answer had already been set as {stand_by_answer}!')
             return
 
-        quiz_data['stand_by_ans'] = msg
-
-        await ctx.send(f':white_check_mark: The stand-by answer has been set as {quiz_data["stand_by_ans"]}!')
-
-        with open('jsons/quiz.json', mode='w', encoding='utf8') as temp_file:
-            json.dump(quiz_data, temp_file)
+        quiz_data_cursor.update_one({"_id": 0}, {"$set": {"stand_by_answer": insert_answer}})
+        await ctx.send(f':white_check_mark: The stand-by answer has been set as {insert_answer}!')
 
         await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group quiz - quiz_push used by member {ctx.author.id}. {func.now_time_info("whole")}')
@@ -42,13 +39,20 @@ class Quiz(Cog_Extension):
         if msg.author == self.bot.user or msg.channel != main_channel or msg.content[0] == '~':
             return
 
-        with open('jsons/quiz.json', mode='r', encoding='utf8') as temp_file:
-            quiz_data = json.load(temp_file)
+        quiz_data_cursor = client["quiz_data"]
+        quiz_status = quiz_data_cursor.find_one({"_id": 0})["event_status"]
 
-        if quiz_data["event_status"] == 'False':
+        if quiz_status == 0:
             return
 
         await msg.delete()
+
+        correct_answer = quiz_data_cursor.find_one({"_id": 0})["correct_answer"]
+
+        mvisualizer_client = MongoClient(link)["mvisualizer"]
+        quiz_score_cursor = mvisualizer_client["score_parameters"]
+        quiz_score = quiz_score_cursor.find_one({"_id": 0})["quiz_point"]
+        score_weight = quiz_score_cursor.find_one({"_id": 0})["score_weight"]
 
         quiz_cursor = client["quiz_event"]
         data = quiz_cursor.find_one({"_id": msg.author.id})
@@ -62,16 +66,16 @@ class Quiz(Cog_Extension):
             member_quiz_info = {"_id": msg.author.id, "correct": 0}
             quiz_cursor.insert_one(member_quiz_info)
 
-            if msg.content[2:-2] == quiz_data["correct_ans"]:
+            if msg.content[2:-2] == correct_answer:
                 quiz_cursor.update_one({"_id": msg.author.id}, {"$set": {"correct": 1}})
 
                 # add score to member fluctlight
                 fl_client = MongoClient(link)["LightCube"]
                 fl_cursor = fl_client["light-cube-info"]
 
-                fl_cursor.update_one({"_id": msg.author.id}, {"$inc": {"score": quiz_data["quiz_score"] * quiz_data["score_weight"]}})
+                fl_cursor.update_one({"_id": msg.author.id}, {"$inc": {"score": quiz_score * score_weight}})
 
-                await sm.active_log_update(self.bot, msg.author.id)
+                await sm.active_log_update(msg.author.id)
 
         else:
             await msg.author.send(':exclamation: 你的答案是錯誤的格式！')
@@ -83,55 +87,56 @@ async def quiz_start(bot):
     main_channel = discord.utils.get(guild.text_channels, name='💎懸賞區')
     cmd_channel = discord.utils.get(guild.text_channels, name='總指令區')
 
-    with open('jsons/quiz.json', mode='r', encoding='utf8') as temp_file:
-        quiz_data = json.load(temp_file)
+    quiz_event_cursor = client["quiz_data"]
 
-    quiz_data['event_status'] = "True"
-    quiz_data['correct_ans'] = quiz_data['stand_by_ans']
-    quiz_data['stand_by_ans'] = 'N/A'
+    stand_by_answer = quiz_event_cursor.find_one({"_id": 0}, {"stand_by_answer": 1})["stand_by_answer"]
+    new_quiz_info = {"event_status": 1, "correct_answer": stand_by_answer, "stand_by_answer": 'N/A'}
+    quiz_event_cursor.update({"_id": 0}, new_quiz_info)
+
+    # data re-check
+    quiz_status = quiz_event_cursor.find_one({"_id": 0}, {"event_status": 1})["event_status"]
+    correct_answer = quiz_event_cursor.find_one({"_id": 0}, {"correct_answer": 1})["correct_answer"]
 
     await cmd_channel.send(
-        f'Quiz Event status set to {quiz_data["event_status"]}, correct answer set to {quiz_data["correct_ans"]}!')
+        f'Quiz Event status set to {quiz_status}, correct answer set to {correct_answer}!')
 
-    await main_channel.send(':loudspeaker: @everyone，有一個新的懸賞活動開始了，請確認你的答案是隱蔽模式！\n:exclamation: (請在答案的前方與後方各加上"||"的符號)')
-    await main_channel.send(f'活動開始於 {func.now_time_info("whole")}')
+    await main_channel.send('@everyone\n'
+                            ':loudspeaker: 新的懸賞活動開始了，請確認你的答案是隱蔽模式！\n'
+                            ':exclamation: 請在答案的前方與後方各加上`||`符號\n'
+                            f'活動開始於 {func.now_time_info("whole")}')
+
     await main_channel.set_permissions(guild.default_role, send_messages=True)
-
-    # get score parameters
-    mvisualizer_client = MongoClient(link)["mvisualizer"]
-    score_cursor = mvisualizer_client["score_parameters"]
-    data = score_cursor.find_one({"_id": 0})
-    quiz_data["quiz_score"] = data["quiz_point"]
-    quiz_data["score_weight"] = data["score_weight"]
-
-    with open('jsons/quiz.json', mode='w', encoding='utf8') as temp_file:
-        json.dump(quiz_data, temp_file)
 
 
 # auto end quiz event
 async def quiz_end(bot):
     guild = bot.guilds[0]
     main_channel = discord.utils.get(guild.text_channels, name='💎懸賞區')
-    cmd_channel = discord.utils.get(guild.text_channels, name='總指令區')
+    cmd_channel = discord.utils.get(guild.text_channels, name='總指令')
 
-    with open('jsons/quiz.json', mode='r', encoding='utf8') as temp_file:
-        quiz_data = json.load(temp_file)
+    quiz_event_cursor = client["quiz_data"]
+    quiz_event_cursor.update_one({"_id": 0}, {"event_status": 0})
 
-    quiz_data['event_status'] = "False"
+    old_correct_ans = quiz_event_cursor.find_one({"_id": 0}, {"correct_answer": 1})["correct_answer"]
+    quiz_event_cursor.update_one({"_id": 0}, {"correct_answer": 'N/A'})
+
+    # data re-check
+    quiz_status = quiz_event_cursor.find_one({"_id": 0}, {"event_status": 1})["event_status"]
+    correct_answer = quiz_event_cursor.find_one({"_id": 0}, {"correct_answer": 1})["correct_answer"]
 
     await cmd_channel.send(
-        f'Quiz Event status set to {quiz_data["event_status"]}, correct answer set to {quiz_data["correct_ans"]}!')
+        f'Quiz Event status set to {quiz_status}, correct answer set to {correct_answer}!')
+
+    await main_channel.send(f'@everyone\n'
+                            f':loudspeaker: 懸賞活動結束了！\n'
+                            f':white_check_mark: 這周的正確答案是 `{old_correct_ans}`\n'
+                            f':stopwatch: 活動結束於 {func.now_time_info("whole")}')
+
     await main_channel.set_permissions(guild.default_role, send_messages=False)
-    await main_channel.send(f':loudspeaker: @everyone，懸賞活動結束了！這周的正確答案是 {quiz_data["correct_ans"]}。\n :stopwatch: 活動結束於 {func.now_time_info("whole")}')
-
-    quiz_data['correct_ans'] = "N/A"
-
-    with open('jsons/quiz.json', mode='w', encoding='utf8') as temp_file:
-        json.dump(quiz_data, temp_file)
 
     # list the winners
     quiz_cursor = client["quiz_event"]
-    data = quiz_cursor.find({"correct": 1})
+    data = quiz_cursor.find({"correct": {"$eq": 1}})
 
     winners = str()
     for winner in data:

@@ -66,7 +66,7 @@ class Main(Cog_Extension):
         fluctlight_cursor = fluctlight_client["light-cube-info"]
 
         fluctlight_cursor.update_one({"_id": member_id}, {"$inc": {"score": float(delta_value)}})
-        await sm.active_log_update(self.bot, member_id)
+        await sm.active_log_update(member_id)
 
         await ctx.send('ok!')
 

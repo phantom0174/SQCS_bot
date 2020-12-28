@@ -5,10 +5,8 @@ from core.setup import jdata, client, link
 import core.functions as func
 import discord
 import asyncio
-import random
-import json
 import pymongo
-import core.score_module as sm
+
 
 class Kick_Member(Cog_Extension):
 
@@ -25,7 +23,7 @@ class Kick_Member(Cog_Extension):
         data = kick_member_cursor.find({})
 
         if data is None:
-            await ctx.send('There are no member in the kick list!')
+            await ctx.send(':exclamation: There are no member in the kick list!')
             return
 
         for member in data:
@@ -38,7 +36,7 @@ class Kick_Member(Cog_Extension):
         if len(kick_member_list) > 0:
             await ctx.send(kick_member_list)
 
-        await ctx.send('Logging finished!')
+        await ctx.send(':white_check_mark: Logging finished!')
 
         await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group kick - list used by member {ctx.author.id}. {func.now_time_info("whole")}')
@@ -52,7 +50,7 @@ class Kick_Member(Cog_Extension):
         data = fluctlight_cursor.find_one({"_id": member_id}, {"contrib": 1, "lvl_ind": 1})
 
         if data is None:
-            await ctx.send(f'There\'re no data of member whose id is {member_id}')
+            await ctx.send(f':exclamation: There\'re no data of member whose id is {member_id}')
             return
 
         member_contrib = data["contrib"]
@@ -68,7 +66,7 @@ class Kick_Member(Cog_Extension):
         kick_member_cursor = client["kick_member_list"]
         kick_member_cursor.insert_one(member_info)
 
-        await ctx.send(f'Member {member_name}({member_id}) has been added to the kick list!')
+        await ctx.send(f':white_check_mark: Member {member_name}({member_id}) has been added to the kick list!')
 
         await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group kick - add used by member {ctx.author.id}. {func.now_time_info("whole")}')
@@ -80,12 +78,12 @@ class Kick_Member(Cog_Extension):
         data = kick_member_cursor.find_one({"_id": member_id})
 
         if data is None:
-            await ctx.send(f'Member {member_id} isn\'t in the kick list!')
+            await ctx.send(f':exclamation: Member {member_id} isn\'t in the kick list!')
             return
 
         kick_member_cursor.delete_one({"_id": member_id})
 
-        await ctx.send(f'Member {member_id} has been removed from the kick list!')
+        await ctx.send(f':white_check_mark: Member {member_id} has been removed from the kick list!')
 
         await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group kick - remove used by member {ctx.author.id}. {func.now_time_info("whole")}')
@@ -97,30 +95,34 @@ class Kick_Member(Cog_Extension):
         data = kick_member_cursor.find_one({"_id": member_id})
 
         if data is None:
-            await ctx.send(f'Member {member_id} isn\'t in the kick list!')
+            await ctx.send(f':exclamation: Member {member_id} isn\'t in the kick list!')
             return
 
         kick_user = await ctx.guild.fetch_member(member_id)
 
         if reason == 'default':
-            kick_reason = f'Levelling index reached {data["lvl_ind"]}.'
+            kick_reason = f':skull_crossbones: Levelling index reached {data["lvl_ind"]}.'
         else:
             kick_reason = reason
 
-        await kick_user.kick(reason=kick_reason)
+        try:
+            await kick_user.kick(reason=kick_reason)
+        except:
+            await ctx.send(f':x: Error when kicking member {data["name"]}({data["_id"]})!')
 
         fluctlight_client = MongoClient(link)["LightCube"]
         fluctlight_cursor = fluctlight_client["light-cube-info"]
         active_logs_cursor = fluctlight_client["active_logs"]
 
+        kick_member_cursor.delete_one({"_id": member_id})
+
         try:
-            kick_member_cursor.delete_one({"_id": member_id})
             fluctlight_cursor.delete_one({"_id": member_id})
             active_logs_cursor.delete_one({"_id": member_id})
         except:
-            pass
+            await ctx.send(f':x: Error when deleting member {data["name"]}({data["_id"]})\'s fluctlight data!')
 
-        await ctx.send(f'Kicked member {data["name"]}({data["_id"]})!')
+        await ctx.send(f':white_check_mark: Kicked member {data["name"]}({data["_id"]})!')
 
         await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group kick - kick_single used by member {ctx.author.id}. {func.now_time_info("whole")}')
@@ -133,7 +135,7 @@ class Kick_Member(Cog_Extension):
         data = kick_member_cursor.find({})
 
         if data is None:
-            await ctx.send('Kick member list is empty!')
+            await ctx.send(':exclamation: Kick member list is empty!')
             return
 
         fluctlight_client = MongoClient(link)["LightCube"]
@@ -142,16 +144,20 @@ class Kick_Member(Cog_Extension):
 
         for member in data:
             kick_user = await ctx.guild.fetch_member(member["_id"])
-            await kick_user.kick(reason=f'Levelling index reached {member["lvl_ind"]}.')
+
+            try:
+                await kick_user.kick(reason=f'Levelling index reached {member["lvl_ind"]}.')
+            except:
+                await ctx.send(f':x: Error when kicking member {member["name"]}({member["_id"]})!')
 
             try:
                 fluctlight_cursor.delete_one({"_id": member["_id"]})
                 active_logs_cursor.delete_one({"_id": member["_id"]})
             except:
-                pass
+                await ctx.send(f':x: Error when deleting member {member["name"]}({member["_id"]})\'s fluctlight data!')
 
         kick_member_cursor.delete_many({})
-        await ctx.send('All members in the kick list has been kicked!')
+        await ctx.send(':white_check_mark: All members in the kick list has been kicked!')
 
         await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group kick - kick_all used by member {ctx.author.id}. {func.now_time_info("whole")}')

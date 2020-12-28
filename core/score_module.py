@@ -7,7 +7,7 @@ import discord
 import asyncio
 
 
-async def active_log_update(bot, member_id):
+async def active_log_update(member_id):
     fluctlight_client = MongoClient(link)["LightCube"]
     fluctlight_cursor = fluctlight_client["light-cube-info"]
 

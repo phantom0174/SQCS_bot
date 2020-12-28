@@ -37,7 +37,6 @@ class Lecture(Cog_Extension):
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def mani(self, ctx, *, msg):
-
         mode = msg.split(' ')[0]
         lecture_list_cursor = client["lecture_list"]
 
@@ -69,7 +68,6 @@ class Lecture(Cog_Extension):
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def start(self, ctx, week: int):
-
         lecture_list_cursor = client["lecture_list"]
         data = lecture_list_cursor.find_one({"_id": week})
 
@@ -84,16 +82,8 @@ class Lecture(Cog_Extension):
         mvisualizer_client = MongoClient(link)['mvisualizer']
         score_cursor = mvisualizer_client["score_parameters"]
 
-        temp_score_weight = score_cursor.find_one({"_id": 0})["score_weight"]
+        score_weight = score_cursor.find_one({"_id": 0})["score_weight"]
         lect_attend_score = score_cursor.find_one({"_id": 0})["lecture_attend_point"]
-
-        with open('jsons/lecture.json', mode='r', encoding='utf8') as temp_file:
-            lect_data = json.load(temp_file)
-
-        lect_data['temp_sw'] = temp_score_weight
-
-        with open('jsons/lecture.json', mode='w', encoding='utf8') as temp_file:
-            json.dump(lect_data, temp_file)
 
         msg_logs = await ctx.channel.history(limit=200).flatten()
         for msg in msg_logs:
@@ -112,8 +102,8 @@ class Lecture(Cog_Extension):
         voice_channel = discord.utils.get(ctx.guild.voice_channels, name=channel_name)
 
         for member in voice_channel.members:
-            fl_cursor.update_one({"_id": member.id}, {"$inc": {"score": lect_attend_score * temp_score_weight}})
-            await sm.active_log_update(self.bot, member.id)
+            fl_cursor.update_one({"_id": member.id}, {"$inc": {"score": lect_attend_score * score_weight}})
+            await sm.active_log_update(member.id)
 
         await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group lect - start used by member {ctx.author.id}. {func.now_time_info("whole")}')
@@ -142,27 +132,28 @@ class Lecture(Cog_Extension):
 
         # add score to correct members
         lecture_event_cursor = client["lecture_event"]
+        mvisualizer_client = MongoClient(link)['mvisualizer']
+        score_cursor = mvisualizer_client["score_parameters"]
 
-        with open('jsons/lecture.json', mode='r', encoding='utf8') as temp_file:
-            l_data = json.load(temp_file)  # lecture data
+        score_weight = score_cursor.find_one({"_id": 0})["score_weight"]
 
-        TScore = float(5)
+        top_score = float(5)
         for crt_msg in correct_msgs:
             TargetId = crt_msg.author.id
-            mScore = TScore * float(l_data["temp_sw"])
+            delta_score = top_score * score_weight
 
             data = lecture_event_cursor.find_one({"_id": TargetId})
 
             if data is None:
-                member_info = {"_id": TargetId, "score": mScore, "count": 1}
+                member_info = {"_id": TargetId, "score": delta_score, "count": 1}
                 lecture_event_cursor.insert_one(member_info)
             else:
-                lecture_event_cursor.update_one({"_id": TargetId}, {"$inc": {"score": mScore, "count": 1}})
+                lecture_event_cursor.update_one({"_id": TargetId}, {"$inc": {"score": delta_score, "count": 1}})
 
-            await sm.active_log_update(self.bot, TargetId)
+            await sm.active_log_update(TargetId)
 
-            if TScore > 1:
-                TScore -= 1
+            if top_score > 1:
+                top_score -= 1
 
         await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group lect - ans_check used by member {ctx.author.id}. {func.now_time_info("whole")}')
@@ -212,7 +203,7 @@ class Lecture(Cog_Extension):
             data_members += f'{medal}{member_name}:: Score: {member["score"]}, Answer Count: {member["count"]}\n'
 
             fl_cursor.update_one({"_id": member["_id"]}, {"$inc": {"score": member["score"]}})
-            await sm.active_log_update(self.bot, member["_id"])
+            await sm.active_log_update(member["_id"])
 
             ranking += 1
 
