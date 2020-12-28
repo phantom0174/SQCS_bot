@@ -1,11 +1,16 @@
 ![](https://img.shields.io/uptimerobot/status/m786417212-72995a6e32a6e120933f8255)
 ![](https://img.shields.io/uptimerobot/ratio/7/m786417212-72995a6e32a6e120933f8255)
 ![](https://img.shields.io/uptimerobot/ratio/m786417212-72995a6e32a6e120933f8255)
-# HSQCC_bot
-## 🛠 Builder
+<br>
+![](https://i.imgur.com/H5OiNY3m.jpg)
+![](https://i.imgur.com/hvb9x1cm.jpg)
+<br>
 
+## 🔧 Builder
+- Programed and run by Phantom0174
+- Contributers: @qiaoyi213
 
-### Event update
+## 📜 Event update
 - 2020/11/18: Bot 24/7 online.
 - 2020/11/25: Intents activate.
 - 2020/11/28: Quiz event automize.
@@ -17,67 +22,14 @@
 - 2020/12/13: Emoji Added.
 - 2020/12/14: Fix repl update.
 - 2020/12/21: Move database to MongoDB.
+- 2020/12/26: Fix lecture cog.
+- 2020/12/27: Fix VIUpdate function.
+- 2020/12/28: Quiz event en-DB, VIUpdate function en-fracture.
 
-
-### Bot Info
- - Bot set by phantom0174
+## ✅ Open-source
  - This bot manages event-related tasks in DC guild.
  - If using relevent data, please cite the data source.
 
-### Command list
-* help
-  * Show all command & command group
-  * Authority requirements: none
-
-* ping
-  * Basic ping command
-  * Authority requirements: none
-
-* m_check (Member check)
-  * Show the list of all members in guild.
-  * Authority requirements: General Coordinator, Administrator
-  * Results can only be seen at host.
-
-* clear \<quantity\>
-  * The command that deletes message.
-  * Authority requirements: none
-
----
-
-* **Quiz event group** (group name: quiz)
-
-  * quiz_push \<stand-by answer\> (Quiz standby-answer pushback)
-    * Push the answer of the next quiz event.
-    * Authority requirements: General Coordinator
-
-  * **Start & End command had already been automized**
-
-
-* **Lecture event group** (group name: lect)
-
-  * start \<week\>
-    * The command that starts the lecture.
-    * Authority requirements: General Coordinator, Administrator
-
-  * ans_check \<\[correct answer list\]\>
-    * To check if the members' answer is right or not.
-    * Authority requirements: General Coordinator, Administrator
-
-  * end
-    * The command that ends the lecture.
-    * Authority requirements: General Coordinator, Administrator
-
-
-* **Picture group** (group name: pic)
-
-  * p_m \<mode(0 -> delete || 1 -> pushback)\> \<manipulate object(0 -> index || 1 -> url)\> (Picture manipulate)
-    * Manipulates the pictures in the database.
-    * Authority requirements: General Coordinator, Administrator
-
-  * p_check (Picture check)
-    * Show all the pictures in the database.
-    * Authority requirements: none
-
-  * rpic (Random picture)
-    * Send a random picture.
-    * Authority requirements: none
+## 📃 Command list
+- I\'m just too lazy to write down any usage of commands.
+- You can use the default command `+help` in the guild to search for usage.
