@@ -7,7 +7,7 @@
 <br>
 
 ## 🔧 Builder
-- Programed and run by Phantom0174
+- Programed and run by phantom0174
 - Contributers: @qiaoyi213
 
 ## 📜 Event update
