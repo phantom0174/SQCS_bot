@@ -6,11 +6,12 @@
 ![](https://i.imgur.com/hvb9x1ct.jpg)
 <br>
 
-## 🔧 Builder
+## 🔧 Developer
 - Programed and run by phantom0174
 - Contributers: @qiaoyi213
 
 ## 📜 Event update
+```
 - 2020/11/18: Bot 24/7 online.
 - 2020/11/25: Intents activate.
 - 2020/11/28: Quiz event automize.
@@ -25,9 +26,10 @@
 - 2020/12/26: Fix lecture cog.
 - 2020/12/27: Fix VIUpdate function.
 - 2020/12/28: Quiz event en-DB, VIUpdate function en-fracture.
+```
 
 ## ✅ Open-source
- - This bot manages event-related tasks in DC guild.
+ - This bot handles event-related tasks in SQCS DC Guild.
  - If using relevent data, please cite the data source.
 
 ## 📃 Command list
