@@ -65,6 +65,7 @@ class Quiz(Cog_Extension):
             await msg.author.send(':white_check_mark: 我收到你的答案了!')
             member_quiz_info = {"_id": msg.author.id, "correct": 0}
             quiz_cursor.insert_one(member_quiz_info)
+            await sm.active_log_update(msg.author.id)
 
             if msg.content[2:-2] == correct_answer:
                 quiz_cursor.update_one({"_id": msg.author.id}, {"$set": {"correct": 1}})
@@ -74,8 +75,6 @@ class Quiz(Cog_Extension):
                 fl_cursor = fl_client["light-cube-info"]
 
                 fl_cursor.update_one({"_id": msg.author.id}, {"$inc": {"score": quiz_score * score_weight}})
-
-                await sm.active_log_update(msg.author.id)
 
         else:
             await msg.author.send(':exclamation: 你的答案是錯誤的格式！')
