@@ -58,6 +58,8 @@ class React(Cog_Extension):
         await member.send(msg)
 
         # create personal fluctlight data
+        start_time = time.time()
+
         fluctlight_client = MongoClient(link)["LightCube"]
         fluctlight_cursor = fluctlight_client["light-cube-info"]
 
@@ -80,8 +82,11 @@ class React(Cog_Extension):
             fluctlight_cursor.delete_one({"_id": member.id})
             fluctlight_cursor.insert_one(member_fluctlight)
 
+        end_time = time.time()
+
         msg = '\n'.join(msg_json["fl_create_finish"])
         await member.send(msg)
+        await member.send(f'順帶一提，我用了 {round(end_time - start_time, 2)} (sec) 建立你的檔案><!')
 
 
 def setup(bot):
