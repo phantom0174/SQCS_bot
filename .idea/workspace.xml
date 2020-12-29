@@ -20,7 +20,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a2c41741-fa8c-4512-aef2-bbf655cfc924" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cogs/react.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/react.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

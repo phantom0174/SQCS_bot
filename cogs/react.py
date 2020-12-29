@@ -52,7 +52,8 @@ class React(Cog_Extension):
             msg = '\n'.join(msg_json["time_out"])
             deep_freeze_status = 0
 
-        msg += '\n'.join(msg_json["contact_method"])
+        # another \n for last un-inserted \n
+        msg += '\n' + '\n'.join(msg_json["contact_method"])
 
         await member.send(msg)
 
