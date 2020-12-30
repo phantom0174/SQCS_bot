@@ -12,3 +12,6 @@ client = MongoClient(link)["sqcs-bot"]
 
 with open('./jsons/setting.json', mode='r', encoding='utf8') as jfile:
     jdata = json.load(jfile)
+
+with open('./jsons/human_ext.json', mode='r', encoding='utf8') as temp_file:
+    rsp = json.load(temp_file)

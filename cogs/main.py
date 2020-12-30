@@ -1,6 +1,6 @@
 from core.classes import Cog_Extension
 from discord.ext import commands
-from core.setup import jdata, client, link
+from core.setup import jdata, client, link, rsp
 import core.functions as func
 import discord
 from pymongo import MongoClient
@@ -67,6 +67,11 @@ class Main(Cog_Extension):
 
         fluctlight_cursor.update_one({"_id": member_id}, {"$inc": {"score": float(delta_value)}})
         await sm.active_log_update(member_id)
+
+        member = ctx.guild.fetch_member(member_id)
+        msg = f'耶！你被管理員加了 {delta_value} 分！' + '\n'
+        msg += rsp["main"]["mibu"]["pt_1"]
+        await member.send(msg)
 
         await ctx.send('ok!')
 

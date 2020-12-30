@@ -1,14 +1,12 @@
 # json懶人包 ->>
 # open
-temp_file = open('quiz.json', mode='r', encoding='utf8')
-quiz_data = json.load(temp_file)
-temp_file.close()
+
+with open('quiz.json', mode='r', encoding='utf8') as temp_file:
+    quiz_data = json.load(temp_file)
 
 # close
-temp_file = open('quiz.json', mode='w', encoding='utf8')
-json.dump(quiz_data, temp_file)
-temp_file.close()
-
+with open('quiz.json', mode='w', encoding='utf8') as temp_file:
+    json.dump(quiz_data, temp_file)
 
 
 # cluster collections

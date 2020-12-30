@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 from core.classes import Cog_Extension
 from discord.ext import commands
-from core.setup import jdata, client, link
+from core.setup import jdata, client, link, rsp
 import core.functions as func
 import discord
 import asyncio
@@ -90,7 +90,7 @@ class Kick_Member(Cog_Extension):
 
     @kick.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def kick_single(self, ctx, member_id: int, reason: str):
+    async def kick_single(self, ctx, member_id: int, kick_reason: str):
         kick_member_cursor = client["kick_member_list"]
         data = kick_member_cursor.find_one({"_id": member_id})
 
@@ -100,10 +100,8 @@ class Kick_Member(Cog_Extension):
 
         kick_user = await ctx.guild.fetch_member(member_id)
 
-        if reason == 'default':
+        if kick_reason == 'default':
             kick_reason = f':skull_crossbones: Levelling index reached {data["lvl_ind"]}.'
-        else:
-            kick_reason = reason
 
         try:
             await kick_user.kick(reason=kick_reason)
@@ -123,6 +121,11 @@ class Kick_Member(Cog_Extension):
             await ctx.send(f':x: Error when deleting member {data["name"]}({data["_id"]})\'s fluctlight data!')
 
         await ctx.send(f':white_check_mark: Kicked member {data["name"]}({data["_id"]})!')
+
+        msg = '\n'.join(rsp["kick"]["kick_single"]) + '\n'
+        msg += f'> {kick_reason}\n'
+        msg += '\n'.join(rsp["kick"]["re_join"])
+        await kick_user.send(msg)
 
         await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group kick - kick_single used by member {ctx.author.id}. {func.now_time_info("whole")}')
@@ -155,6 +158,11 @@ class Kick_Member(Cog_Extension):
                 active_logs_cursor.delete_one({"_id": member["_id"]})
             except:
                 await ctx.send(f':x: Error when deleting member {member["name"]}({member["_id"]})\'s fluctlight data!')
+
+            msg = '\n'.join(rsp["kick"]["kick_all"]) + '\n'
+            msg += f'> Levelling index reached {member["lvl_ind"]}.' + '\n'
+            msg += '\n'.join(rsp["kick"]["re_join"])
+            await kick_user.send(msg)
 
         kick_member_cursor.delete_many({})
         await ctx.send(':white_check_mark: All members in the kick list has been kicked!')

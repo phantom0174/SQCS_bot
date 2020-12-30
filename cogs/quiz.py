@@ -1,6 +1,6 @@
 from core.classes import Cog_Extension
 from discord.ext import commands
-from core.setup import jdata, client, link
+from core.setup import jdata, client, link, rsp
 import core.functions as func
 import discord
 import json
@@ -58,11 +58,13 @@ class Quiz(Cog_Extension):
         data = quiz_cursor.find_one({"_id": msg.author.id})
 
         if data is not None:
-            await msg.author.send(':no_entry_sign: 你已經傳送過答案了，請不要重複傳送！')
+            message = ':no_entry_sign: ' + '\n'.join(rsp["quiz"]["repeat_answer"])
+            await msg.author.send(message)
             return
 
         if msg.content[0:2] == '||' and msg.content[-2:] == '||':
-            await msg.author.send(':white_check_mark: 我收到你的答案了!')
+            message = ':white_check_mark: ' + '\n'.join(rsp["quiz"]["get_answer"])
+            await msg.author.send(message)
             member_quiz_info = {"_id": msg.author.id, "correct": 0}
             quiz_cursor.insert_one(member_quiz_info)
             await sm.active_log_update(msg.author.id)
@@ -77,7 +79,10 @@ class Quiz(Cog_Extension):
                 fl_cursor.update_one({"_id": msg.author.id}, {"$inc": {"score": quiz_score * score_weight}})
 
         else:
-            await msg.author.send(':exclamation: 你的答案是錯誤的格式！')
+            message = ':exclamation: ' + '\n'.join(rsp["invalid_syntax"]["pt_1"]) + '\n'
+            message += '\n'.join(rsp["quiz"]["answer_tut"]) + '\n'
+            message += '\n'.join(rsp["quiz"]["invalid_syntax"]["pt_2"])
+            await msg.author.send(message)
 
 
 # auto start quiz event
@@ -99,10 +104,11 @@ async def quiz_start(bot):
     await cmd_channel.send(
         f'Quiz Event status set to {quiz_status}, correct answer set to {correct_answer}!')
 
-    await main_channel.send('@everyone\n'
-                            ':loudspeaker: 新的懸賞活動開始了，請確認你的答案是隱蔽模式！\n'
-                            ':exclamation: 請在答案的前方與後方各加上`||`符號\n'
-                            f'活動開始於 {func.now_time_info("whole")}')
+    msg = '\n'.join(rsp["quiz"]["start"]["pt_1"]) + '\n'
+    msg += '\n'.join(rsp["quiz"]["answer_tut"]) + '\n'
+    msg += '\n'.join(rsp["quiz"]["start"]["pt_2"])
+    await main_channel.send(msg)
+    await main_channel.send(f'活動開始於 {func.now_time_info("whole")}')
 
     await main_channel.set_permissions(guild.default_role, send_messages=True)
 
@@ -126,15 +132,28 @@ async def quiz_end(bot):
     await cmd_channel.send(
         f'Quiz Event status set to {quiz_status}, correct answer set to {correct_answer}!')
 
-    await main_channel.send(f'@everyone\n'
-                            f':loudspeaker: 懸賞活動結束了！\n'
-                            f':white_check_mark: 這周的正確答案是 `{old_correct_ans}`\n'
-                            f':stopwatch: 活動結束於 {func.now_time_info("whole")}')
+    quiz_cursor = client["quiz_event"]
+    fluctlight_client = MongoClient(link)["LightCube"]
+    fluctlight_cursor = fluctlight_client["light-cube-info"]
+    msg = '\n'.join(rsp["quiz"]["end"]["main"]["pt_1"]) + '\n'
+    msg += f':white_check_mark: 這次的答案呢...是 `{old_correct_ans}`！' + '\n'
+    msg += '\n'.join(rsp["quiz"]["end"]["main"]["pt_2"]) + '\n'
+
+    attend_count = len(list(quiz_cursor.find({})))
+    quiz_attend_per = len(list(fluctlight_cursor.find({"deep_freeze": {"$eq": 0}})))
+    quiz_attend_level = int(attend_count / quiz_attend_per)
+
+    if quiz_attend_level > 7:
+        quiz_attend_level = 7
+
+    msg += f'我這次有 {round((attend_count / quiz_attend_per) * 100, 1)} 分飽！' + '\n'
+    msg += '\n'.join(rsp["quiz"]["end"]["reactions"][quiz_attend_level])
+    await main_channel.send(msg)
+    await main_channel.send(f':stopwatch: 活動結束於 {func.now_time_info("whole")}')
 
     await main_channel.set_permissions(guild.default_role, send_messages=False)
 
     # list the winners
-    quiz_cursor = client["quiz_event"]
     data = quiz_cursor.find({"correct": {"$eq": 1}})
 
     winners = str()

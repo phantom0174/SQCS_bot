@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 from core.classes import Cog_Extension
 from discord.ext import commands
-from core.setup import jdata, client, link
+from core.setup import jdata, client, link, rsp
 import core.functions as func
 import discord
 import asyncio
@@ -75,7 +75,10 @@ class Lecture(Cog_Extension):
             await ctx.send(':exclamation: The lecture has already started!')
             return
 
-        await ctx.send(':loudspeaker: @everyone，講座開始了！\n:bulb: 於回答講師問題時請在答案前方加上"&"，回答正確即可加分。')
+        msg = '\n'.join(rsp["lecture"]["start"]["pt_1"]) + '\n'
+        msg += f'星期 `{week}` 的講座 - `{data["name"]}` 開始了呦 \\^~^' + '\n'
+        msg += '\n'.join(rsp["lecture"]["start"]["pt_2"])
+        await ctx.send(msg)
 
         lecture_list_cursor.update({"_id": week}, {"$set": {"status": 1}})
 
@@ -104,6 +107,8 @@ class Lecture(Cog_Extension):
         for member in voice_channel.members:
             fl_cursor.update_one({"_id": member.id}, {"$inc": {"score": lect_attend_score * score_weight}})
             await sm.active_log_update(member.id)
+
+        lecture_list_cursor.update_one({"_id": week}, {"$set": {"population": len(voice_channel.members)}})
 
         await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group lect - start used by member {ctx.author.id}. {func.now_time_info("whole")}')
@@ -169,7 +174,10 @@ class Lecture(Cog_Extension):
             await ctx.send(':exclamation: The lecture has already ended!')
             return
 
-        await ctx.send(':loudspeaker: @here, 講座結束了!\n:partying_face: 感謝大家今天的參與!')
+        msg = '\n'.join(rsp["lecture"]["end"]["main"]) + '\n'
+        population_level = int(data["population"] / 10)
+        msg += rsp["lecture"]["end"]["reactions"][population_level]
+        await ctx.send(msg)
 
         lecture_list_cursor.update_one({"_id": week}, {"$set": {"status": 0}})
 
