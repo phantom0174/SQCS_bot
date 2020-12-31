@@ -45,3 +45,24 @@ def getChannel(bot, target):
         return discord.utils.get(bot.guilds[1].text_channels, name='sqcs-and-mv')
     if target == '_Report':
         return discord.utils.get(bot.guilds[1].text_channels, name='sqcs-report')
+
+
+async def get_time_title(hour):
+    morning = range(6, 12)
+    noon = range(12, 13)
+    after_noon = range(13, 18)
+    evening = range(18, 24)
+    night = range(0, 6)
+
+    if hour in morning:
+        return 'morning'
+    if hour in noon:
+        return 'noon'
+    if hour in after_noon:
+        return 'after_noon'
+    if hour in evening:
+        return 'evening'
+    if hour in night:
+        return 'night'
+
+    return 'morning'

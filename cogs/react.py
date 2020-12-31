@@ -4,7 +4,7 @@ import core.functions as func
 import json
 import time
 from pymongo import MongoClient
-from core.setup import client, link
+from core.setup import client, link, rsp
 import asyncio
 
 
@@ -23,14 +23,14 @@ class React(Cog_Extension):
         if member.bot:
             return
 
-        with open('./jsons/join_messages.json', mode='r', encoding='utf8') as temp_file:
-            msg_json = json.load(temp_file)
+        time_status = await func.get_time_title(func.now_time_info('hour'))
 
-        msg = '\n'.join(msg_json["join_opening"])
+        msg = '\n'.join(rsp["join"]["opening"][time_status]) + '\n'
+        msg += '\n'.join(rsp["join"]["opening"]["main"])
         await member.send(msg)
         await asyncio.sleep(60)
 
-        msg = '\n'.join(msg_json["hackmd_read"])
+        msg = '\n'.join(rsp["join"]["hackmd_read"])
         await member.send(msg)
 
         def check(message):
@@ -40,20 +40,20 @@ class React(Cog_Extension):
             deep_freeze_status = (await self.bot.wait_for('message', check=check, timeout=60.0)).content
 
             if deep_freeze_status == 'y':
-                msg = '\n'.join(msg_json["df_1"])
+                msg = '\n'.join(rsp["join"]["df_1"])
                 deep_freeze_status = 1
             elif deep_freeze_status == 'n':
-                msg = '\n'.join(msg_json["df_0"])
+                msg = '\n'.join(rsp["join"]["df_0"])
                 deep_freeze_status = 0
             else:
-                msg = '\n'.join(msg_json["invalid_syntax"])
+                msg = '\n'.join(rsp["join"]["invalid_syntax"])
                 deep_freeze_status = 0
         except asyncio.TimeoutError:
-            msg = '\n'.join(msg_json["time_out"])
+            msg = '\n'.join(rsp["join"]["time_out"])
             deep_freeze_status = 0
 
         # another \n for last un-inserted \n
-        msg += '\n' + '\n'.join(msg_json["contact_method"])
+        msg += '\n' + '\n'.join(rsp["join"]["contact_method"])
 
         await member.send(msg)
 
@@ -84,7 +84,7 @@ class React(Cog_Extension):
 
         end_time = time.time()
 
-        msg = '\n'.join(msg_json["fl_create_finish"])
+        msg = '\n'.join(rsp["join"]["fl_create_finish"])
         await member.send(msg)
         await member.send(f'順帶一提，我用了 {round(end_time - start_time, 2)} (sec) 建立你的檔案><!')
 
