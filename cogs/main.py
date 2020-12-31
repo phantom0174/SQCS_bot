@@ -64,14 +64,21 @@ class Main(Cog_Extension):
     async def mibu(self, ctx, member_id: int, delta_value: str):
         fluctlight_client = MongoClient(link)["LightCube"]
         fluctlight_cursor = fluctlight_client["light-cube-info"]
+        score_parameters_client = MongoClient(link)["mvisualizer"]
+        score_parameters_cursor = score_parameters_client["score_parameters"]
 
-        fluctlight_cursor.update_one({"_id": member_id}, {"$inc": {"score": float(delta_value)}})
-        await sm.active_log_update(member_id)
+        score_weight = score_parameters_cursor.find_one({"_id": 0})["score_weight"]
 
-        member = ctx.guild.fetch_member(member_id)
-        msg = f'耶！你被管理員加了 {delta_value} 分！' + '\n'
-        msg += rsp["main"]["mibu"]["pt_1"]
-        await member.send(msg)
+        try:
+            fluctlight_cursor.update_one({"_id": member_id}, {"$inc": {"score": float(delta_value) * score_weight}})
+            await sm.active_log_update(member_id)
+
+            member = ctx.guild.fetch_member(member_id)
+            msg = f'耶！你被管理員加了 {delta_value} 分！' + '\n'
+            msg += rsp["main"]["mibu"]["pt_1"]
+            await member.send(msg)
+        except:
+            await ctx.send(':exclamation: Error when manipulating!')
 
         await ctx.send('ok!')
 

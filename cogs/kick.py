@@ -103,6 +103,11 @@ class Kick_Member(Cog_Extension):
         if kick_reason == 'default':
             kick_reason = f':skull_crossbones: Levelling index reached {data["lvl_ind"]}.'
 
+        msg = '\n'.join(rsp["kick"]["kick_single"]) + '\n'
+        msg += f'> {kick_reason}\n'
+        msg += '\n'.join(rsp["kick"]["re_join"])
+        await kick_user.send(msg)
+
         try:
             await kick_user.kick(reason=kick_reason)
         except:
@@ -121,11 +126,6 @@ class Kick_Member(Cog_Extension):
             await ctx.send(f':x: Error when deleting member {data["name"]}({data["_id"]})\'s fluctlight data!')
 
         await ctx.send(f':white_check_mark: Kicked member {data["name"]}({data["_id"]})!')
-
-        msg = '\n'.join(rsp["kick"]["kick_single"]) + '\n'
-        msg += f'> {kick_reason}\n'
-        msg += '\n'.join(rsp["kick"]["re_join"])
-        await kick_user.send(msg)
 
         await func.getChannel(self.bot, '_Report').send(
             f'[Command]Group kick - kick_single used by member {ctx.author.id}. {func.now_time_info("whole")}')
@@ -148,6 +148,11 @@ class Kick_Member(Cog_Extension):
         for member in data:
             kick_user = await ctx.guild.fetch_member(member["_id"])
 
+            msg = '\n'.join(rsp["kick"]["kick_all"]) + '\n'
+            msg += f'> Levelling index reached {member["lvl_ind"]}.' + '\n'
+            msg += '\n'.join(rsp["kick"]["re_join"])
+            await kick_user.send(msg)
+
             try:
                 await kick_user.kick(reason=f'Levelling index reached {member["lvl_ind"]}.')
             except:
@@ -158,11 +163,6 @@ class Kick_Member(Cog_Extension):
                 active_logs_cursor.delete_one({"_id": member["_id"]})
             except:
                 await ctx.send(f':x: Error when deleting member {member["name"]}({member["_id"]})\'s fluctlight data!')
-
-            msg = '\n'.join(rsp["kick"]["kick_all"]) + '\n'
-            msg += f'> Levelling index reached {member["lvl_ind"]}.' + '\n'
-            msg += '\n'.join(rsp["kick"]["re_join"])
-            await kick_user.send(msg)
 
         kick_member_cursor.delete_many({})
         await ctx.send(':white_check_mark: All members in the kick list has been kicked!')
