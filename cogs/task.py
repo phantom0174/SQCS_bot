@@ -19,7 +19,7 @@ class Task(Cog_Extension):
 
         self.quiz_auto.start()
 
-    @tasks.loop(minutes=30)
+    @tasks.loop(minutes=10)
     async def quiz_auto(self):
         await self.bot.wait_until_ready()
 

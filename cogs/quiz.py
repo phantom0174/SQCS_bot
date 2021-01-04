@@ -117,13 +117,13 @@ async def quiz_start(bot):
 async def quiz_end(bot):
     guild = bot.guilds[0]
     main_channel = discord.utils.get(guild.text_channels, name='💎懸賞區')
-    cmd_channel = discord.utils.get(guild.text_channels, name='總指令')
+    cmd_channel = discord.utils.get(guild.text_channels, name='總指令區')
 
     quiz_event_cursor = client["quiz_data"]
-    quiz_event_cursor.update_one({"_id": 0}, {"event_status": 0})
+    quiz_event_cursor.update_one({"_id": 0}, {"$set": {"event_status": 0}})
 
     old_correct_ans = quiz_event_cursor.find_one({"_id": 0}, {"correct_answer": 1})["correct_answer"]
-    quiz_event_cursor.update_one({"_id": 0}, {"correct_answer": 'N/A'})
+    quiz_event_cursor.update_one({"_id": 0}, {"$set": {"correct_answer": 'N/A'}})
 
     # data re-check
     quiz_status = quiz_event_cursor.find_one({"_id": 0}, {"event_status": 1})["event_status"]
@@ -147,7 +147,7 @@ async def quiz_end(bot):
         quiz_attend_level = 7
 
     msg += f'我這次有 {round((attend_count / quiz_attend_per) * 100, 1)} 分飽！' + '\n'
-    msg += '\n'.join(rsp["quiz"]["end"]["reactions"][quiz_attend_level])
+    msg += rsp["quiz"]["end"]["reactions"][quiz_attend_level]
     await main_channel.send(msg)
     await main_channel.send(f':stopwatch: 活動結束於 {func.now_time_info("whole")}')
 
