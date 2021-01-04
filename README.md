@@ -2,8 +2,8 @@
 ![](https://img.shields.io/uptimerobot/ratio/7/m786417212-72995a6e32a6e120933f8255)
 ![](https://img.shields.io/uptimerobot/ratio/m786417212-72995a6e32a6e120933f8255)
 <br>
-![Imgur](https://i.imgur.com/H5OiNY3m.jpg)
-![Imgur](https://i.imgur.com/26skltlm.png)
+![Imgur](https://i.imgur.com/H5OiNY3t.jpg)
+![Imgur](https://i.imgur.com/hvb9x1ct.jpg)
 <br>
 
 ## 🔧 Developer
