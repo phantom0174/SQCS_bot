@@ -2,7 +2,7 @@
 ![](https://img.shields.io/uptimerobot/ratio/7/m786417212-72995a6e32a6e120933f8255)
 ![](https://img.shields.io/uptimerobot/ratio/m786417212-72995a6e32a6e120933f8255)
 <br>
-![img]https://upload.cc/i1/2021/01/04/y0wpXS.jpg
+![](https://upload.cc/i1/2021/01/04/y0wpXS.jpg)
 ![Imgur](https://i.imgur.com/hvb9x1ct.jpg)
 <br>
 
