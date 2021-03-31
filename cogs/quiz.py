@@ -79,7 +79,7 @@ class Quiz(Cog_Extension):
                 fl_cursor.update_one({"_id": msg.author.id}, {"$inc": {"score": quiz_score * score_weight}})
 
         else:
-            message = ':exclamation: ' + '\n'.join(rsp[quiz]["invalid_syntax"]["pt_1"]) + '\n'
+            message = ':exclamation: ' + '\n'.join(rsp["quiz"]["invalid_syntax"]["pt_1"]) + '\n'
             message += '\n'.join(rsp["quiz"]["answer_tut"]) + '\n'
             message += '\n'.join(rsp["quiz"]["invalid_syntax"]["pt_2"])
             await msg.author.send(message)
