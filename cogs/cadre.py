@@ -76,6 +76,7 @@ class Cadre(Cog_Extension):
 
         await ctx.author.send(
             f':white_check_mark: You\'ve permitted user {member.name} to join cadre {data["apply_cadre"]}!\n'
+            f'https://discord.gg/QTS66u8QhG\n'
             f'此為幹部群的連結，請在加入之後使用指令領取屬於你的身分組')
         await member.send(f':white_check_mark: You\'ve been permitted to join cadre {data["apply_cadre"]}!')
 
