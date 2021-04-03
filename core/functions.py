@@ -1,11 +1,9 @@
 from datetime import datetime, timezone, timedelta
-from math import *
+import math
 import discord
 import json
 
 
-<<<<<<< Updated upstream
-=======
 def sgn(num):
     if num > 0:
         return 1
@@ -15,7 +13,6 @@ def sgn(num):
     return -1
 
 
->>>>>>> Stashed changes
 def now_time_info(mode):
     dt1 = datetime.utcnow().replace(tzinfo=timezone.utc)
     dt2 = dt1.astimezone(timezone(timedelta(hours=8)))  # 轉換時區 -> 東八區
@@ -26,12 +23,15 @@ def now_time_info(mode):
         return int(dt2.strftime("%H"))
     if mode == 'date':
         return int(dt2.isoweekday())
+    if mode == 'week':
+        return str(dt2.strftime("%A"))
 
 
-def role_check(roles, target_roles):
+def role_check(roles, t_role):
     for role in roles:
-        if role.name in target_roles:
-            return True
+        for mrole in t_role:
+            if role.name == mrole:
+                return True
 
     return False
 
@@ -76,9 +76,6 @@ async def get_time_title(hour):
     if hour in night:
         return 'night'
 
-<<<<<<< Updated upstream
-    return 'morning'
-=======
     return 'morning'
 
 
@@ -114,4 +111,3 @@ def score_weight_update(t_score, avr_score, max_score, min_score):
     pt1 = float(1/2)
     pt2 = float(3/(2*(1 + pow(math.e, -5 * alpha + math.log(2)))))
     return pt1 + pt2
->>>>>>> Stashed changes
