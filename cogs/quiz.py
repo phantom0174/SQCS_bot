@@ -168,8 +168,13 @@ async def quiz_end(bot):
 
     quiz_cursor.delete_many({})
 
+<<<<<<< Updated upstream
     await main_channel.send(embed=func.create_embed(':scroll: Quiz Event Result', 0x42fcff, ['Winner'], [winners]))
     await func.getChannel(bot, '_ToMV').send('update_guild_fluctlight')
+=======
+    await main_channel.send(embed=func.create_embed(':scroll: Quiz Event Result', 'default', 0x42fcff, ['Winner'], [winners]))
+    await guild_weekly_update(bot)
+>>>>>>> Stashed changes
 
 
 def setup(bot):

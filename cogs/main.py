@@ -31,7 +31,8 @@ class Main(Cog_Extension):
     # member check
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def m_check(self, ctx):
+    async def member_check(self, ctx):
+        await ctx.send('The result can only be seen at the console!')
         for member in ctx.guild.members:
             print(member)
 
@@ -82,6 +83,23 @@ class Main(Cog_Extension):
 
         await ctx.send('ok!')
 
+<<<<<<< Updated upstream
+=======
+    # active percentage
+    @commands.command()
+    @commands.has_any_role('總召', 'Administrator')
+    async def active_query(self, ctx):
+        fluctlight_cursor = fluctlight_client["light-cube-info"]
+        active_data = list(fluctlight_cursor.find({"deep_freeze": {"$ne": 1}, "week_active": {"$ne": 0}}))
+        true_data = list(fluctlight_cursor.find({"deep_freeze": {"$ne": 1}}))
+
+        active = len(active_data)
+        true = len(true_data)
+
+        await ctx.send(f':scroll: Weekly activeness until now is {(active / true) * 100} %\n'
+                       f'Active: {active}, Total: {true}')
+
+>>>>>>> Stashed changes
 
 def setup(bot):
     bot.add_cog(Main(bot))

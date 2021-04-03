@@ -43,7 +43,7 @@ async def unload(ctx, msg):
 @bot.command()
 @commands.has_any_role('總召', 'Administrator')
 async def reload(ctx, msg):
-    if msg != '*':
+    if msg != 'all':
         try:
             bot.reload_extension(f'cogs.{msg}')
             await ctx.send(f':white_check_mark: Extension {msg} reloaded.')
@@ -53,6 +53,8 @@ async def reload(ctx, msg):
         for filename in os.listdir('./cogs'):
             if filename.endswith('.py'):
                 bot.reload_extension(f'cogs.{filename[:-3]}')
+
+    await ctx.send(':white_check_mark: Reload finished!')
 
 
 @bot.command()

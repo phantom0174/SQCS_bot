@@ -20,7 +20,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a2c41741-fa8c-4512-aef2-bbf655cfc924" name="Default Changelist" comment="">
+<<<<<<< Updated upstream
       <change beforePath="$PROJECT_DIR$/cogs/quiz.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/quiz.py" afterDir="false" />
+=======
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/deep_freeze.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/deep_freeze.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/kick.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/kick.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/lecture.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/lecture.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/manipulate.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/manipulate.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cogs/quiz.py" beforeDir="false" afterPath="$PROJECT_DIR$/cogs/quiz.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/functions.py" afterDir="false" />
+>>>>>>> Stashed changes
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

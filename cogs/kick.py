@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 from core.classes import Cog_Extension
 from discord.ext import commands
-from core.setup import jdata, client, link, rsp
+from core.setup import jdata, client, link, rsp, fluctlight_client
 import core.functions as func
 import discord
 import asyncio
@@ -17,12 +17,14 @@ class Kick_Member(Cog_Extension):
     @kick.command()
     @commands.has_any_role('總召', 'Administrator')
     async def list(self, ctx):
+        await ctx.send(':hourglass_flowing_sand: Finding...')
+
         kick_member_cursor = client["kick_member_list"]
 
         kick_member_list = str()
         data = kick_member_cursor.find({})
 
-        if data is None:
+        if data.count() == 0:
             await ctx.send(':exclamation: There are no member in the kick list!')
             return
 
@@ -44,12 +46,11 @@ class Kick_Member(Cog_Extension):
     @kick.command()
     @commands.has_any_role('總召', 'Administrator')
     async def add(self, ctx, member_id: int):
-        fluctlight_client = MongoClient(link)["LightCube"]
         fluctlight_cursor = fluctlight_client["light-cube-info"]
 
         data = fluctlight_cursor.find_one({"_id": member_id}, {"contrib": 1, "lvl_ind": 1})
 
-        if data is None:
+        if data.count() == 0:
             await ctx.send(f':exclamation: There\'re no data of member whose id is {member_id}')
             return
 
@@ -77,7 +78,7 @@ class Kick_Member(Cog_Extension):
         kick_member_cursor = client["kick_member_list"]
         data = kick_member_cursor.find_one({"_id": member_id})
 
-        if data is None:
+        if data.count() == 0:
             await ctx.send(f':exclamation: Member {member_id} isn\'t in the kick list!')
             return
 
@@ -94,7 +95,7 @@ class Kick_Member(Cog_Extension):
         kick_member_cursor = client["kick_member_list"]
         data = kick_member_cursor.find_one({"_id": member_id})
 
-        if data is None:
+        if data.count() == 0:
             await ctx.send(f':exclamation: Member {member_id} isn\'t in the kick list!')
             return
 
@@ -113,7 +114,6 @@ class Kick_Member(Cog_Extension):
         except:
             await ctx.send(f':x: Error when kicking member {data["name"]}({data["_id"]})!')
 
-        fluctlight_client = MongoClient(link)["LightCube"]
         fluctlight_cursor = fluctlight_client["light-cube-info"]
         active_logs_cursor = fluctlight_client["active_logs"]
 
@@ -137,11 +137,10 @@ class Kick_Member(Cog_Extension):
 
         data = kick_member_cursor.find({})
 
-        if data is None:
+        if data.count() == 0:
             await ctx.send(':exclamation: Kick member list is empty!')
             return
 
-        fluctlight_client = MongoClient(link)["LightCube"]
         fluctlight_cursor = fluctlight_client["light-cube-info"]
         active_logs_cursor = fluctlight_client["active_logs"]
 

@@ -27,7 +27,7 @@ class Lecture(Cog_Extension):
         for item in data:
             lecture_list += f'Name: {item["name"]}, Week: {item["_id"]}\n'
 
-        if data is None:
+        if data.count() == 0:
             lecture_list = 'No data.'
 
         await ctx.send(lecture_list)
@@ -149,7 +149,7 @@ class Lecture(Cog_Extension):
 
             data = lecture_event_cursor.find_one({"_id": TargetId})
 
-            if data is None:
+            if data.count() == 0:
                 member_info = {"_id": TargetId, "score": delta_score, "count": 1}
                 lecture_event_cursor.insert_one(member_info)
             else:
@@ -188,7 +188,7 @@ class Lecture(Cog_Extension):
         lecture_event_cursor = client["lecture_event"]
         data = lecture_event_cursor.find({}).sort("score", -1)
 
-        if data is None:
+        if data.count() == 0:
             await ctx.send(':exclamation: There are no data to show!')
             return
 
@@ -215,7 +215,7 @@ class Lecture(Cog_Extension):
 
             ranking += 1
 
-        await ctx.send(embed=func.create_embed(':scroll: Lecture Event Result', 0x42fcff, ['Lecture final info'], [data_members]))
+        await ctx.send(embed=func.create_embed(':scroll: Lecture Event Result', 'default', 0x42fcff, ['Lecture final info'], [data_members]))
 
         lecture_event_cursor.delete_many({})
 
