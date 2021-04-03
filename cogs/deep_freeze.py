@@ -43,7 +43,7 @@ class Deep_Freeze(Cog_Extension):
         if len(member_list) > 0:
             await ctx.send(member_list)
 
-        await ctx.send(':white_check_mark: Logging finished!')
+        await ctx.send(':white_check_mark: Finding finished!')
 
 
 def setup(bot):

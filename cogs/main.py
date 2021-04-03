@@ -1,6 +1,6 @@
 from core.classes import Cog_Extension
 from discord.ext import commands
-from core.setup import jdata, client, link, rsp
+from core.setup import jdata, client, link, rsp, fluctlight_client
 import core.functions as func
 import discord
 from pymongo import MongoClient
@@ -38,18 +38,27 @@ class Main(Cog_Extension):
 
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def findname(self, ctx, search_name):
+    async def findvname(self, ctx, search_name):
         for member in ctx.guild.members:
-            member_name = member.nick
-            if member_name is None:
-                member_name = member.name
+            member_name = member.name
 
             if member_name.find(search_name) != -1:
                 await ctx.send(f'{member_name} {member.id}')
 
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def findid(self, ctx, search_id: int):
+    async def findvnick(self, ctx, search_name):
+        for member in ctx.guild.members:
+            member_nick = member.nick
+            if member_nick is None:
+                continue
+
+            if member_nick.find(search_name) != -1:
+                await ctx.send(f'{member_nick} {member.id}')
+
+    @commands.command()
+    @commands.has_any_role('總召', 'Administrator')
+    async def findvid(self, ctx, search_id: int):
         for member in ctx.guild.members:
             if member.id != search_id:
                 continue
@@ -63,10 +72,8 @@ class Main(Cog_Extension):
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
     async def mibu(self, ctx, member_id: int, delta_value: str):
-        fluctlight_client = MongoClient(link)["LightCube"]
         fluctlight_cursor = fluctlight_client["light-cube-info"]
-        score_parameters_client = MongoClient(link)["mvisualizer"]
-        score_parameters_cursor = score_parameters_client["score_parameters"]
+        score_parameters_cursor = client["score_parameters"]
 
         score_weight = score_parameters_cursor.find_one({"_id": 0})["score_weight"]
 
@@ -83,8 +90,6 @@ class Main(Cog_Extension):
 
         await ctx.send('ok!')
 
-<<<<<<< Updated upstream
-=======
     # active percentage
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
@@ -99,7 +104,6 @@ class Main(Cog_Extension):
         await ctx.send(f':scroll: Weekly activeness until now is {(active / true) * 100} %\n'
                        f'Active: {active}, Total: {true}')
 
->>>>>>> Stashed changes
 
 def setup(bot):
     bot.add_cog(Main(bot))
