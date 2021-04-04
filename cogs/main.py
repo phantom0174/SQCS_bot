@@ -27,6 +27,14 @@ class Main(Cog_Extension):
                     find = bool(True)
                     break
 
+    @commands.command()
+    async def msg_repeat(self, ctx, *, msg):
+        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][N/A][msg_repeat][msg: {msg}]')
+
+        re_msg = msg.split('\n')
+        for log in re_msg:
+            await ctx.send(log)
+
     # member check
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')

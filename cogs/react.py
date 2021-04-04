@@ -1,22 +1,12 @@
 from core.classes import Cog_Extension
 from discord.ext import commands
 import core.functions as func
-import json
 import time
-from pymongo import MongoClient
-from core.setup import client, link, rsp
+from core.setup import rsp, fluctlight_client
 import asyncio
 
 
 class React(Cog_Extension):
-
-    @commands.command()
-    async def msg_re(self, ctx, *, msg):
-        re_msg = msg.split('\n')
-        for log in re_msg:
-            await ctx.send(log)
-
-        await func.getChannel(self.bot, '_Report').send(f'[Command]msg_re used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
@@ -60,21 +50,22 @@ class React(Cog_Extension):
         # create personal fluctlight data
         start_time = time.time()
 
-        fluctlight_client = MongoClient(link)["LightCube"]
         fluctlight_cursor = fluctlight_client["light-cube-info"]
 
-        member_fluctlight = {"_id": member.id,
-                             "score": 0,
-                             "du": 0,
-                             "oc_auth": 0,
-                             "sc_auth": 0,
-                             "lvl_ind": 0,
-                             "mdu": 0,
-                             "odu": 0,
-                             "odu_time": time.time(),
-                             "contrib": 0,
-                             "week_active": 0,
-                             "deep_freeze": deep_freeze_status}
+        member_fluctlight = {
+            "_id": member.id,
+            "score": 0,
+            "du": 0,
+            "oc_auth": 0,
+            "sc_auth": 0,
+            "lvl_ind": 0,
+            "mdu": 0,
+            "odu": 0,
+            "odu_time": time.time(),
+            "contrib": 0,
+            "week_active": 0,
+            "deep_freeze": deep_freeze_status
+        }
 
         try:
             fluctlight_cursor.insert_one(member_fluctlight)
