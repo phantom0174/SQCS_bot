@@ -19,6 +19,10 @@ class Query(Cog_Extension):
         quiz_cursor = client["quiz_event"]
         data = quiz_cursor.find({})
 
+        if data.count() == 0:
+            await ctx.send(':exclamation: There is no data!')
+            return
+
         status = str()
         for item in data:
             member_name = (await ctx.guild.fetch_member(item["_id"])).nick

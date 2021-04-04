@@ -12,7 +12,7 @@ class Cadre(Cog_Extension):
         pass
 
     @ca.command()
-    async def apply(self, ctx, cadre):
+    async def apply(self, ctx, cadre: str):
         appl = ctx.author  # applicant
 
         await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][ca][apply][cadre: {cadre}]')
@@ -35,11 +35,16 @@ class Cadre(Cog_Extension):
             return
 
         apply_time = func.now_time_info('whole')
-        apply_info = {"_id": appl, "apply_cadre": cadre, "apply_time": apply_time}
+        apply_info = {
+            "_id": appl.id,
+            "apply_cadre": cadre,
+            "apply_time": apply_time
+        }
+
         cadre_cursor.insert_one(apply_info)
 
         await appl.send(f':white_check_mark: 我收到你的申請了！請耐心等待\n'
-                        f'申請人id: {appl}, 申請職位: {cadre}, 申請時間: {apply_time}')
+                        f'申請人名字: {appl.name}, 申請人id: {appl.id}, 申請職位: {cadre}, 申請時間: {apply_time}')
 
     @ca.command()
     @commands.has_any_role('總召', 'Administrator')

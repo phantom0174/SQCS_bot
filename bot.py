@@ -55,7 +55,7 @@ async def reload(ctx, msg):
             if filename.endswith('.py'):
                 bot.reload_extension(f'cogs.{filename[:-3]}')
 
-    await ctx.send(':white_check_mark: Reload finished!')
+        await ctx.send(':white_check_mark: Reload finished!')
 
 
 @bot.command()
