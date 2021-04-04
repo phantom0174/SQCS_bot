@@ -23,14 +23,16 @@ class Task(Cog_Extension):
     async def quiz_auto(self):
         await self.bot.wait_until_ready()
 
+        report_channel = discord.utils.get(self.bot.guilds[1].text_channels, name='sqcs-report')
+
         quiz_status = self.quiz_data_cursor.find_one({"_id": 0})["event_status"]
 
         if func.now_time_info('date') == 1 and func.now_time_info('hour') >= 6 and quiz_status == 0:
             await quiz_start(self.bot)
-            await func.getChannel(self.bot, '_Report').send(f'[Auto]Quiz event start. {func.now_time_info("whole")}')
+            await report_channel.send(f'[AUTO QUIZ START][{func.now_time_info("whole")}]')
         elif func.now_time_info('date') == 7 and func.now_time_info('hour') >= 23 and quiz_status == 1:
             await quiz_end(self.bot)
-            await func.getChannel(self.bot, '_Report').send(f'[Auto]Quiz event end. {func.now_time_info("whole")}')
+            await report_channel.send(f'[AUTO QUIZ END][{func.now_time_info("whole")}]')
 
 
 def setup(bot):
