@@ -18,7 +18,9 @@ class Quiz(Cog_Extension):
     # push back stand by answer
     @quiz.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def quiz_push(self, ctx, insert_answer: str):
+    async def ans_push(self, ctx, insert_answer: str):
+        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][quiz][ans_push][insert_answer: {insert_answer}]')
+
         quiz_data_cursor = client["quiz_data"]
 
         stand_by_answer = quiz_data_cursor.find_one({"_id": 0})["stand_by_answer"]
@@ -29,9 +31,6 @@ class Quiz(Cog_Extension):
 
         quiz_data_cursor.update_one({"_id": 0}, {"$set": {"stand_by_answer": insert_answer}})
         await ctx.send(f':white_check_mark: The stand-by answer has been set as {insert_answer}!')
-
-        await func.getChannel(self.bot, '_Report').send(
-            f'[Command]Group quiz - quiz_push used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
     # event answer listen function
     @commands.Cog.listener()
@@ -50,8 +49,7 @@ class Quiz(Cog_Extension):
 
         correct_answer = quiz_data_cursor.find_one({"_id": 0})["correct_answer"]
 
-        mvisualizer_client = MongoClient(link)["mvisualizer"]
-        quiz_score_cursor = mvisualizer_client["score_parameters"]
+        quiz_score_cursor = client["score_parameters"]
         quiz_score = quiz_score_cursor.find_one({"_id": 0})["quiz_point"]
         score_weight = quiz_score_cursor.find_one({"_id": 0})["score_weight"]
 
