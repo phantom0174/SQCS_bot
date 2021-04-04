@@ -2,13 +2,8 @@ from core.setup import jdata, client
 import core.functions as func
 from cogs.quiz import quiz_start, quiz_end
 import discord
-import asyncio
-import json
-import sys
-import os
 from discord.ext import commands, tasks
 from core.classes import Cog_Extension
-from pymongo import MongoClient
 
 
 class Task(Cog_Extension):
