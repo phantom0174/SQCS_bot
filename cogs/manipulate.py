@@ -1,7 +1,7 @@
 from discord.ext import commands
 import core.functions as func
 from core.classes import Cog_Extension
-from core.setup import fluctlight_client
+from core.setup import client, fluctlight_client
 
 
 class Manipulate(Cog_Extension):
@@ -33,6 +33,17 @@ class Manipulate(Cog_Extension):
 
         member_name = (await ctx.guild.fetch_user(target_id))
         await ctx.send(f'Member {member_name}\'s {attribute} has been set as {data[attribute]}!')
+
+    @mani.command()
+    @commands.has_any_role('總召', 'Administrator')
+    async def quiz(self, ctx, member_id: int, alter: int):
+        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][mani][quiz][member_id: {member_id}, alter: {alter}]')
+
+        quiz_cursor = client["quiz"]
+        quiz_cursor.update_one({"_id": member_id}, {"$set": {"correct": alter}})
+
+        member_name = (await self.bot.fetch_user(member_id)).name
+        await ctx.send(f'Member {member_name}\'s correct answer has been set as {alter}!')
 
 
 def setup(bot):
