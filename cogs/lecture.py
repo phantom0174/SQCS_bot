@@ -1,7 +1,6 @@
-from pymongo import MongoClient
 from core.classes import Cog_Extension
 from discord.ext import commands
-from core.setup import jdata, client, link, rsp
+from core.setup import jdata, client, link, rsp, fluctlight_client
 import core.functions as func
 import discord
 import asyncio
@@ -172,7 +171,7 @@ class Lecture(Cog_Extension):
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def end(self, ctx, week: int):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][lect][emd][week: {week}]')
+        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][lect][end][week: {week}]')
 
         lecture_list_cursor = client["lecture_list"]
         data = lecture_list_cursor.find_one({"_id": week})
@@ -189,8 +188,7 @@ class Lecture(Cog_Extension):
         lecture_list_cursor.update_one({"_id": week}, {"$set": {"status": 0}})
 
         # adding scores and show lecture final data
-        fl_client = MongoClient(link)["LightCube"]
-        fl_cursor = fl_client["light-cube-info"]
+        fl_cursor = fluctlight_client["light-cube-info"]
 
         lecture_event_cursor = client["lecture_event"]
         data = lecture_event_cursor.find({}).sort("score", -1)

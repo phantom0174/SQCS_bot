@@ -2,8 +2,7 @@ from datetime import datetime, timezone, timedelta
 import math
 import discord
 import json
-from core.setup import client, link
-from pymongo import MongoClient
+from core.setup import client, link, fluctlight_client
 import core.score_module as sm
 
 
@@ -68,8 +67,7 @@ def report_lect_attend(bot, attendants, week):
     lect_attend_score = score_cursor.find_one({"_id": 0})["lecture_attend_point"]
 
     # add score to the attendances
-    fl_client = MongoClient(link)["LightCube"]
-    fl_cursor = fl_client["light-cube-info"]
+    fl_cursor = fluctlight_client["light-cube-info"]
 
     report_channel = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-lecture-attend')
 
