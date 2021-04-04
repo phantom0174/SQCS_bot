@@ -26,6 +26,7 @@
 - 2020/12/27: Fix VIUpdate function.
 - 2020/12/28: Quiz event en-DB, VIUpdate function en-fracture.
 - 2020/12/30: Add humanity extension.
+- 2021/04/03: Integrate with Synthesizer and MVisualizer.
 ```
 
 ## ✅ Open-source
