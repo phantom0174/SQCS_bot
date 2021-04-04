@@ -56,7 +56,7 @@ class Quiz(Cog_Extension):
         quiz_cursor = client["quiz_event"]
         data = quiz_cursor.find_one({"_id": msg.author.id})
 
-        if data is not None:
+        if not data:
             message = ':no_entry_sign: ' + '\n'.join(rsp["quiz"]["repeat_answer"])
             await msg.author.send(message)
             return

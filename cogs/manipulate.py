@@ -23,7 +23,7 @@ class Manipulate(Cog_Extension):
         fluctlight_cursor = fluctlight_client["light-cube-info"]
         data = fluctlight_cursor.find_one({"_id": target_id})
 
-        if data.count() == 0:
+        if not data:
             await ctx.send(f':exclamation: There are no data of {target_id}!')
             return
 

@@ -46,7 +46,7 @@ class Kick_Member(Cog_Extension):
         fluctlight_cursor = fluctlight_client["light-cube-info"]
         data = fluctlight_cursor.find_one({"_id": member_id}, {"contrib": 1, "lvl_ind": 1})
 
-        if data.count() == 0:
+        if not data:
             await ctx.send(f':exclamation: There\'re no data of member whose id is {member_id}')
             return
 
@@ -78,7 +78,7 @@ class Kick_Member(Cog_Extension):
         kick_member_cursor = client["kick_member_list"]
         data = kick_member_cursor.find_one({"_id": member_id})
 
-        if data.count() == 0:
+        if not data:
             await ctx.send(f':exclamation: Member {member_id} isn\'t in the kick list!')
             return
 
@@ -94,7 +94,7 @@ class Kick_Member(Cog_Extension):
         kick_member_cursor = client["kick_member_list"]
         data = kick_member_cursor.find_one({"_id": member_id})
 
-        if data.count() == 0:
+        if not data:
             await ctx.send(f':exclamation: Member {member_id} isn\'t in the kick list!')
             return
 

@@ -27,7 +27,7 @@ class Cadre(Cog_Extension):
         cadre_cursor = client["cadre"]
         data = cadre_cursor.find_one({"_id": appl.id})
 
-        if data.count() != 0:
+        if data:
             await appl.send(f':exclamation: {appl.mention} (id: {data["_id"]}),\n'
                             f'您已經於 {data["apply_time"]} 申請 `{data["apply_cadre"]}` 職位！\n'
                             f'請確認是否發生以下狀況 `重複申請；同時申請兩職位；申請錯誤`\n'
@@ -73,7 +73,7 @@ class Cadre(Cog_Extension):
         cadre_cursor = client["cadre"]
         data = cadre_cursor.find_one({"_id": permit_id})
 
-        if data.count() == 0:
+        if not data:
             await ctx.send(f':exclamation: There exists no applicant whose id is {permit_id}!')
             return
 
@@ -96,7 +96,7 @@ class Cadre(Cog_Extension):
         cadre_cursor = client["cadre"]
         data = cadre_cursor.find_one({"_id": search_id})
 
-        if data.count() == 0:
+        if not data:
             await ctx.send(f':exclamation: There are no applicant whose Id is {search_id}!')
             return
 
@@ -110,7 +110,7 @@ class Cadre(Cog_Extension):
         cadre_cursor = client["cadre"]
         data = cadre_cursor.find_one({"_id": delete_id})
 
-        if data.count() == 0:
+        if not data:
             await ctx.send(f':exclamation: There exists no applicant whose id is {delete_id}!')
 
         member_name = await ctx.guild.fetch_member(data["_id"])

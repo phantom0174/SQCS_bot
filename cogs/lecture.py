@@ -44,7 +44,7 @@ class Lecture(Cog_Extension):
 
         # find if already exists
         data = lecture_list_cursor.find_one({"_id": lect_week})
-        if data.count() != 0:
+        if data:
             await ctx.send('There already exists a lecture on the same day!')
             return
 
@@ -80,7 +80,7 @@ class Lecture(Cog_Extension):
         lecture_list_cursor = client["lecture_list"]
         data = lecture_list_cursor.find_one({"_id": week})
 
-        if data.count() == 0:
+        if not data:
             await ctx.send(f':exclamation: There exists no lecture on week {week}!')
             return
 
@@ -152,7 +152,7 @@ class Lecture(Cog_Extension):
 
             data = lecture_event_cursor.find_one({"_id": target_id})
 
-            if data.count() == 0:
+            if not data:
                 member_info = {
                     "_id": target_id,
                     "score": delta_score,

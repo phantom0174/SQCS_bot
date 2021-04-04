@@ -1,10 +1,4 @@
-import math
-import core.functions as func
-from core.setup import jdata, client, link, fluctlight_client
-from pymongo import MongoClient
-import core.rank_module as rk_mod
-import discord
-import asyncio
+from core.setup import fluctlight_client
 
 
 async def active_log_update(member_id):

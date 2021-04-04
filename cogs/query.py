@@ -51,7 +51,8 @@ async def personal_info(member_id):
     fluctlight_cursor = fluctlight_client["light-cube-info"]
     data = fluctlight_cursor.find_one({"_id": member_id})
 
-    if data.count() == 0:
+    # method used when checking a dict is empty or not
+    if not data:
         return func.create_embed('Object info', 'default', 0xe46bf9, ['Error'], ['Logging error'])
 
     value_title = ['Object Id', 'Score', 'Durability', 'Object Control Authority', 'System Control Authority',
