@@ -7,7 +7,6 @@ import discord
 import asyncio
 import random
 import json
-import pymongo
 import core.score_module as sm
 
 

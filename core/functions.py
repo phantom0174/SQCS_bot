@@ -53,9 +53,9 @@ def create_embed(Title, thumbnail, Color, FieldsName, Values):
     return embed
 
 
-def report(bot, content):
+def report_cmd(bot, ctx, content):
     report_channel = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-report')
-    msg = content + '\n' + f'[{now_time_info("whole")}]'
+    msg = content + f'[{ctx.author.name}][{ctx.author.id}]\n' + f'[{now_time_info("whole")}]'
     await report_channel.send(msg)
 
 
