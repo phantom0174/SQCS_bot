@@ -19,56 +19,71 @@ class Lecture(Cog_Extension):
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def list(self, ctx):
+        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][lect][list]')
+
         lecture_list_cursor = client["lecture_list"]
         data = lecture_list_cursor.find({})
+
+        if data.count() == 0:
+            await ctx.send(':exclamation: No data!')
+            return
 
         lecture_list = str()
         for item in data:
             lecture_list += f'Name: {item["name"]}, Week: {item["_id"]}\n'
 
-        if data.count() == 0:
-            lecture_list = 'No data.'
-
         await ctx.send(lecture_list)
-        await func.getChannel(self.bot, '_Report').send(
-            f'[Command]Group lect - list used by member {ctx.author.id}. {func.now_time_info("whole")}')
+        await ctx.send(':white_check_mark: Logging finished!')
 
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def mani(self, ctx, *, msg):
-        mode = msg.split(' ')[0]
+    async def add(self, ctx, lect_week: int, lect_name: str):
+        await func.report_cmd(self.bot, ctx,
+                              f'[CMD EXECUTED][lect][add][lect_week: {lect_week}, lect_name: {lect_name}]')
+
         lecture_list_cursor = client["lecture_list"]
 
-        if mode == '1':
-            if len(msg.split(' ')) < 3:
-                await ctx.send('Not enough parameters!')
-                return
+        # find if already exists
+        data = lecture_list_cursor.find_one({"_id": lect_week})
+        if data.count() != 0:
+            await ctx.send('There already exists a lecture on the same day!')
+            return
 
-            lecture_name = msg.split(' ')[1]
-            lecture_week = int(msg.split(' ')[2])
+        lecture_info = {
+            "_id": lect_week,
+            "name": lect_name,
+            "status": 0
+        }
 
-            lecture_info = {"_id": lecture_week, "name": lecture_name, "status": 0}
-            lecture_list_cursor.insert_one(lecture_info)
+        lecture_list_cursor.insert_one(lecture_info)
 
-            await ctx.send(f'Lecture {lecture_name}, on week {lecture_week} has been pushed!')
-        elif mode == '0':
-            delete_lecture_name = msg.split(' ')[1]
+        await ctx.send(f'Lecture {lect_name}, on week {lect_week} has been added!')
 
-            try:
-                lecture_list_cursor.delete_one({"name": delete_lecture_name})
-                await ctx.send(f'Lecture {delete_lecture_name} has been removed!')
-            except:
-                await ctx.send(f'There are no lecture named {delete_lecture_name}!')
-                return
+    @lect.command()
+    @commands.has_any_role('總召', 'Administrator')
+    async def remove(self, ctx, del_lect_week: int):
+        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][lect][remove][del_lect_week: {del_lect_week}]')
 
-        await func.getChannel(self.bot, '_Report').send(
-            f'[Command]Group lect - mani used by member {ctx.author.id}. {func.now_time_info("whole")}')
+        lecture_list_cursor = client["lecture_list"]
+
+        try:
+            lecture_list_cursor.delete_one({"week": del_lect_week})
+            await ctx.send(f':white_check_mark: The lecture on week `{del_lect_week}` has been removed!')
+        except Exception as e:
+            await ctx.send(f':exclamation: Error occurred when deleting lecture on week {del_lect_week}!')
+            await ctx.send(content=e, delete_after=5.0)
 
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def start(self, ctx, week: int):
+        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][lect][start][week: {week}]')
+
         lecture_list_cursor = client["lecture_list"]
         data = lecture_list_cursor.find_one({"_id": week})
+
+        if data.count() == 0:
+            await ctx.send(f':exclamation: There exists no lecture on week {week}!')
+            return
 
         if data["status"] == 1:
             await ctx.send(':exclamation: The lecture has already started!')
@@ -81,12 +96,7 @@ class Lecture(Cog_Extension):
 
         lecture_list_cursor.update({"_id": week}, {"$set": {"status": 1}})
 
-        mvisualizer_client = MongoClient(link)['mvisualizer']
-        score_cursor = mvisualizer_client["score_parameters"]
-
-        score_weight = score_cursor.find_one({"_id": 0})["score_weight"]
-        lect_attend_score = score_cursor.find_one({"_id": 0})["lecture_attend_point"]
-
+        # delete previous special message
         msg_logs = await ctx.channel.history(limit=200).flatten()
         for msg in msg_logs:
             if len(msg.content) > 0 and msg.content[0] == '&':
@@ -96,26 +106,22 @@ class Lecture(Cog_Extension):
         random.seed(func.now_time_info('hour') * 92384)
         await asyncio.sleep(random.randint(30, 180))
 
-        # add score to the attendances
-        fl_client = MongoClient(link)["LightCube"]
-        fl_cursor = fl_client["light-cube-info"]
-
         channel_name = lecture_list_cursor.find_one({"_id": week})["name"]
         voice_channel = discord.utils.get(ctx.guild.voice_channels, name=channel_name)
 
+        attendants = list()
         for member in voice_channel.members:
-            fl_cursor.update_one({"_id": member.id}, {"$inc": {"score": lect_attend_score * score_weight}})
-            await sm.active_log_update(member.id)
+            attendants.append(member.id)
 
-        lecture_list_cursor.update_one({"_id": week}, {"$set": {"population": len(voice_channel.members)}})
-
-        await func.getChannel(self.bot, '_Report').send(
-            f'[Command]Group lect - start used by member {ctx.author.id}. {func.now_time_info("whole")}')
+        await func.report_lect_attend(self.bot, attendants, week)
+        lecture_list_cursor.update_one({"_id": week}, {"$set": {"population": len(attendants)}})
 
     # lecture ans check
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def ans_check(self, ctx, *, msg):
+        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][lect][ans_check][correct_ans: {msg}]')
+
         correct_answer = msg.split(' ')
         msg_logs = await ctx.channel.history(limit=100).flatten()
         correct_msgs = []  # correct message
@@ -136,35 +142,37 @@ class Lecture(Cog_Extension):
 
         # add score to correct members
         lecture_event_cursor = client["lecture_event"]
-        mvisualizer_client = MongoClient(link)['mvisualizer']
-        score_cursor = mvisualizer_client["score_parameters"]
+        score_cursor = client["score_parameters"]
 
         score_weight = score_cursor.find_one({"_id": 0})["score_weight"]
 
         top_score = float(5)
         for crt_msg in correct_msgs:
-            TargetId = crt_msg.author.id
+            target_id = crt_msg.author.id
             delta_score = top_score * score_weight
 
-            data = lecture_event_cursor.find_one({"_id": TargetId})
+            data = lecture_event_cursor.find_one({"_id": target_id})
 
             if data.count() == 0:
-                member_info = {"_id": TargetId, "score": delta_score, "count": 1}
+                member_info = {
+                    "_id": target_id,
+                    "score": delta_score,
+                    "count": 1
+                }
+
                 lecture_event_cursor.insert_one(member_info)
             else:
-                lecture_event_cursor.update_one({"_id": TargetId}, {"$inc": {"score": delta_score, "count": 1}})
+                lecture_event_cursor.update_one({"_id": target_id}, {"$inc": {"score": delta_score, "count": 1}})
 
-            await sm.active_log_update(TargetId)
+            await sm.active_log_update(target_id)
 
             if top_score > 1:
                 top_score -= 1
 
-        await func.getChannel(self.bot, '_Report').send(
-            f'[Command]Group lect - ans_check used by member {ctx.author.id}. {func.now_time_info("whole")}')
-
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def end(self, ctx, week: int):
+        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][lect][emd][week: {week}]')
 
         lecture_list_cursor = client["lecture_list"]
         data = lecture_list_cursor.find_one({"_id": week})
@@ -174,7 +182,7 @@ class Lecture(Cog_Extension):
             return
 
         msg = '\n'.join(rsp["lecture"]["end"]["main"]) + '\n'
-        population_level = int(data["population"] / 10)
+        population_level = int(round(data["population"] / 10))
         msg += rsp["lecture"]["end"]["reactions"][population_level]
         await ctx.send(msg)
 
@@ -217,9 +225,6 @@ class Lecture(Cog_Extension):
         await ctx.send(embed=func.create_embed(':scroll: Lecture Event Result', 'default', 0x42fcff, ['Lecture final info'], [data_members]))
 
         lecture_event_cursor.delete_many({})
-
-        await func.getChannel(self.bot, '_Report').send(
-            f'[Command]Group lect - end used by member {ctx.author.id}. {func.now_time_info("whole")}')
 
 
 def setup(bot):

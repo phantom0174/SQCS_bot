@@ -2,6 +2,9 @@ from datetime import datetime, timezone, timedelta
 import math
 import discord
 import json
+from core.setup import client, link
+from pymongo import MongoClient
+import core.score_module as sm
 
 
 def sgn(num):
@@ -57,6 +60,29 @@ def report_cmd(bot, ctx, content):
     report_channel = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-report')
     msg = content + f'[{ctx.author.name}][{ctx.author.id}]\n' + f'[{now_time_info("whole")}]'
     await report_channel.send(msg)
+
+
+def report_lect_attend(bot, attendants, week):
+    score_cursor = client["score_parameters"]
+    score_weight = score_cursor.find_one({"_id": 0})["score_weight"]
+    lect_attend_score = score_cursor.find_one({"_id": 0})["lecture_attend_point"]
+
+    # add score to the attendances
+    fl_client = MongoClient(link)["LightCube"]
+    fl_cursor = fl_client["light-cube-info"]
+
+    report_channel = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-lecture-attend')
+
+    for member_id in attendants:
+        try:
+            fl_cursor.update_one({"_id": member_id}, {"$inc": {"score": lect_attend_score * score_weight}})
+            await sm.active_log_update(member_id)
+        except:
+            await report_channel.send(f'[DB MANI ERROR][to: {member_id}][inc_score: {lect_attend_score * score_weight}]')
+
+    await report_channel.send(f'[LECT ATTEND][week: {week}][attendants:\n'
+                              f'{attendants}\n'
+                              f'[{now_time_info("whole")}]')
 
 
 async def get_time_title(hour):
