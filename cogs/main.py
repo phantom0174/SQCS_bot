@@ -1,7 +1,6 @@
 from core.classes import Cog_Extension
 from discord.ext import commands
 from core.setup import jdata, client, link, rsp, fluctlight_client
-import core.functions as func
 import discord
 import core.score_module as sm
 

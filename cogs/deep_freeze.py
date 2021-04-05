@@ -1,7 +1,6 @@
 from discord.ext import commands
 from core.classes import Cog_Extension
 from core.setup import fluctlight_client
-import core.functions as func
 
 
 class Deep_Freeze(Cog_Extension):

@@ -1,5 +1,4 @@
 from discord.ext import commands
-import core.functions as func
 import discord
 import sys
 import os
@@ -18,8 +17,6 @@ async def on_ready():
 @bot.command()
 @commands.has_any_role('總召', 'Administrator')
 async def load(ctx, msg):
-    await func.report_cmd(bot, ctx, f'[CMD EXECUTED][N/A][load]')
-
     try:
         bot.load_extension(f'cogs.{msg}')
         await ctx.send(f':white_check_mark: Extension {msg} loaded.')
@@ -30,8 +27,6 @@ async def load(ctx, msg):
 @bot.command()
 @commands.has_any_role('總召', 'Administrator')
 async def unload(ctx, msg):
-    await func.report_cmd(bot, ctx, f'[CMD EXECUTED][N/A][unload]')
-
     try:
         bot.unload_extension(f'cogs.{msg}')
         await ctx.send(f':white_check_mark: Extension {msg} unloaded.')
@@ -42,8 +37,6 @@ async def unload(ctx, msg):
 @bot.command()
 @commands.has_any_role('總召', 'Administrator')
 async def reload(ctx, msg):
-    await func.report_cmd(bot, ctx, f'[CMD EXECUTED][N/A][reload]')
-
     if msg != 'all':
         try:
             bot.reload_extension(f'cogs.{msg}')
@@ -61,8 +54,6 @@ async def reload(ctx, msg):
 @bot.command()
 @commands.has_any_role('總召')
 async def safe_stop(ctx):
-    await func.report_cmd(bot, ctx, f'[CMD EXECUTED][N/A][safe_stop]')
-
     await ctx.send(':white_check_mark: The bot has stopped!')
     sys.exit(0)
 

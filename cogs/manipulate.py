@@ -1,5 +1,4 @@
 from discord.ext import commands
-import core.functions as func
 from core.classes import Cog_Extension
 from core.setup import client, fluctlight_client
 

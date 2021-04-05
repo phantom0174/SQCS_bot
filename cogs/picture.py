@@ -1,7 +1,6 @@
 from core.classes import Cog_Extension
 from discord.ext import commands
 from core.setup import jdata
-import core.functions as func
 import random
 import json
 
