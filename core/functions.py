@@ -55,12 +55,6 @@ def create_embed(Title, thumbnail, Color, FieldsName, Values):
     return embed
 
 
-async def report_cmd(bot, ctx, content):
-    report_channel = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-report')
-    msg = content + f'[{ctx.author.name}][{ctx.author.id}]\n' + f'[{now_time_info("whole")}]'
-    await report_channel.send(msg)
-
-
 async def report_lect_attend(bot, attendants, week):
     score_cursor = client["score_parameters"]
     score_weight = score_cursor.find_one({"_id": 0})["score_weight"]

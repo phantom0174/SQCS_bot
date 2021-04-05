@@ -19,7 +19,6 @@ class Quiz(Cog_Extension):
     @quiz.command()
     @commands.has_any_role('總召', 'Administrator')
     async def ans_push(self, ctx, insert_answer: str):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][quiz][ans_push][insert_answer: {insert_answer}]')
 
         quiz_data_cursor = client["quiz_data"]
 

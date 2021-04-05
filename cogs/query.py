@@ -14,7 +14,6 @@ class Query(Cog_Extension):
     @query.command()
     @commands.has_any_role('總召', 'Administrator')
     async def quiz(self, ctx):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][query][quiz]')
 
         quiz_cursor = client["quiz_event"]
         data = quiz_cursor.find({})
@@ -39,15 +38,11 @@ class Query(Cog_Extension):
 
     @query.command()
     async def my_data(self, ctx):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][query][my_data]')
-
         await ctx.author.send(embed=(await personal_info(ctx.author.id)))
 
     @query.command()
     @commands.has_any_role('總召', 'Administrator')
     async def member_data(self, ctx, target_id: int):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][query][member_data][target_id: {target_id}]')
-
         await ctx.author.send(embed=(await personal_info(target_id)))
 
 

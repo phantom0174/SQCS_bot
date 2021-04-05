@@ -3,7 +3,6 @@ from discord.ext import commands
 from core.setup import jdata, client, link, rsp, fluctlight_client
 import core.functions as func
 import discord
-from pymongo import MongoClient
 import core.score_module as sm
 
 
@@ -16,7 +15,6 @@ class Main(Cog_Extension):
     # delete message
     @commands.command()
     async def clear(self, ctx, msg_id: int):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][N/A][clear][msg_id: {msg_id}]')
 
         find = bool(False)
         while not find:
@@ -29,7 +27,6 @@ class Main(Cog_Extension):
 
     @commands.command()
     async def msg_repeat(self, ctx, *, msg):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][N/A][msg_repeat][msg: {msg}]')
 
         re_msg = msg.split('\n')
         for log in re_msg:
@@ -39,7 +36,6 @@ class Main(Cog_Extension):
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
     async def member_check(self, ctx):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][N/A][member_check]')
 
         await ctx.send('The result can only be seen at the console!')
         for member in ctx.guild.members:
@@ -48,7 +44,6 @@ class Main(Cog_Extension):
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
     async def findvname(self, ctx, search_via_name: str):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][N/A][findvname][search_via_name: {search_via_name}]')
 
         for member in ctx.guild.members:
             member_name = member.name
@@ -59,7 +54,6 @@ class Main(Cog_Extension):
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
     async def findvnick(self, ctx, search_via_nick: str):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][N/A][findvnick][search_via_nick: {search_via_nick}]')
 
         for member in ctx.guild.members:
             member_nick = member.nick
@@ -72,7 +66,6 @@ class Main(Cog_Extension):
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
     async def findvid(self, ctx, search_via_id: int):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][N/A][findvnick][search_via_id: {search_via_id}]')
 
         for member in ctx.guild.members:
             if member.id != search_via_id:
@@ -87,8 +80,6 @@ class Main(Cog_Extension):
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
     async def mibu(self, ctx, member_id: int, delta_value: str):
-        await func.report_cmd(self.bot, ctx,
-                              f'[CMD EXECUTED][N/A][findvnick][member_id: {member_id}, delta_value: {delta_value}]')
 
         fluctlight_cursor = fluctlight_client["light-cube-info"]
         score_parameters_cursor = client["score_parameters"]
@@ -112,7 +103,6 @@ class Main(Cog_Extension):
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
     async def active_query(self, ctx):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][N/A][active_query]')
 
         fluctlight_cursor = fluctlight_client["light-cube-info"]
         active_data = list(fluctlight_cursor.find({"deep_freeze": {"$ne": 1}, "week_active": {"$ne": 0}}))

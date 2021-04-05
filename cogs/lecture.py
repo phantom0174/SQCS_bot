@@ -18,7 +18,6 @@ class Lecture(Cog_Extension):
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def list(self, ctx):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][lect][list]')
 
         lecture_list_cursor = client["lecture_list"]
         data = lecture_list_cursor.find({})
@@ -37,8 +36,6 @@ class Lecture(Cog_Extension):
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def add(self, ctx, lect_week: int, lect_name: str):
-        await func.report_cmd(self.bot, ctx,
-                              f'[CMD EXECUTED][lect][add][lect_week: {lect_week}, lect_name: {lect_name}]')
 
         lecture_list_cursor = client["lecture_list"]
 
@@ -61,7 +58,6 @@ class Lecture(Cog_Extension):
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def remove(self, ctx, del_lect_week: int):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][lect][remove][del_lect_week: {del_lect_week}]')
 
         lecture_list_cursor = client["lecture_list"]
 
@@ -75,7 +71,6 @@ class Lecture(Cog_Extension):
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def start(self, ctx, week: int):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][lect][start][week: {week}]')
 
         lecture_list_cursor = client["lecture_list"]
         data = lecture_list_cursor.find_one({"_id": week})
@@ -119,7 +114,6 @@ class Lecture(Cog_Extension):
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def ans_check(self, ctx, *, msg):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][lect][ans_check][correct_ans: {msg}]')
 
         correct_answer = msg.split(' ')
         msg_logs = await ctx.channel.history(limit=100).flatten()
@@ -171,7 +165,6 @@ class Lecture(Cog_Extension):
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def end(self, ctx, week: int):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][lect][end][week: {week}]')
 
         lecture_list_cursor = client["lecture_list"]
         data = lecture_list_cursor.find_one({"_id": week})

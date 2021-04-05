@@ -15,8 +15,6 @@ class Cadre(Cog_Extension):
     async def apply(self, ctx, cadre: str):
         appl = ctx.author  # applicant
 
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][ca][apply][cadre: {cadre}]')
-
         if ctx.channel.name != '📝幹部申請區':
             return
 
@@ -49,7 +47,6 @@ class Cadre(Cog_Extension):
     @ca.command()
     @commands.has_any_role('總召', 'Administrator')
     async def list(self, ctx):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][ca][list]')
 
         cadre_cursor = client["cadre"]
         data = cadre_cursor.find({})
@@ -73,7 +70,6 @@ class Cadre(Cog_Extension):
     @ca.command()
     @commands.has_any_role('總召', 'Administrator')
     async def permit(self, ctx, permit_id: int):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][ca][permit][permit_id: {permit_id}]')
 
         cadre_cursor = client["cadre"]
         data = cadre_cursor.find_one({"_id": permit_id})
@@ -96,7 +92,6 @@ class Cadre(Cog_Extension):
     @ca.command()
     @commands.has_any_role('總召', 'Administrator')
     async def search(self, ctx, search_id: int):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][ca][search][search_id: {search_id}]')
 
         cadre_cursor = client["cadre"]
         data = cadre_cursor.find_one({"_id": search_id})
@@ -110,7 +105,6 @@ class Cadre(Cog_Extension):
 
     @ca.command()
     async def remove(self, ctx, delete_id: int):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][ca][remove][delete_id: {delete_id}]')
 
         cadre_cursor = client["cadre"]
         data = cadre_cursor.find_one({"_id": delete_id})

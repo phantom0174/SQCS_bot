@@ -15,7 +15,6 @@ class Picture(Cog_Extension):
     @pic.command()
     @commands.has_any_role('總召', 'Administrator')
     async def add(self, ctx, link: str):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][pic][add][link: {link}]')
 
         with open('jsons/setting.json', mode='r', encoding='utf8') as temp_file:
             setting_data = json.load(temp_file)
@@ -30,7 +29,6 @@ class Picture(Cog_Extension):
     @pic.command()
     @commands.has_any_role('總召', 'Administrator')
     async def remove(self, ctx, index: int):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][pic][remove][index: {index}]')
 
         with open('jsons/setting.json', mode='r', encoding='utf8') as temp_file:
             setting_data = json.load(temp_file)
@@ -49,7 +47,6 @@ class Picture(Cog_Extension):
 
     @pic.command()
     async def list(self, ctx):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][pic][link]')
 
         with open('jsons/setting.json', mode='r', encoding='utf8') as temp_file:
             setting_data = json.load(temp_file)
@@ -66,7 +63,6 @@ class Picture(Cog_Extension):
 
     @pic.command()
     async def random(self, ctx):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][pic][random]')
 
         random_picture = random.choice(jdata['pic'])
         await ctx.send(random_picture)

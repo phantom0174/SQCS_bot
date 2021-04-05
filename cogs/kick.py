@@ -14,7 +14,6 @@ class Kick_Member(Cog_Extension):
     @kick.command()
     @commands.has_any_role('總召', 'Administrator')
     async def list(self, ctx):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][kick][list]')
 
         await ctx.send(':hourglass_flowing_sand: Finding...')
 
@@ -41,7 +40,6 @@ class Kick_Member(Cog_Extension):
     @kick.command()
     @commands.has_any_role('總召', 'Administrator')
     async def add(self, ctx, member_id: int):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][kick][add][member_id: {member_id}]')
 
         fluctlight_cursor = fluctlight_client["light-cube-info"]
         data = fluctlight_cursor.find_one({"_id": member_id}, {"contrib": 1, "lvl_ind": 1})
@@ -73,7 +71,6 @@ class Kick_Member(Cog_Extension):
     @kick.command()
     @commands.has_any_role('總召', 'Administrator')
     async def remove(self, ctx, member_id: int):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][kick][remove][member_id: {member_id}]')
 
         kick_member_cursor = client["kick_member_list"]
         data = kick_member_cursor.find_one({"_id": member_id})
@@ -89,7 +86,6 @@ class Kick_Member(Cog_Extension):
     @kick.command()
     @commands.has_any_role('總召', 'Administrator')
     async def kick_single(self, ctx, member_id: int, kick_reason: str):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][kick][kick_single][member_id: {member_id}, kick_reason: {kick_reason}]')
 
         kick_member_cursor = client["kick_member_list"]
         data = kick_member_cursor.find_one({"_id": member_id})
@@ -130,7 +126,6 @@ class Kick_Member(Cog_Extension):
     @kick.command()
     @commands.has_any_role('總召', 'Administrator')
     async def kick_all(self, ctx):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][kick][kick_all]')
 
         kick_member_cursor = client["kick_member_list"]
         data = kick_member_cursor.find({})

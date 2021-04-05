@@ -13,8 +13,6 @@ class Manipulate(Cog_Extension):
     @mani.command()
     @commands.has_any_role('總召', 'Administrator')
     async def uti_mani(self, ctx, attribute: str, target_id: int, delta_value: float):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][mani][uti_mani]'
-                                             f'[attribute: {attribute}, target_id: {target_id}, delta_value: {delta_value}]')
 
         if attribute not in ['score', 'du', 'oca', 'sca', 'contrib', 'lvl_ind']:
             await ctx.send(f':exclamation: There exists no attribute {attribute}!')
@@ -37,7 +35,6 @@ class Manipulate(Cog_Extension):
     @mani.command()
     @commands.has_any_role('總召', 'Administrator')
     async def quiz(self, ctx, member_id: int, alter: int):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][mani][quiz][member_id: {member_id}, alter: {alter}]')
 
         quiz_cursor = client["quiz"]
         quiz_cursor.update_one({"_id": member_id}, {"$set": {"correct": alter}})

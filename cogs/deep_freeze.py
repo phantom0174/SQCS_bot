@@ -13,7 +13,6 @@ class Deep_Freeze(Cog_Extension):
     @df.command()
     @commands.has_any_role('總召', 'Administrator')
     async def mani(self, ctx, member_id: int, status: int):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][df][mani][member_id: {member_id}, status: {status}]')
 
         fluctlight_cursor = fluctlight_client["light-cube-info"]
 
@@ -30,7 +29,6 @@ class Deep_Freeze(Cog_Extension):
     @df.command()
     @commands.has_any_role('總召', 'Administrator')
     async def list(self, ctx):
-        await func.report_cmd(self.bot, ctx, f'[CMD EXECUTED][df][list]')
 
         await ctx.send(':hourglass_flowing_sand: Finding...')
         fluctlight_cursor = fluctlight_client["light-cube-info"]

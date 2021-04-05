@@ -2,6 +2,7 @@ from pymongo import MongoClient
 from core.setup import jdata, client, link, fluctlight_client
 import core.functions as func
 import statistics
+import discord
 
 
 # main function
@@ -42,7 +43,7 @@ async def guild_weekly_update(bot):
 
     # calculate levelling index
     # insert score_parameters_cursor, fluctlight_cursor, active_logs_cursor
-    await lvl_ind_update(score_parameters_cursor, fluctlight_cursor, active_logs_cursor, avr_contrib)
+    await lvl_ind_update(fluctlight_cursor, active_logs_cursor, avr_contrib)
 
     # detect member levelling index reached warning range
     # insert self.bot, fluctlight_cursor
@@ -59,9 +60,11 @@ async def guild_weekly_update(bot):
     # add 1 to week_total_count
     # score_parameters_cursor.update_one({"_id": 0}, {"$inc": {"week_total_count": 1}})
 
-    await func.getChannel(bot, '_Report').send(
-        f'[Auto]Very important update. {func.now_time_info("whole")}')
+    report_channel = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-report')
+    await report_channel.send(f'[Auto]Very important update. {func.now_time_info("whole")}')
 
+
+# vice functions
 
 async def active_logs_update(fluctlight_cursor, active_logs_cursor):
     data = fluctlight_cursor.find({}, {"week_active": 1, "deep_freeze": 1})
@@ -72,7 +75,7 @@ async def active_logs_update(fluctlight_cursor, active_logs_cursor):
 
         member_active_info = active_logs_cursor.find_one({"_id": member_id})
 
-        if member_active_info is None:
+        if not member_active_info:
             if member["deep_freeze"] == 0:
                 active_logs_cursor.insert({"_id": member_id, "log": member_active})
             elif member["deep_freeze"] == 1:
@@ -87,8 +90,6 @@ async def active_logs_update(fluctlight_cursor, active_logs_cursor):
 
     fluctlight_cursor.update_many({}, {"$set": {"week_active": 0}})
 
-
-# vice functions
 
 async def contribution_update(fluctlight_cursor, active_logs_cursor):
     avr_contrib = float(0)
@@ -113,7 +114,7 @@ async def contribution_update(fluctlight_cursor, active_logs_cursor):
     return avr_contrib
 
 
-async def lvl_ind_update(score_parameters_cursor, fluctlight_cursor, active_logs_cursor, avr_contrib):
+async def lvl_ind_update(fluctlight_cursor, active_logs_cursor, avr_contrib):
     # old definition
     # total_week_count = score_parameters_cursor.find_one({"_id": 0})["week_total_count"]
 
@@ -121,7 +122,7 @@ async def lvl_ind_update(score_parameters_cursor, fluctlight_cursor, active_logs
     for member in data:
         member_active_logs = active_logs_cursor.find_one({"_id": member["_id"]})
 
-        if member_active_logs is None:
+        if not member_active_logs:
             continue
 
         # new definition
@@ -151,6 +152,10 @@ async def lvl_ind_detect(bot, fluctlight_cursor):
             if member_name is None:
                 member_name = user.name
 
-            member_info = {"_id": user.id, "name": member_name, "contrib": member["contrib"],
-                           "lvl_ind": member["lvl_ind"]}
+            member_info = {
+                "_id": user.id,
+                "name": member_name,
+                "contrib": member["contrib"],
+                "lvl_ind": member["lvl_ind"]
+            }
             kick_member_cursor.insert_one(member_info)
