@@ -18,7 +18,7 @@ class Cadre(Cog_Extension):
         if ctx.channel.name != '📝幹部申請區':
             return
 
-        if cadre not in ['副召', '網管', '議程', '公關', '美宣']:
+        if cadre not in ['副召', '網管', '議程', '公關', '美宣', '學術']:
             await ctx.send(content=f':exclamation: {appl.mention}, 沒有名為 `{cadre}` 的職位！', delete_after=5.0)
             return
 
