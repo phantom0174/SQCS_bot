@@ -11,6 +11,15 @@ class Main(Cog_Extension):
     async def ping(self, ctx):
         await ctx.send(f':stopwatch: {round(self.bot.latency * 1000)} (ms)')
 
+    @commands.command()
+    async def common_role_give(self, ctx):
+        common_role = ctx.guild.get_role(743654256565026817)
+        for member in ctx.guild.members:
+            if len(member.roles) == 1 and member.roles[0].name == '@everyone':
+                await member.add_roles(common_role)
+
+        await ctx.send(':white_check_mark: Operation finished!')
+
     # delete message
     @commands.command()
     async def clear(self, ctx, msg_id: int):
