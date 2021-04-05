@@ -22,6 +22,7 @@ class Main(Cog_Extension):
 
     # delete message
     @commands.command()
+    @commands.has_any_role('總召', 'Administrator')
     async def clear(self, ctx, msg_id: int):
 
         find = bool(False)
