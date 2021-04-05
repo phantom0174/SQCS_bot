@@ -20,7 +20,7 @@ class Event(Cog_Extension):
         user_id = ctx.author.id
         message = ctx.message.content
 
-        if cmd_parents is None:
+        if len(cmd_parents) == 0:
             cmd_parents = str('N/A')
 
         log_msg = f'[{cmd_parents}][{cmd_name}], [{channel_name}], [{user_name}][{user_id}]\n[{message}]\n'
