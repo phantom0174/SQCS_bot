@@ -1,3 +1,4 @@
+[![CodeFactor](https://www.codefactor.io/repository/github/phantom0174/sqcs_bot/badge)](https://www.codefactor.io/repository/github/phantom0174/sqcs_bot)
 ![](https://img.shields.io/uptimerobot/status/m786417212-72995a6e32a6e120933f8255)
 ![](https://img.shields.io/uptimerobot/ratio/7/m786417212-72995a6e32a6e120933f8255)
 ![](https://img.shields.io/uptimerobot/ratio/m786417212-72995a6e32a6e120933f8255)
@@ -27,6 +28,7 @@
 - 2020/12/28: Quiz event en-DB, VIUpdate function en-fracture.
 - 2020/12/30: Add humanity extension.
 - 2021/04/03: Integrate with Synthesizer and MVisualizer.
+- 2021/04/05: Create logging and error handler.
 ```
 
 ## ✅ Open-source
