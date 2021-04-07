@@ -1,7 +1,6 @@
 from datetime import datetime, timezone, timedelta
 import math
 import discord
-import json
 from core.setup import client, link, fluctlight_client
 import core.score_module as sm
 

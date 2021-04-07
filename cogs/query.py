@@ -1,7 +1,7 @@
-from core.classes import Cog_Extension
+from core.classes import Cog_Extension, JsonApi
 from discord.ext import commands
 import core.functions as func
-from core.setup import jdata, client, fluctlight_client
+from core.setup import client, fluctlight_client
 import random
 
 
@@ -59,7 +59,8 @@ async def personal_info(member_id):
     obj_info = [data["_id"], data["score"], data["du"], data["oc_auth"], data["sc_auth"], data["contrib"],
                 data["lvl_ind"], data["deep_freeze"]]
 
-    rand_icon = random.choice(jdata['fluctlight_gifs'])
+    icon_json = JsonApi().get_json('sta')
+    rand_icon = random.choice(icon_json['fluctlight_gifs'])
     return func.create_embed('Object info', rand_icon, 0xe46bf9, value_title, obj_info)
 
 

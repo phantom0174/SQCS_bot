@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-from core.setup import jdata, client, link, fluctlight_client
+from core.setup import client, link, fluctlight_client
 import core.functions as func
 import statistics
 import discord

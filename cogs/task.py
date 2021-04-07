@@ -1,4 +1,4 @@
-from core.setup import jdata, client
+from core.setup import client
 import core.functions as func
 from cogs.quiz import quiz_start, quiz_end
 import discord

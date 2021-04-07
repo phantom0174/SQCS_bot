@@ -1,6 +1,6 @@
 from core.classes import Cog_Extension
 from discord.ext import commands
-from core.setup import jdata, client, link, rsp, fluctlight_client
+from core.setup import client, link, rsp, fluctlight_client
 import core.functions as func
 import discord
 import asyncio

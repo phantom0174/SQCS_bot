@@ -1,9 +1,8 @@
 from core.classes import Cog_Extension
 from discord.ext import commands
-from core.setup import jdata, client, link, rsp
+from core.setup import client, link, rsp
 import core.functions as func
 import discord
-import json
 from pymongo import MongoClient
 import core.score_module as sm
 from core.vi_update import guild_weekly_update

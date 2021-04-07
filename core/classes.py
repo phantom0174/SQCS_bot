@@ -14,7 +14,8 @@ class JsonApi:
         self.link_header = 'https://api.jsonstorage.net/v1/json/'
         self.link_dict = {
             "sta": str(os.environ.get("StaticSettingJson")),
-            "dyn": str(os.environ.get("DynamicSettingJson"))
+            "dyn": str(os.environ.get("DynamicSettingJson")),
+            "human": str(os.environ.get("HumanityExtensionJson"))
         }
 
     def get_json(self, type):
