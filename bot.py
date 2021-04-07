@@ -3,6 +3,7 @@ import discord
 import sys
 import os
 import keep_alive
+import asyncio
 
 
 intents = discord.Intents.all()
@@ -53,8 +54,9 @@ async def reload(ctx, msg):
 
 @bot.command()
 @commands.has_any_role('總召')
-async def safe_stop(ctx):
-    await ctx.send(':white_check_mark: The bot has stopped!')
+async def shut_down(ctx):
+    await ctx.send(':white_check_mark: The bot is shutting down...')
+    await asyncio.sleep(1)
     sys.exit(0)
 
 
