@@ -16,7 +16,12 @@ class Deep_Freeze(Cog_Extension):
         fluctlight_cursor = fluctlight_client["light-cube-info"]
 
         try:
-            fluctlight_cursor.update_one({"_id": member_id}, {"$set": {"deep_freeze": status}})
+            execute = {
+                "$set": {
+                    "deep_freeze": status
+                }
+            }
+            fluctlight_cursor.update_one({"_id": member_id}, execute)
             member = await ctx.guild.fetch_member(member_id)
 
             await member.send(f':exclamation: 你的 `deep freeze` 狀態被設定為 {status} 了！')

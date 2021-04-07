@@ -96,7 +96,12 @@ class Main(Cog_Extension):
         score_weight = score_parameters_cursor.find_one({"_id": 0})["score_weight"]
 
         try:
-            fluctlight_cursor.update_one({"_id": member_id}, {"$inc": {"score": float(delta_value) * score_weight}})
+            execute = {
+                "$inc": {
+                    "score": float(delta_value) * score_weight
+                }
+            }
+            fluctlight_cursor.update_one({"_id": member_id}, execute)
             await sm.active_log_update(member_id)
 
             member = ctx.guild.fetch_member(member_id)

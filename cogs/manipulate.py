@@ -24,7 +24,12 @@ class Manipulate(Cog_Extension):
             await ctx.send(f':exclamation: There are no data of {target_id}!')
             return
 
-        fluctlight_cursor.update_one({"_id": target_id}, {"$set": {attribute: delta_value}})
+        execute = {
+            "$set": {
+                attribute: delta_value
+            }
+        }
+        fluctlight_cursor.update_one({"_id": target_id}, execute)
 
         data = fluctlight_cursor.find({"_id": target_id}, {attribute: 1})
 
@@ -36,7 +41,12 @@ class Manipulate(Cog_Extension):
     async def quiz(self, ctx, member_id: int, alter: int):
 
         quiz_cursor = client["quiz"]
-        quiz_cursor.update_one({"_id": member_id}, {"$set": {"correct": alter}})
+        execute = {
+            "$set": {
+                "correct": alter
+            }
+        }
+        quiz_cursor.update_one({"_id": member_id}, execute)
 
         member_name = (await self.bot.fetch_user(member_id)).name
         await ctx.send(f'Member {member_name}\'s correct answer has been set as {alter}!')

@@ -67,7 +67,12 @@ async def report_lect_attend(bot, attendants, week):
 
     for member_id in attendants:
         try:
-            fl_cursor.update_one({"_id": member_id}, {"$inc": {"score": lect_attend_score * score_weight}})
+            execute = {
+                "$inc": {
+                    "score": lect_attend_score * score_weight
+                }
+            }
+            fl_cursor.update_one({"_id": member_id}, execute)
             await sm.active_log_update(member_id)
         except:
             await report_channel.send(f'[DB MANI ERROR][to: {member_id}][inc_score: {lect_attend_score * score_weight}]')

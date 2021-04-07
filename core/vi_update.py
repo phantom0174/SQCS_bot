@@ -84,9 +84,19 @@ async def active_logs_update(fluctlight_cursor, active_logs_cursor):
             old_log = active_logs_cursor.find_one({"_id": member_id})["log"]
 
             if member["deep_freeze"] == 0:
-                active_logs_cursor.update_one({"_id": member_id}, {"$set": {"log": str(member_active + old_log)}})
+                execute = {
+                    "$set": {
+                        "log": str(member_active + old_log)
+                    }
+                }
+                active_logs_cursor.update_one({"_id": member_id}, execute)
             elif member["deep_freeze"] == 1:
-                active_logs_cursor.update_one({"_id": member_id}, {"$set": {"log": str(member_active + '1')}})
+                execute = {
+                    "$set": {
+                        "log": str(member_active + '1')
+                    }
+                }
+                active_logs_cursor.update_one({"_id": member_id}, execute)
 
     fluctlight_cursor.update_many({}, {"$set": {"week_active": 0}})
 

@@ -7,4 +7,9 @@ async def active_log_update(member_id):
     # week active update
     data = fluctlight_cursor.find_one({"_id": member_id}, {"week_active": 1})
     if data["week_active"] == 0:
-        fluctlight_cursor.update_one({"_id": member_id}, {"$set": {"week_active": 1}})
+        execute = {
+            "$set": {
+                "week_active": 1
+            }
+        }
+        fluctlight_cursor.update_one({"_id": member_id}, execute)

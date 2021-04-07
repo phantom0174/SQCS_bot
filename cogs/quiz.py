@@ -28,7 +28,12 @@ class Quiz(Cog_Extension):
             await ctx.send(f':exclamation: The stand-by answer had already been set as {stand_by_answer}!')
             return
 
-        quiz_data_cursor.update_one({"_id": 0}, {"$set": {"stand_by_answer": insert_answer}})
+        execute = {
+            "$set": {
+                "stand_by_answer": insert_answer
+            }
+        }
+        quiz_data_cursor.update_one({"_id": 0}, execute)
         await ctx.send(f':white_check_mark: The stand-by answer has been set as {insert_answer}!')
 
     # event answer listen function
@@ -68,13 +73,23 @@ class Quiz(Cog_Extension):
             await sm.active_log_update(msg.author.id)
 
             if msg.content[2:-2] == correct_answer:
-                quiz_cursor.update_one({"_id": msg.author.id}, {"$set": {"correct": 1}})
+                execute = {
+                    "$set": {
+                        "correct": 1
+                    }
+                }
+                quiz_cursor.update_one({"_id": msg.author.id}, execute)
 
                 # add score to member fluctlight
                 fl_client = MongoClient(link)["LightCube"]
                 fl_cursor = fl_client["light-cube-info"]
 
-                fl_cursor.update_one({"_id": msg.author.id}, {"$inc": {"score": quiz_score * score_weight}})
+                execute = {
+                    "$inc": {
+                        "score": quiz_score * score_weight
+                    }
+                }
+                fl_cursor.update_one({"_id": msg.author.id}, execute)
 
         else:
             message = ':exclamation: ' + '\n'.join(rsp["quiz"]["invalid_syntax"]["pt_1"]) + '\n'
@@ -92,7 +107,11 @@ async def quiz_start(bot):
     quiz_event_cursor = client["quiz_data"]
 
     stand_by_answer = quiz_event_cursor.find_one({"_id": 0}, {"stand_by_answer": 1})["stand_by_answer"]
-    new_quiz_info = {"event_status": 1, "correct_answer": stand_by_answer, "stand_by_answer": 'N/A'}
+    new_quiz_info = {
+        "event_status": 1,
+        "correct_answer": stand_by_answer,
+        "stand_by_answer": 'N/A'
+    }
     quiz_event_cursor.update({"_id": 0}, new_quiz_info)
 
     # data re-check
@@ -118,10 +137,20 @@ async def quiz_end(bot):
     cmd_channel = discord.utils.get(guild.text_channels, name='總指令區')
 
     quiz_event_cursor = client["quiz_data"]
-    quiz_event_cursor.update_one({"_id": 0}, {"$set": {"event_status": 0}})
+    execute = {
+        "$set": {
+            "event_status": 0
+        }
+    }
+    quiz_event_cursor.update_one({"_id": 0}, execute)
 
     old_correct_ans = quiz_event_cursor.find_one({"_id": 0}, {"correct_answer": 1})["correct_answer"]
-    quiz_event_cursor.update_one({"_id": 0}, {"$set": {"correct_answer": 'N/A'}})
+    execute = {
+        "$set": {
+            "correct_answer": 'N/A'
+        }
+    }
+    quiz_event_cursor.update_one({"_id": 0}, execute)
 
     # data re-check
     quiz_status = quiz_event_cursor.find_one({"_id": 0}, {"event_status": 1})["event_status"]

@@ -5,7 +5,6 @@ import core.functions as func
 import discord
 import asyncio
 import random
-import json
 import core.score_module as sm
 
 
@@ -88,7 +87,13 @@ class Lecture(Cog_Extension):
         msg += '\n'.join(rsp["lecture"]["start"]["pt_2"])
         await ctx.send(msg)
 
-        lecture_list_cursor.update({"_id": week}, {"$set": {"status": 1}})
+        execute = {
+            "$set": {
+                "status": 1
+            }
+        }
+
+        lecture_list_cursor.update({"_id": week}, execute)
 
         # delete previous special message
         msg_logs = await ctx.channel.history(limit=200).flatten()
@@ -108,7 +113,12 @@ class Lecture(Cog_Extension):
             attendants.append(member.id)
 
         await func.report_lect_attend(self.bot, attendants, week)
-        lecture_list_cursor.update_one({"_id": week}, {"$set": {"population": len(attendants)}})
+        execute = {
+            "$set": {
+                "population": len(attendants)
+            }
+        }
+        lecture_list_cursor.update_one({"_id": week}, execute)
 
     # lecture ans check
     @lect.command()
@@ -155,7 +165,13 @@ class Lecture(Cog_Extension):
 
                 lecture_event_cursor.insert_one(member_info)
             else:
-                lecture_event_cursor.update_one({"_id": target_id}, {"$inc": {"score": delta_score, "count": 1}})
+                execute = {
+                    "$inc": {
+                        "score": delta_score,
+                        "count": 1
+                    }
+                }
+                lecture_event_cursor.update_one({"_id": target_id}, execute)
 
             await sm.active_log_update(target_id)
 
@@ -177,8 +193,12 @@ class Lecture(Cog_Extension):
         population_level = int(round(data["population"] / 10))
         msg += rsp["lecture"]["end"]["reactions"][population_level]
         await ctx.send(msg)
-
-        lecture_list_cursor.update_one({"_id": week}, {"$set": {"status": 0}})
+        execute = {
+            "$set": {
+                "status": 0
+            }
+        }
+        lecture_list_cursor.update_one({"_id": week}, execute)
 
         # adding scores and show lecture final data
         fl_cursor = fluctlight_client["light-cube-info"]
@@ -208,7 +228,12 @@ class Lecture(Cog_Extension):
 
             data_members += f'{medal}{member_name}:: Score: {member["score"]}, Answer Count: {member["count"]}\n'
 
-            fl_cursor.update_one({"_id": member["_id"]}, {"$inc": {"score": member["score"]}})
+            execute = {
+                "$inc": {
+                    "score": member["score"]
+                }
+            }
+            fl_cursor.update_one({"_id": member["_id"]}, execute)
             await sm.active_log_update(member["_id"])
 
             ranking += 1
