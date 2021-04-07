@@ -1,8 +1,6 @@
-from core.classes import Cog_Extension
+from core.classes import Cog_Extension, JsonApi
 from discord.ext import commands
-from core.setup import jdata
 import random
-import json
 
 
 class Picture(Cog_Extension):
@@ -15,13 +13,11 @@ class Picture(Cog_Extension):
     @commands.has_any_role('總召', 'Administrator')
     async def add(self, ctx, link: str):
 
-        with open('jsons/setting.json', mode='r', encoding='utf8') as temp_file:
-            setting_data = json.load(temp_file)
+        pic_json = JsonApi().get_json('dyn')
 
-        setting_data['pic'].append(link)
+        pic_json['group_pic'].append(link)
 
-        with open('jsons/setting.json', mode='w', encoding='utf8') as temp_file:
-            json.dump(setting_data, temp_file)
+        JsonApi().put_json('dyn', pic_json)
 
         await ctx.send(f':white_check_mark: Object {link} successfully added!')
 
@@ -29,30 +25,27 @@ class Picture(Cog_Extension):
     @commands.has_any_role('總召', 'Administrator')
     async def remove(self, ctx, index: int):
 
-        with open('jsons/setting.json', mode='r', encoding='utf8') as temp_file:
-            setting_data = json.load(temp_file)
+        pic_json = JsonApi().get_json('dyn')
 
-        if index >= int(len(setting_data['pic'])):
+        if index >= int(len(pic_json['group_pic'])):
             await ctx.send('Index out of range!')
             return
 
-        del_object = setting_data['pic'][index]
-        del(setting_data['pic'][index])
+        del_object = pic_json['group_pic'][index]
+        del(pic_json['group_pic'][index])
 
-        with open('jsons/setting.json', mode='w', encoding='utf8') as temp_file:
-            json.dump(setting_data, temp_file)
+        JsonApi().put_json('dyn', pic_json)
 
         await ctx.send(f'Object {del_object} successfully deleted!')
 
     @pic.command()
     async def list(self, ctx):
 
-        with open('jsons/setting.json', mode='r', encoding='utf8') as temp_file:
-            setting_data = json.load(temp_file)
+        pic_json = JsonApi().get_json('dyn')
 
         pic_str = str()
-        for i, pic in enumerate(setting_data['pic']):
-            pic_str += f'{i}: {setting_data["pic"][i]}\n'
+        for i, pic in enumerate(pic_json['group_pic']):
+            pic_str += f'{i}: {pic_json["group_pic"][i]}\n'
 
             if len(pic_str) > 1600:
                 await ctx.send(pic_str)
@@ -63,7 +56,9 @@ class Picture(Cog_Extension):
     @pic.command()
     async def random(self, ctx):
 
-        random_picture = random.choice(jdata['pic'])
+        pic_json = JsonApi().get_json('dyn')
+
+        random_picture = random.choice(pic_json['group_pic'])
         await ctx.send(random_picture)
 
 
