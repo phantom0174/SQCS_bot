@@ -29,6 +29,7 @@
 - 2020/12/30: Add humanity extension.
 - 2021/04/03: Integrate with Synthesizer and MVisualizer.
 - 2021/04/05: Create logging and error handler.
+- 2021/04/07: Using json api.
 ```
 
 ## ✅ Open-source
