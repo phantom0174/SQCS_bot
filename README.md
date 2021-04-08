@@ -33,7 +33,7 @@
 ```
 
 ## ✅ Open-source
- - This bot handles event-related tasks in [SQCS](https://sqcs.ckcsc.net) Discord Guild.
+ - This bot handles comprehensive tasks in [SQCS](https://sqcs.ckcsc.net) Discord Guild.
  - If using relevant data, please cite the data source.
 
 ## 📃 Command list
