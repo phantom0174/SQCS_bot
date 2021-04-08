@@ -7,7 +7,7 @@
 <br>
 
 ## 🔧 Developer
-- Programed and run by phantom0174
+- Programed and run by phantom0174, made with ❤️️
 - Contributors: @qiaoyi213
 
 ## 📜 Event update
