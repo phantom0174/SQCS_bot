@@ -1,5 +1,5 @@
 # Token
 .env
 
-# Jsons
-# jsons/
+# JetBrain files
+.idea

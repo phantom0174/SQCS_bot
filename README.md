@@ -8,7 +8,7 @@
 
 ## 🔧 Developer
 - Programed and run by phantom0174
-- Contributers: @qiaoyi213
+- Contributors: @qiaoyi213
 
 ## 📜 Event update
 ```
@@ -33,8 +33,8 @@
 ```
 
 ## ✅ Open-source
- - This bot handles event-related tasks in SQCS DC Guild.
- - If using relevent data, please cite the data source.
+ - This bot handles event-related tasks in [SQCS](https://sqcs.ckcsc.net) Discord Guild.
+ - If using relevant data, please cite the data source.
 
 ## 📃 Command list
 - I\'m just too lazy to write down any usage of commands.
