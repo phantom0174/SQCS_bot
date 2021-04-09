@@ -72,4 +72,5 @@ for filename in os.listdir('./cogs'):
 
 keep_alive.keep_alive()
 
-bot.run(os.environ.get("TOKEN"))
+if __name__ == "__main__":
+    bot.run(os.environ.get("TOKEN"))
