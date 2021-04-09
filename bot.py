@@ -62,7 +62,8 @@ async def shut_down(ctx):
 
 @bot.event
 async def on_disconnect():
-    print('Bot disconnected')
+    report_channel = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-report')
+    await report_channel.send(':exclamation: Bot disconnected!')
 
 
 for filename in os.listdir('./cogs'):
