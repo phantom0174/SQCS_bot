@@ -30,7 +30,7 @@ class Task(Cog_Extension):
             await report_channel.send(f'[AUTO QUIZ END][{func.now_time_info("whole")}]')
 
         # nts ban
-        nt_list = JsonApi().get_json('nt')
+        nt_list = JsonApi().get_json('nt')["id_list"]
         for member in self.bot.guilds[0].members:
             if member.id in nt_list:
                 await member.send(':recycle:')

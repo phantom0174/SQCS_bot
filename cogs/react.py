@@ -10,7 +10,7 @@ class React(Cog_Extension):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        nts = JsonApi().get_json('nt')
+        nts = JsonApi().get_json('nt')["id_list"]
         if member.id in nts:
             return
 
