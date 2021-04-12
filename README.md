@@ -1,6 +1,10 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/phantom0174/sqcs_bot/badge)](https://www.codefactor.io/repository/github/phantom0174/sqcs_bot)
 ![](https://img.shields.io/uptimerobot/status/m786417212-72995a6e32a6e120933f8255)
+<br>
+📆 Weekly:
 ![](https://img.shields.io/uptimerobot/ratio/7/m786417212-72995a6e32a6e120933f8255)
+<br>
+📅 Monthly:
 ![](https://img.shields.io/uptimerobot/ratio/m786417212-72995a6e32a6e120933f8255)
 <br>
 <img src="https://upload.cc/i1/2021/01/04/y0wpXS.jpg" width=200> 　　　　<img src="https://upload.cc/i1/2021/01/04/N8sInJ.png" width=200>
@@ -30,6 +34,7 @@
 - 2021/04/03: Integrate with Synthesizer and MVisualizer.
 - 2021/04/05: Create logging and error handler.
 - 2021/04/07: Using json api.
+- 2021/04/12: Add NT module.
 ```
 
 ## ✅ Open-source
