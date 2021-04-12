@@ -13,6 +13,7 @@ class Task(Cog_Extension):
         self.quiz_data_cursor = client["quiz_data"]
 
         self.quiz_auto.start()
+        self.nt_auto.start()
 
     @tasks.loop(minutes=10)
     async def quiz_auto(self):
@@ -29,7 +30,10 @@ class Task(Cog_Extension):
             await quiz_end(self.bot)
             await report_channel.send(f'[AUTO QUIZ END][{func.now_time_info("whole")}]')
 
-        # nts ban
+    @tasks.loop(minutes=5)
+    async def nt_auto(self):
+        await self.bot.wait_until_ready()
+
         nt_list = JsonApi().get_json('nt')["id_list"]
         for member in self.bot.guilds[0].members:
             if member.id in nt_list:
