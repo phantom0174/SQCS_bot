@@ -1,4 +1,4 @@
-from core.classes import Cog_Extension
+from core.classes import Cog_Extension, JsonApi
 from discord.ext import commands
 import core.functions as func
 import time
@@ -10,6 +10,10 @@ class React(Cog_Extension):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
+        nts = JsonApi().get_json('nt')
+        if member.id in nts:
+            return
+
         if member.bot:
             return
 

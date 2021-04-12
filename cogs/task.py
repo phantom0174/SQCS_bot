@@ -3,7 +3,7 @@ import core.functions as func
 from cogs.quiz import quiz_start, quiz_end
 import discord
 from discord.ext import commands, tasks
-from core.classes import Cog_Extension
+from core.classes import Cog_Extension, JsonApi
 
 
 class Task(Cog_Extension):
@@ -28,6 +28,13 @@ class Task(Cog_Extension):
         elif func.now_time_info('date') == 7 and func.now_time_info('hour') >= 23 and quiz_status == 1:
             await quiz_end(self.bot)
             await report_channel.send(f'[AUTO QUIZ END][{func.now_time_info("whole")}]')
+
+        # nts ban
+        nt_list = JsonApi().get_json('nt')
+        for member in self.bot.guilds[0].members:
+            if member.id in nt_list:
+                await member.send(':recycle:')
+                await member.ban()
 
 
 def setup(bot):
