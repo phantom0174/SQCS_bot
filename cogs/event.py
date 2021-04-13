@@ -1,6 +1,5 @@
-from core.classes import Cog_Extension
+from core.classes import Cog_Extension, JsonApi
 from discord.ext import commands
-from core.setup import client
 import discord
 import core.functions as func
 
@@ -24,8 +23,11 @@ class Event(Cog_Extension):
             cmd_parents = str('N/A')
 
         log_msg = f'[{cmd_parents}][{cmd_name}], [{channel_name}], [{user_name}][{user_id}]\n[{message}]\n'
-        report_channel = discord.utils.get(self.bot.guilds[1].text_channels, name='sqcs-report')
-        await report_channel.send(f'[cmd exec]{log_msg}[{func.now_time_info("whole")}]')
+        full_log = f'[cmd exec]{log_msg}[{func.now_time_info("whole")}]'
+
+        log_json = JsonApi().get_json('CmdLoggingJson')
+        log_json['logs'].append(full_log)
+        JsonApi().put_json('CmdLoggingJson', log_json)
 
 
 def setup(bot):
