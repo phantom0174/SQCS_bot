@@ -1,20 +1,21 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/phantom0174/sqcs_bot/badge)](https://www.codefactor.io/repository/github/phantom0174/sqcs_bot)
 ![](https://img.shields.io/uptimerobot/status/m786417212-72995a6e32a6e120933f8255)
 <br>
-📆 Weekly:
+📆 `Weekly:`
 ![](https://img.shields.io/uptimerobot/ratio/7/m786417212-72995a6e32a6e120933f8255)
 <br>
-📅 Monthly:
+📅 `Monthly:`
 ![](https://img.shields.io/uptimerobot/ratio/m786417212-72995a6e32a6e120933f8255)
 <br>
 <img src="https://upload.cc/i1/2021/01/04/y0wpXS.jpg" width=200> 　　　　<img src="https://upload.cc/i1/2021/01/04/N8sInJ.png" width=200>
 <br>
 
 ## 🔧 Developer
-- Programed and run by phantom0174, made with ❤️️
-- Contributors: @qiaoyi213
+- Programed and run by `@phantom0174`, made with ❤️️
+- Contributors: `@qiaoyi213`
 
 ## 📜 Event update
+`version 1.20.4.14`
 ```
 - 2020/11/18: Bot 24/7 online.
 - 2020/11/25: Intents activate.
@@ -35,6 +36,7 @@
 - 2021/04/05: Create logging and error handler.
 - 2021/04/07: Using json api.
 - 2021/04/12: Add NT module.
+- 2021/04/14: Unadhere logging system from SQCS Working Bot.
 ```
 
 ## ✅ Open-source
