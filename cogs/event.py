@@ -34,8 +34,8 @@ class Event(Cog_Extension):
         pass
 
     @log.command()
-    async def query_len(self, ctx):
-        logs_list = JsonApi().get_json('CmdLogging')["logs"]
+    async def query_len(self, ctx, title: str = "CmdLogging"):
+        logs_list = JsonApi().get_json(title)["logs"]
         await ctx.send(f'There are currently {len(logs_list)} logs in the json file!')
 
     @log.command()
