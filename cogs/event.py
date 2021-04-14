@@ -39,7 +39,7 @@ class Event(Cog_Extension):
         await ctx.send(f'There are currently {len(logs_list)} logs in the json file!')
 
     @log.command()
-    async def release_log(self, ctx, title: str = "CmdLogging"):
+    async def release(self, ctx, title: str = "CmdLogging"):
         logging_channel = {
             "CmdLogging": "sqcs-report",
             "LectureLogging": "sqcs-lecture-report"

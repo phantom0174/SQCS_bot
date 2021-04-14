@@ -3,6 +3,7 @@ import math
 import discord
 from core.setup import client, link, fluctlight_client
 import core.score_module as sm
+from core.classes import JsonApi
 
 
 def sgn(num):
@@ -62,6 +63,7 @@ async def report_lect_attend(bot, attendants, week):
     # add score to the attendances
     fl_cursor = fluctlight_client["light-cube-info"]
 
+    report_json = JsonApi().get_json('LectureLogging')
     report_channel = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-lecture-attend')
 
     for member_id in attendants:
@@ -76,9 +78,10 @@ async def report_lect_attend(bot, attendants, week):
         except:
             await report_channel.send(f'[DB MANI ERROR][to: {member_id}][inc_score: {lect_attend_score * score_weight}]')
 
-    await report_channel.send(f'[LECT ATTEND][week: {week}][attendants:\n'
-                              f'{attendants}\n'
-                              f'[{now_time_info("whole")}]')
+    report_json["logs"].append(f'[LECT ATTEND][week: {week}][attendants:\n'
+                               f'{attendants}\n'
+                               f'[{now_time_info("whole")}]')
+    JsonApi().put_json('LectureLogging', report_json)
 
 
 async def get_time_title(hour):
