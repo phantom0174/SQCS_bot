@@ -3,6 +3,7 @@ import math
 import discord
 from core.setup import client, link, fluctlight_client
 import core.score_module as sm
+from core.classes import JsonApi
 
 
 def sgn(num):

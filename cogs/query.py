@@ -59,8 +59,8 @@ async def personal_info(member_id):
     obj_info = [data["_id"], data["score"], data["du"], data["oc_auth"], data["sc_auth"], data["contrib"],
                 data["lvl_ind"], data["deep_freeze"]]
 
-    icon_json = JsonApi().get_json('StaticSettingJson')
-    rand_icon = random.choice(icon_json['fluctlight_gifs'])
+    icon_json = JsonApi().get_json('StaticSetting')
+    rand_icon = random.choice(icon_json['fluctlight_query_gifs'])
     return func.create_embed('Object info', rand_icon, 0xe46bf9, value_title, obj_info)
 
 

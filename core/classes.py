@@ -15,7 +15,7 @@ class JsonApi:
 
         # json link switcher
         self.json_links = str(os.environ.get("JsonApiLinks"))
-        self.link_dict = requests.get(self.link_header + self.json_links).json()
+        self.link_dict = requests.get(self.link_header + self.json_links).json()["links"]
 
     def get_json(self, name):
         if name not in self.link_dict.keys():
