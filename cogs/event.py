@@ -29,7 +29,7 @@ class Event(Cog_Extension):
         log_json['logs'].append(full_log)
         JsonApi().put_json('CmdLogging', log_json)
 
-    @commands.Group()
+    @commands.group()
     async def log(self, ctx):
         pass
 
