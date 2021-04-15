@@ -1,3 +1,5 @@
+# SQCS Bot
+
 [![CodeFactor](https://www.codefactor.io/repository/github/phantom0174/sqcs_bot/badge)](https://www.codefactor.io/repository/github/phantom0174/sqcs_bot)
 ![](https://img.shields.io/uptimerobot/status/m786417212-72995a6e32a6e120933f8255)
 <br>
@@ -11,12 +13,15 @@
 <br>
 
 ## 🔧 Developer
+
 - Programed and run by `@phantom0174`, made with ❤️️
 - Contributors: `@qiaoyi213`
 
 ## 📜 Event update
+
 `version 1.20.4.14`
-```
+
+```markdown
 - 2020/11/18: Bot 24/7 online.
 - 2020/11/25: Intents activate.
 - 2020/11/28: Quiz event automize.
@@ -36,13 +41,15 @@
 - 2021/04/05: Create logging and error handler.
 - 2021/04/07: Using json api.
 - 2021/04/12: Add NT module.
-- 2021/04/14: Unadhere logging system from SQCS Working Bot.
+- 2021/04/14: Detach logging system from SQCS Working Bot.
 ```
 
 ## ✅ Open-source
- - This bot handles comprehensive tasks in [SQCS](https://sqcs.ckcsc.net) Discord Guild.
- - If using relevant data, please cite the data source.
+
+- This bot handles comprehensive tasks in [SQCS](https://sqcs.ckcsc.net) Discord Guild.
+- If using relevant data, please cite the data source.
 
 ## 📃 Command list
+
 - I\'m just too lazy to write down any usage of commands.
 - You can use the default command `+help` in the guild to search for usage.
