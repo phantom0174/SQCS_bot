@@ -55,9 +55,7 @@ class Event(Cog_Extension):
         if len(logs_json["logs"]) == 0:
             return
 
-        logs = str()
-        for item in logs_json["logs"]:
-            logs += f'{item}\n'
+        logs = '\n'.join(logs_json["logs"])
 
         with open('./txts/report_buffer.txt', mode='w', encoding='utf8') as temp_file:
             temp_file.write(logs)

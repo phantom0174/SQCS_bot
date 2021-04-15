@@ -119,9 +119,15 @@ def lvl_ind_calc(log, member_week_count, contrib, avr_contrib):
     theta1 = sgn(contrib - avr_contrib)
 
     # calculate theta 2
-    active_days = int(0)
-    for char in log:
-        active_days += int(char)
+
+    # original code
+    # active_days = int(0)
+    # for char in log:
+    #    active_days += int(char)
+
+    # bit advanced code
+    active_days = sum(map(int, log))
+
     theta2 = sgn(active_days - (1/2) * member_week_count)
 
     return float(-sgn(theta1 + theta2) * abs((contrib - avr_contrib) * (theta1 + theta2)) / 2)

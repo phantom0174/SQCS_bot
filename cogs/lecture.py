@@ -25,9 +25,8 @@ class Lecture(Cog_Extension):
             await ctx.send(':exclamation: No data!')
             return
 
-        lecture_list = str()
-        for item in data:
-            lecture_list += f'Name: {item["name"]}, Week: {item["_id"]}\n'
+        # improved code
+        lecture_list = '\n'.join(map(lambda item: f'Name: {item["name"]}, Week: {item["_id"]}', data))
 
         await ctx.send(lecture_list)
         await ctx.send(':white_check_mark: Logging finished!')
@@ -102,15 +101,14 @@ class Lecture(Cog_Extension):
                 await msg.delete()
 
         # cd time from preventing member leave at once
+        # need to fix for stable pattern
         random.seed(func.now_time_info('hour') * 92384)
         await asyncio.sleep(random.randint(30, 180))
 
         channel_name = lecture_list_cursor.find_one({"_id": week})["name"]
         voice_channel = discord.utils.get(ctx.guild.voice_channels, name=channel_name)
 
-        attendants = list()
-        for member in voice_channel.members:
-            attendants.append(member.id)
+        attendants = [member.id for member in voice_channel.members]
 
         await func.report_lect_attend(self.bot, attendants, week)
         execute = {
@@ -211,16 +209,15 @@ class Lecture(Cog_Extension):
             return
 
         data_members = str()
-        ranking = int(1)
-        for member in data:
-            if ranking == 1:
-                medal = ':first_place:'
-            elif ranking == 2:
-                medal = ':second_place:'
-            elif ranking == 3:
-                medal = ':third_place:'
-            else:
-                medal = ':medal:'
+
+        ranking_medal_prefix = {
+            0: ':first_place:',
+            1: ':second_place:',
+            2: ':third_place:'
+        }
+
+        for rank, member in enumerate(data):
+            medal = ranking_medal_prefix.get(rank, ':medal:')
 
             member_name = (await ctx.guild.fetch_member(member["_id"])).nick
             if member_name is None:
@@ -235,8 +232,6 @@ class Lecture(Cog_Extension):
             }
             fl_cursor.update_one({"_id": member["_id"]}, execute)
             await sm.active_log_update(member["_id"])
-
-            ranking += 1
 
         await ctx.send(embed=func.create_embed(':scroll: Lecture Event Result', 'default', 0x42fcff, ['Lecture final info'], [data_members]))
 

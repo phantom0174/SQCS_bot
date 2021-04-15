@@ -54,10 +54,26 @@ async def personal_info(member_id):
     if not data:
         return func.create_embed('Object info', 'default', 0xe46bf9, ['Error'], ['Logging error'])
 
-    value_title = ['Object Id', 'Score', 'Durability', 'Object Control Authority', 'System Control Authority',
-                   'Contribution', 'Levelling Index', "Deep Freeze"]
-    obj_info = [data["_id"], data["score"], data["du"], data["oc_auth"], data["sc_auth"], data["contrib"],
-                data["lvl_ind"], data["deep_freeze"]]
+    value_title = [
+        'Object Id',
+        'Score',
+        'Durability',
+        'Object Control Authority',
+        'System Control Authority',
+        'Contribution',
+        'Levelling Index',
+        'Deep Freeze'
+    ]
+    obj_info = [
+        data["_id"],
+        data["score"],
+        data["du"],
+        data["oc_auth"],
+        data["sc_auth"],
+        data["contrib"],
+        data["lvl_ind"],
+        data["deep_freeze"]
+    ]
 
     icon_json = JsonApi().get_json('StaticSetting')
     rand_icon = random.choice(icon_json['fluctlight_query_gifs'])

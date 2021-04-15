@@ -11,10 +11,7 @@ class React(Cog_Extension):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         nts = JsonApi().get_json('NT')["id_list"]
-        if member.id in nts:
-            return
-
-        if member.bot:
+        if (member.id in nts) or member.bot:
             return
 
         time_status = await func.get_time_title(func.now_time_info('hour'))

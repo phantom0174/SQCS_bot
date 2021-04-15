@@ -1,9 +1,8 @@
 from core.classes import Cog_Extension
 from discord.ext import commands
-from core.setup import client, link, rsp
+from core.setup import client, rsp, fluctlight_client
 import core.functions as func
 import discord
-from pymongo import MongoClient
 import core.score_module as sm
 from core.vi_update import guild_weekly_update
 
@@ -80,8 +79,7 @@ class Quiz(Cog_Extension):
                 quiz_cursor.update_one({"_id": msg.author.id}, execute)
 
                 # add score to member fluctlight
-                fl_client = MongoClient(link)["LightCube"]
-                fl_cursor = fl_client["light-cube-info"]
+                fl_cursor = fluctlight_client["light-cube-info"]
 
                 execute = {
                     "$inc": {
@@ -118,7 +116,9 @@ async def quiz_start(bot):
     correct_answer = quiz_event_cursor.find_one({"_id": 0}, {"correct_answer": 1})["correct_answer"]
 
     await cmd_channel.send(
-        f'Quiz Event status set to {quiz_status}, correct answer set to {correct_answer}!')
+        f'Quiz Event status set to {quiz_status}, '
+        f'correct answer set to {correct_answer}!'
+    )
 
     msg = '\n'.join(rsp["quiz"]["start"]["pt_1"]) + '\n'
     msg += '\n'.join(rsp["quiz"]["answer_tut"]) + '\n'
@@ -156,13 +156,14 @@ async def quiz_end(bot):
     correct_answer = quiz_event_cursor.find_one({"_id": 0}, {"correct_answer": 1})["correct_answer"]
 
     await cmd_channel.send(
-        f'Quiz Event status set to {quiz_status}, correct answer set to {correct_answer}!')
+        f'Quiz Event status set to {quiz_status}, '
+        f'correct answer set to {correct_answer}!'
+    )
 
     quiz_cursor = client["quiz_event"]
-    fluctlight_client = MongoClient(link)["LightCube"]
     fluctlight_cursor = fluctlight_client["light-cube-info"]
     msg = '\n'.join(rsp["quiz"]["end"]["main"]["pt_1"]) + '\n'
-    msg += f':white_check_mark: 這次的答案呢...是 `{old_correct_ans}`！' + '\n'
+    msg += f':white_check_mark: 這次的答案呢...是 `{old_correct_ans}`！\n'
     msg += '\n'.join(rsp["quiz"]["end"]["main"]["pt_2"]) + '\n'
 
     attend_count = len(list(quiz_cursor.find({})))
@@ -172,7 +173,7 @@ async def quiz_end(bot):
     if quiz_attend_level > 7:
         quiz_attend_level = 7
 
-    msg += f'我這次有 {round((attend_count / quiz_attend_per) * 100, 1)} 分飽！' + '\n'
+    msg += f'我這次有 {round((attend_count / quiz_attend_per) * 100, 1)} 分飽！\n'
     msg += rsp["quiz"]["end"]["reactions"][quiz_attend_level]
     await main_channel.send(msg)
     await main_channel.send(f':stopwatch: 活動結束於 {func.now_time_info("whole")}')

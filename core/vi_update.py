@@ -24,10 +24,9 @@ async def guild_weekly_update(bot):
     score_parameters_cursor.update({"_id": 0}, {"$set": {"maximum_score": max_score}})
     score_parameters_cursor.update({"_id": 0}, {"$set": {"minimum_score": min_score}})
 
-    # need to improve -> sum method
-    total_score = float(0)
-    for item in fluctlight_cursor.find({"deep_freeze": {"$ne": 1}}, {"score": 1}):
-        total_score += item["score"]
+    # improved sum method
+    without_frozen_member_cursor = fluctlight_cursor.find({"deep_freeze": {"$ne": 1}}, {"score": 1})
+    total_score = sum(map(lambda item: item["score"], without_frozen_member_cursor))
 
     # save total score to week score log -> used in score weight update
     score_parameters_cursor.update_one({"_id": 0}, {"$push": {"week_score_log": total_score}})
