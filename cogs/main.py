@@ -89,7 +89,7 @@ class Main(Cog_Extension):
 
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def mibu(self, ctx, member_id: int, delta_value: str):
+    async def mibu(self, ctx, member_id: int, delta_value: float):
 
         fluctlight_cursor = fluctlight_client["light-cube-info"]
         score_parameters_cursor = client["score_parameters"]
@@ -99,7 +99,7 @@ class Main(Cog_Extension):
         try:
             execute = {
                 "$inc": {
-                    "score": float(delta_value) * score_weight
+                    "score": delta_value * score_weight
                 }
             }
             fluctlight_cursor.update_one({"_id": member_id}, execute)
