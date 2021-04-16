@@ -6,11 +6,11 @@ from core.setup import client, fluctlight_client
 class Manipulate(Cog_Extension):
 
     @commands.group()
+    @commands.has_any_role('總召', 'Administrator')
     async def mani(self, ctx):
         pass
 
     @mani.command()
-    @commands.has_any_role('總召', 'Administrator')
     async def uti_mani(self, ctx, attribute: str, target_id: int, delta_value: float):
 
         if attribute not in ['score', 'du', 'oca', 'sca', 'contrib', 'lvl_ind']:
@@ -37,7 +37,6 @@ class Manipulate(Cog_Extension):
         await ctx.send(f'Member {member_name}\'s {attribute} has been set as {data[attribute]}!')
 
     @mani.command()
-    @commands.has_any_role('總召', 'Administrator')
     async def quiz(self, ctx, member_id: int, alter: int):
 
         quiz_cursor = client["quiz"]

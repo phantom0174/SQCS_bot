@@ -10,7 +10,6 @@ class Picture(Cog_Extension):
         pass
 
     @pic.command()
-    @commands.has_any_role('總召', 'Administrator')
     async def add(self, ctx, link: str):
 
         pic_json = JsonApi().get_json('DynamicSetting')
@@ -20,7 +19,6 @@ class Picture(Cog_Extension):
         await ctx.send(f':white_check_mark: Object {link} successfully added!')
 
     @pic.command()
-    @commands.has_any_role('總召', 'Administrator')
     async def remove(self, ctx, index: int):
 
         pic_json = JsonApi().get_json('DynamicSetting')
@@ -43,7 +41,7 @@ class Picture(Cog_Extension):
 
         pic_str = str()
         for i, pic in enumerate(pic_json['picture_link']):
-            pic_str += f'{i}: {pic_json["picture_link"][i]}\n'
+            pic_str += f'{i}: {pic}\n'
 
             if len(pic_str) > 1600:
                 await ctx.send(pic_str)

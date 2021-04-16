@@ -10,12 +10,12 @@ from core.vi_update import guild_weekly_update
 class Quiz(Cog_Extension):
 
     @commands.group()
+    @commands.has_any_role('總召', 'Administrator')
     async def quiz(self, ctx):
         pass
 
     # push back stand by answer
     @quiz.command()
-    @commands.has_any_role('總召', 'Administrator')
     async def ans_push(self, ctx, insert_answer: str):
 
         quiz_data_cursor = client["quiz_data"]

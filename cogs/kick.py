@@ -7,11 +7,11 @@ import discord
 class Kick_Member(Cog_Extension):
 
     @commands.group()
+    @commands.has_any_role('總召', 'Administrator')
     async def kick(self, ctx):
         pass
 
     @kick.command()
-    @commands.has_any_role('總召', 'Administrator')
     async def list(self, ctx):
 
         await ctx.send(':hourglass_flowing_sand: Finding...')
@@ -37,7 +37,6 @@ class Kick_Member(Cog_Extension):
         await ctx.send(':white_check_mark: Logging finished!')
 
     @kick.command()
-    @commands.has_any_role('總召', 'Administrator')
     async def add(self, ctx, member_id: int):
 
         fluctlight_cursor = fluctlight_client["light-cube-info"]
@@ -68,7 +67,6 @@ class Kick_Member(Cog_Extension):
         await ctx.send(f':white_check_mark: Member {member_name}({member_id}) has been added to the kick list!')
 
     @kick.command()
-    @commands.has_any_role('總召', 'Administrator')
     async def remove(self, ctx, member_id: int):
 
         kick_member_cursor = client["kick_member_list"]
@@ -83,7 +81,6 @@ class Kick_Member(Cog_Extension):
         await ctx.send(f':white_check_mark: Member {member_id} has been removed from the kick list!')
 
     @kick.command()
-    @commands.has_any_role('總召', 'Administrator')
     async def kick_single(self, ctx, member_id: int, kick_reason: str):
 
         kick_member_cursor = client["kick_member_list"]
@@ -123,7 +120,6 @@ class Kick_Member(Cog_Extension):
         await ctx.send(f':white_check_mark: Kicked member {data["name"]}({data["_id"]})!')
 
     @kick.command()
-    @commands.has_any_role('總召', 'Administrator')
     async def kick_all(self, ctx):
 
         kick_member_cursor = client["kick_member_list"]

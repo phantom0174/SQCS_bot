@@ -30,6 +30,7 @@ class Event(Cog_Extension):
         JsonApi().put_json('CmdLogging', log_json)
 
     @commands.group()
+    @commands.has_any_role('總召', 'Administrator')
     async def log(self, ctx):
         pass
 

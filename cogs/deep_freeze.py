@@ -6,11 +6,11 @@ from core.setup import fluctlight_client
 class Deep_Freeze(Cog_Extension):
 
     @commands.group()
+    @commands.has_any_role('總召', 'Administrator')
     async def df(self, ctx):
         pass
 
     @df.command()
-    @commands.has_any_role('總召', 'Administrator')
     async def mani(self, ctx, member_id: int, status: int):
 
         fluctlight_cursor = fluctlight_client["light-cube-info"]
@@ -31,7 +31,6 @@ class Deep_Freeze(Cog_Extension):
             return
 
     @df.command()
-    @commands.has_any_role('總召', 'Administrator')
     async def list(self, ctx):
 
         await ctx.send(':hourglass_flowing_sand: Finding...')

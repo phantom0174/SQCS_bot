@@ -12,6 +12,7 @@ class Main(Cog_Extension):
         await ctx.send(f':stopwatch: {round(self.bot.latency * 1000)} (ms)')
 
     @commands.command()
+    @commands.has_any_role('總召', 'Administrator')
     async def common_role_give(self, ctx):
         common_role = ctx.guild.get_role(743654256565026817)
         for member in ctx.guild.members:
