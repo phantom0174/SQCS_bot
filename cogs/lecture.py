@@ -1,6 +1,6 @@
-from core.classes import Cog_Extension
+from core.classes import CogExtension
 from discord.ext import commands
-from core.setup import client, link, rsp, fluctlight_client
+from core.setup import client, rsp, fluctlight_client
 import core.functions as func
 import discord
 import asyncio
@@ -8,7 +8,7 @@ import random
 import core.score_module as sm
 
 
-class Lecture(Cog_Extension):
+class Lecture(CogExtension):
 
     @commands.group()
     async def lect(self, ctx):
@@ -26,7 +26,9 @@ class Lecture(Cog_Extension):
             return
 
         # improved code
-        lecture_list = '\n'.join(map(lambda item: f'Name: {item["name"]}, Week: {item["_id"]}', data))
+        lecture_list = '\n'.join(
+            map(lambda item: f'Name: {item["name"]}, Week: {item["_id"]}', data)
+        )
 
         await ctx.send(lecture_list)
         await ctx.send(':white_check_mark: Logging finished!')
@@ -233,7 +235,15 @@ class Lecture(Cog_Extension):
             fl_cursor.update_one({"_id": member["_id"]}, execute)
             await sm.active_log_update(member["_id"])
 
-        await ctx.send(embed=func.create_embed(':scroll: Lecture Event Result', 'default', 0x42fcff, ['Lecture final info'], [data_members]))
+        embed_para = [
+            ':scroll: Lecture Event Result',
+            'default',
+            0x42fcff,
+            ['Lecture final info'],
+            [data_members]
+        ]
+
+        await ctx.send(embed=func.create_embed(*embed_para))
 
         lecture_event_cursor.delete_many({})
 

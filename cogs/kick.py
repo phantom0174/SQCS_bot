@@ -1,10 +1,9 @@
-from core.classes import Cog_Extension
+from core.classes import CogExtension
 from discord.ext import commands
 from core.setup import client, rsp, fluctlight_client
-import discord
 
 
-class Kick_Member(Cog_Extension):
+class KickMember(CogExtension):
 
     @commands.group()
     @commands.has_any_role('總召', 'Administrator')
@@ -25,8 +24,15 @@ class Kick_Member(Cog_Extension):
 
         kick_member_list = str()
         for member in data:
-            kick_member_list += f'Id: {member["_id"]}, Name: {member["name"]}, Contrib: {member["contrib"]}, lvl_ind: {member["lvl_ind"]}\n'
 
+            member_info: str = (
+                f'Id: {member["_id"]},'
+                f'Name: {member["name"]},'
+                f'Contrib: {member["contrib"]},'
+                f'lvl_ind: {member["lvl_ind"]}\n'
+            )
+
+            kick_member_list += member_info
             if len(kick_member_list) > 1600:
                 await ctx.send(kick_member_list)
                 kick_member_list = ''
@@ -158,4 +164,4 @@ class Kick_Member(Cog_Extension):
 
 
 def setup(bot):
-    bot.add_cog(Kick_Member(bot))
+    bot.add_cog(KickMember(bot))

@@ -1,10 +1,10 @@
-from core.classes import Cog_Extension, JsonApi
+from core.classes import CogExtension, JsonApi
 from discord.ext import commands
 import discord
 import core.functions as func
 
 
-class Event(Cog_Extension):
+class Event(CogExtension):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
@@ -22,7 +22,13 @@ class Event(Cog_Extension):
         if len(cmd_parents) == 0:
             cmd_parents = str('N/A')
 
-        log_msg = f'[{cmd_parents}][{cmd_name}], [{channel_name}], [{user_name}][{user_id}]\n[{message}]\n'
+        log_msg: str = (
+            f'[{cmd_parents}][{cmd_name}], '
+            f'[{channel_name}], '
+            f'[{user_name}][{user_id}]\n'
+            f'[{message}]\n'
+        )
+
         full_log = f'[cmd exec]{log_msg}[{func.now_time_info("whole")}]'
 
         log_json = JsonApi().get_json('CmdLogging')
@@ -61,8 +67,8 @@ class Event(Cog_Extension):
         with open('./txts/report_buffer.txt', mode='w', encoding='utf8') as temp_file:
             temp_file.write(logs)
 
-        # clear the string
-        logs = ''
+        # clear the string -> unnecessary
+        # logs = ''
 
         await buffer_channel.send(file=discord.File('./txts/report_buffer.txt'))
 

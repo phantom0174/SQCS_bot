@@ -1,10 +1,9 @@
-import discord
 from discord.ext import commands
 import os
 import requests
 
 
-class Cog_Extension(commands.Cog):
+class CogExtension(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -30,4 +29,4 @@ class JsonApi:
             error_json = {"type": "put_json_error"}
             return error_json
 
-        update = requests.put(self.link_header + self.link_dict[name], json=alter_json)
+        requests.put(self.link_header + self.link_dict[name], json=alter_json)

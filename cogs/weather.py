@@ -1,6 +1,5 @@
-import discord
 from discord.ext import commands
-from core.classes import Cog_Extension
+from core.classes import CogExtension
 import requests
 import os
 
@@ -27,7 +26,7 @@ time_range_title = {
 }
 
 
-class WeatherQuery(Cog_Extension):
+class WeatherQuery(CogExtension):
     @commands.group()
     async def wea(self, ctx):
         pass
@@ -35,7 +34,13 @@ class WeatherQuery(Cog_Extension):
     @wea.command()
     async def query(self, ctx, target_county: str = ''):
 
-        response = requests.get(f'https://opendata.cwb.gov.tw/fileapi/v1/opendataapi/F-C0032-001?Authorization={str(os.environ.get("PhantomTWWeatherApiKey"))}&format=json')
+        weather_api_link_header: str = (
+            'https://opendata.cwb.gov.tw/fileapi/v1/opendataapi/F-C0032-001?Authorization='
+        )
+        response = requests.get(
+            f'{weather_api_link_header}'
+            f'{str(os.environ.get("PhantomTWWeatherApiKey"))}&format=json'
+        )
 
         location_weather_data = response.json()["cwbopendata"]["dataset"]["location"]
 
@@ -51,9 +56,15 @@ class WeatherQuery(Cog_Extension):
                 county_weather_info += item["locationName"] + '\n'
 
                 for time_range in range(3):
-                    county_weather_info += f'{time_range_title[str(time_range)]}::\n'
+                    county_weather_info += (
+                        f'{time_range_title[str(time_range)]}::\n'
+                    )
                     for (index, info) in enumerate(loc_json):
-                        county_weather_info += f'{data_prefix[str(index)]}: {info["time"][time_range]["parameter"]["parameterName"]} {data_suffix[str(index)]}\n'
+                        county_weather_info += (
+                            f'{data_prefix[str(index)]}: '
+                            f'{info["time"][time_range]["parameter"]["parameterName"]} '
+                            f'{data_suffix[str(index)]}\n'
+                        )
 
                 await ctx.send(county_weather_info)
             county_weather_info = ''

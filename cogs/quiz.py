@@ -1,4 +1,4 @@
-from core.classes import Cog_Extension
+from core.classes import CogExtension
 from discord.ext import commands
 from core.setup import client, rsp, fluctlight_client
 import core.functions as func
@@ -7,7 +7,7 @@ import core.score_module as sm
 from core.vi_update import guild_weekly_update
 
 
-class Quiz(Cog_Extension):
+class Quiz(CogExtension):
 
     @commands.group()
     @commands.has_any_role('總召', 'Administrator')
@@ -195,7 +195,15 @@ async def quiz_end(bot):
 
     quiz_cursor.delete_many({})
 
-    await main_channel.send(embed=func.create_embed(':scroll: Quiz Event Result', 'default', 0x42fcff, ['Winner'], [winners]))
+    embed_para = [
+        ':scroll: Quiz Event Result',
+        'default',
+        0x42fcff,
+        ['Winner'],
+        [winners]
+    ]
+    await main_channel.send(embed=func.create_embed(*embed_para))
+
     await guild_weekly_update(bot)
 
 

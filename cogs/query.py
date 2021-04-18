@@ -1,11 +1,11 @@
-from core.classes import Cog_Extension, JsonApi
+from core.classes import CogExtension, JsonApi
 from discord.ext import commands
 import core.functions as func
 from core.setup import client, fluctlight_client
 import random
 
 
-class Query(Cog_Extension):
+class Query(CogExtension):
 
     @commands.group()
     async def query(self, ctx):
@@ -77,7 +77,15 @@ async def personal_info(member_id):
 
     icon_json = JsonApi().get_json('StaticSetting')
     rand_icon = random.choice(icon_json['fluctlight_query_gifs'])
-    return func.create_embed('Object info', rand_icon, 0xe46bf9, value_title, obj_info)
+
+    embed_para = [
+        'Object info',
+        rand_icon,
+        0xe46bf9,
+        value_title,
+        obj_info
+    ]
+    return func.create_embed(*embed_para)
 
 
 def setup(bot):

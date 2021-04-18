@@ -1,9 +1,9 @@
 from discord.ext import commands
-from core.classes import Cog_Extension
+from core.classes import CogExtension
 from core.setup import client, fluctlight_client
 
 
-class Manipulate(Cog_Extension):
+class Manipulate(CogExtension):
 
     @commands.group()
     @commands.has_any_role('總召', 'Administrator')

@@ -1,11 +1,11 @@
-from core.classes import Cog_Extension
+from core.classes import CogExtension
 from core.setup import client
 from discord.ext import commands
 import core.functions as func
 import os
 
 
-class Cadre(Cog_Extension):
+class Cadre(CogExtension):
 
     @commands.group()
     async def ca(self, ctx):
@@ -26,10 +26,13 @@ class Cadre(Cog_Extension):
         data = cadre_cursor.find_one({"_id": appl.id})
 
         if data:
-            await appl.send(f':exclamation: {appl.mention} (id: {data["_id"]}),\n'
-                            f'您已經於 {data["apply_time"]} 申請 `{data["apply_cadre"]}` 職位！\n'
-                            f'請確認是否發生以下狀況 `重複申請；同時申請兩職位；申請錯誤`\n'
-                            f'如有疑問請洽 @總召')
+            await appl.send(
+                f':exclamation: {appl.mention} (id: {data["_id"]}),\n'
+                f'您已經於 {data["apply_time"]} 申請 `{data["apply_cadre"]}` 職位！\n'
+                f'請確認是否發生以下狀況 `重複申請；同時申請兩職位；申請錯誤`\n'
+                f'如有疑問請洽 @總召'
+            )
+
             return
 
         apply_time = func.now_time_info('whole')
@@ -41,8 +44,13 @@ class Cadre(Cog_Extension):
 
         cadre_cursor.insert_one(apply_info)
 
-        await appl.send(f':white_check_mark: 我收到你的申請了！請耐心等待\n'
-                        f'申請人名字: {appl.name}, 申請人id: {appl.id}, 申請職位: {cadre}, 申請時間: {apply_time}')
+        await appl.send(
+            f':white_check_mark: 我收到你的申請了！請耐心等待\n'
+            f'申請人名字: {appl.name}, '
+            f'申請人id: {appl.id}, '
+            f'申請職位: {cadre}, '
+            f'申請時間: {apply_time}'
+        )
 
     @ca.command()
     @commands.has_any_role('總召', 'Administrator')
@@ -58,7 +66,12 @@ class Cadre(Cog_Extension):
         apply_info = str()
         for item in data:
             member_name = await ctx.guild.fetch_member(item["_id"])
-            apply_info += f'{member_name}({item["_id"]}): {item["apply_cadre"]}, {item["apply_time"]}\n'
+
+            apply_info += (
+                f'{member_name}({item["_id"]}): '
+                f'{item["apply_cadre"]}, '
+                f'{item["apply_time"]}\n'
+            )
 
             if len(apply_info) > 1600:
                 await ctx.send(apply_info)
@@ -81,11 +94,14 @@ class Cadre(Cog_Extension):
         member = await ctx.guild.fetch_member(data["_id"])
 
         await ctx.author.send(
-            f':white_check_mark: You\'ve permitted user {member.name} to join cadre {data["apply_cadre"]}!')
+            f':white_check_mark: You\'ve permitted user {member.name} to join cadre {data["apply_cadre"]}!'
+        )
 
-        await member.send(f':white_check_mark: 您於 {data["apply_time"]} 申請 {data["apply_cadre"]} 的程序已通過！\n'
-                          f'此為幹部群的連結，請在加入之後使用指令領取屬於你的身分組\n'
-                          f'{os.environ.get("Working_link")}')
+        await member.send(
+            f':white_check_mark: 您於 {data["apply_time"]} 申請 {data["apply_cadre"]} 的程序已通過！\n'
+            f'此為幹部群的連結，請在加入之後使用指令領取屬於你的身分組\n'
+            f'{os.environ.get("Working_link")}'
+        )
 
         cadre_cursor.delete_one({"_id": data["_id"]})
 
@@ -101,7 +117,11 @@ class Cadre(Cog_Extension):
             return
 
         member = await ctx.guild.fetch_member(data["_id"])
-        await ctx.send(f'{member.name}: {data["apply_cadre"]}, {data["apply_time"]}')
+        await ctx.send(
+            f'{member.name}: '
+            f'{data["apply_cadre"]}, '
+            f'{data["apply_time"]}'
+        )
 
     @ca.command()
     async def remove(self, ctx, delete_id: int):

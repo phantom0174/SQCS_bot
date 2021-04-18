@@ -1,9 +1,9 @@
 from discord.ext import commands
-from core.classes import Cog_Extension
+from core.classes import CogExtension
 from core.setup import fluctlight_client
 
 
-class Deep_Freeze(Cog_Extension):
+class DeepFreeze(CogExtension):
 
     @commands.group()
     @commands.has_any_role('總召', 'Administrator')
@@ -60,4 +60,4 @@ class Deep_Freeze(Cog_Extension):
 
 
 def setup(bot):
-    bot.add_cog(Deep_Freeze(bot))
+    bot.add_cog(DeepFreeze(bot))

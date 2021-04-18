@@ -1,9 +1,9 @@
-from core.classes import Cog_Extension, JsonApi
+from core.classes import CogExtension, JsonApi
 from discord.ext import commands
 import random
 
 
-class Picture(Cog_Extension):
+class Picture(CogExtension):
 
     @commands.group()
     async def pic(self, ctx):

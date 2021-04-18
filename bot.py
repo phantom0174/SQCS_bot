@@ -46,9 +46,9 @@ async def reload(ctx, msg):
         except:
             await ctx.send(f':exclamation: There are no extension called {msg}!')
     else:
-        for filename in os.listdir('./cogs'):
-            if filename.endswith('.py'):
-                bot.reload_extension(f'cogs.{filename[:-3]}')
+        for reload_filename in os.listdir('./cogs'):
+            if reload_filename.endswith('.py'):
+                bot.reload_extension(f'cogs.{reload_filename[:-3]}')
 
         await ctx.send(':white_check_mark: Reload finished!')
 

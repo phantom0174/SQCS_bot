@@ -1,5 +1,3 @@
-import json
-import pymongo
 from pymongo import MongoClient
 import os
 from core.classes import JsonApi
@@ -13,4 +11,3 @@ client = MongoClient(link)["sqcs-bot"]
 fluctlight_client = MongoClient(link)["LightCube"]
 
 rsp = JsonApi().get_json('HumanityExtensionJson')
-

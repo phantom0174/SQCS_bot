@@ -1,11 +1,10 @@
-from core.classes import Cog_Extension
+from core.classes import CogExtension
 from discord.ext import commands
-from core.setup import client, link, rsp, fluctlight_client
-import discord
+from core.setup import client, rsp, fluctlight_client
 import core.score_module as sm
 
 
-class Main(Cog_Extension):
+class Main(CogExtension):
     # ping
     @commands.command()
     async def ping(self, ctx):
@@ -89,7 +88,7 @@ class Main(Cog_Extension):
 
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def mibu(self, ctx, member_id: int, delta_value: float):
+    async def remedy(self, ctx, member_id: int, delta_value: float):
 
         fluctlight_cursor = fluctlight_client["light-cube-info"]
         score_parameters_cursor = client["score_parameters"]
@@ -110,7 +109,7 @@ class Main(Cog_Extension):
             msg += rsp["main"]["mibu"]["pt_1"]
             await member.send(msg)
         except:
-            await ctx.send(f':exclamation: Error when mibuing {member_id}, value: {delta_value}!')
+            await ctx.send(f':exclamation: Error when remedying {member_id}, value: {delta_value}!')
 
         await ctx.send(':white_check_mark: Ok!')
 
@@ -126,8 +125,10 @@ class Main(Cog_Extension):
         active = len(active_data)
         true = len(true_data)
 
-        await ctx.send(f':scroll: Weekly activeness until now is {(active / true) * 100} %\n'
-                       f'Active: {active}, Total: {true}')
+        await ctx.send(
+            f':scroll: Weekly activeness until now is {(active / true) * 100} %\n'
+            f'Active: {active}, Total: {true}'
+        )
 
 
 def setup(bot):

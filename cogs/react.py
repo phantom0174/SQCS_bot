@@ -1,4 +1,4 @@
-from core.classes import Cog_Extension, JsonApi
+from core.classes import CogExtension, JsonApi
 from discord.ext import commands
 import core.functions as func
 import time
@@ -6,7 +6,7 @@ from core.setup import rsp, fluctlight_client
 import asyncio
 
 
-class React(Cog_Extension):
+class React(CogExtension):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
