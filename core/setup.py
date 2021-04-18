@@ -10,4 +10,4 @@ link = f"mongodb+srv://{account}:{password}@light-cube-cluster.5wswq.mongodb.net
 client = MongoClient(link)["sqcs-bot"]
 fluctlight_client = MongoClient(link)["LightCube"]
 
-rsp = JsonApi().get_json('HumanityExtensionJson')
+rsp = JsonApi().get_json('HumanityExtension')
