@@ -124,27 +124,25 @@ class Quiz(CogExtension):
         quiz_cursor = client["quiz_event"]
         data = quiz_cursor.find_one({"_id": msg.author.id})
 
-        if not data:
+        if data:
             message = ':no_entry_sign: ' + '\n'.join(rsp["quiz"]["repeat_answer"])
             await msg.author.send(message)
             return
 
-        if msg.content[0:2] == '||' and msg.content[-2:] == '||':
+        if msg.content[:2] == '||' and msg.content[-2:] == '||':
             message = ':white_check_mark: ' + '\n'.join(rsp["quiz"]["get_answer"])
             await msg.author.send(message)
-            member_quiz_info = {"_id": msg.author.id, "correct": 0}
+
+            answer_correctness = (msg.content[2:-2] == correct_answer)
+            member_quiz_info = {
+                "_id": msg.author.id,
+                "correct": answer_correctness
+            }
             quiz_cursor.insert_one(member_quiz_info)
             await sm.active_log_update(msg.author.id)
 
-            if msg.content[2:-2] == correct_answer:
-                execute = {
-                    "$set": {
-                        "correct": 1
-                    }
-                }
-                quiz_cursor.update_one({"_id": msg.author.id}, execute)
-
-                # add score to member fluctlight
+            # add score to member fluctlight
+            if answer_correctness:
                 fl_cursor = fluctlight_client["light-cube-info"]
 
                 execute = {
