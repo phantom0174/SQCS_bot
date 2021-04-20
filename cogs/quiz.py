@@ -34,6 +34,20 @@ class Quiz(CogExtension):
         quiz_data_cursor.update_one({"_id": 0}, execute)
         await ctx.send(f':white_check_mark: The stand-by answer has been set as {insert_answer}!')
 
+    @quiz.command()
+    async def mani(self, ctx, member_id: int, alter: int):
+
+        quiz_cursor = client["quiz"]
+        execute = {
+            "$set": {
+                "correct": alter
+            }
+        }
+        quiz_cursor.update_one({"_id": member_id}, execute)
+
+        member_name = (await self.bot.fetch_user(member_id)).name
+        await ctx.send(f'Member {member_name}\'s correct answer has been set as {alter}!')
+
     # event answer listen function
     @commands.Cog.listener()
     async def on_message(self, msg):
