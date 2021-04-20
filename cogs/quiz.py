@@ -16,37 +16,87 @@ class Quiz(CogExtension):
 
     # push back stand by answer
     @quiz.command()
-    async def ans_push(self, ctx, insert_answer: str):
-
+    async def alter_standby_ans(self, ctx, alter_answer: str):
         quiz_data_cursor = client["quiz_data"]
-
-        stand_by_answer = quiz_data_cursor.find_one({"_id": 0})["stand_by_answer"]
-
-        if stand_by_answer != 'N/A':
-            await ctx.send(f':exclamation: The stand-by answer had already been set as {stand_by_answer}!')
-            return
 
         execute = {
             "$set": {
-                "stand_by_answer": insert_answer
+                "stand_by_answer": alter_answer
             }
         }
         quiz_data_cursor.update_one({"_id": 0}, execute)
-        await ctx.send(f':white_check_mark: The stand-by answer has been set as {insert_answer}!')
+        await ctx.send(f':white_check_mark: The stand-by answer has been set as {alter_answer}!')
 
     @quiz.command()
-    async def mani(self, ctx, member_id: int, alter: int):
+    async def alter_formal_ans(self, ctx, alter_answer: str):
+        quiz_data_cursor = client["quiz_data"]
+
+        execute = {
+            "$set": {
+                "correct_answer": alter_answer
+            }
+        }
+        quiz_data_cursor.update_one({"_id": 0}, execute)
+        await ctx.send(f':white_check_mark: The stand-by answer has been set as {alter_answer}!')
+
+    @quiz.command()
+    async def set_qns_link(self, ctx, qns_link: str):
+        quiz_data_cursor = client["quiz_data"]
+
+        execute = {
+            "$set": {
+                "qns_link": qns_link
+            }
+        }
+        quiz_data_cursor.update_one({"_id": 0}, execute)
+        await ctx.send(f':white_check_mark: The question link has been set as {qns_link}!')
+
+    @quiz.command()
+    async def set_ans_link(self, ctx, ans_link: str):
+        quiz_data_cursor = client["quiz_data"]
+
+        execute = {
+            "$set": {
+                "ans_link": ans_link
+            }
+        }
+        quiz_data_cursor.update_one({"_id": 0}, execute)
+        await ctx.send(f':white_check_mark: The question link has been set as {ans_link}!')
+
+    @quiz.command()
+    async def alt_member_result(self, ctx, member_id: int, new_result: int):
+        if new_result not in [0, 1]:
+            await ctx.send(':exclamation: New result must be one of 0 or 1!')
+            return
 
         quiz_cursor = client["quiz"]
         execute = {
             "$set": {
-                "correct": alter
+                "correct": new_result
             }
         }
         quiz_cursor.update_one({"_id": member_id}, execute)
 
         member_name = (await self.bot.fetch_user(member_id)).name
-        await ctx.send(f'Member {member_name}\'s correct answer has been set as {alter}!')
+        await ctx.send(f"Member {member_name}'s correctness has been set as {new_result}!")
+
+    @quiz.command()
+    async def repost_qns(self, ctx):
+        await ctx.message.delete()
+        quiz_cursor = client["quiz"]
+        await ctx.send(
+            f':exclamation: 以下為更新後的問題！\n'
+            f'{quiz_cursor["qns_link"]}'
+        )
+
+    @quiz.command()
+    async def repost_ans(self, ctx):
+        await ctx.message.delete()
+        quiz_cursor = client["quiz"]
+        await ctx.send(
+            f':exclamation: 以下為更新後的解答！\n'
+            f'{quiz_cursor["ans_link"]}'
+        )
 
     # event answer listen function
     @commands.Cog.listener()
@@ -117,17 +167,22 @@ async def quiz_start(bot):
 
     quiz_event_cursor = client["quiz_data"]
 
-    stand_by_answer = quiz_event_cursor.find_one({"_id": 0}, {"stand_by_answer": 1})["stand_by_answer"]
+    quiz_data = quiz_event_cursor.find_one({"_id": 0})
+
+    stand_by_answer = quiz_data["stand_by_answer"]
+
     new_quiz_info = {
-        "event_status": 1,
-        "correct_answer": stand_by_answer,
-        "stand_by_answer": 'N/A'
+        "$set": {
+            "event_status": 1,
+            "correct_answer": stand_by_answer,
+            "stand_by_answer": 'N/A'
+        }
     }
     quiz_event_cursor.update({"_id": 0}, new_quiz_info)
 
     # data re-check
-    quiz_status = quiz_event_cursor.find_one({"_id": 0}, {"event_status": 1})["event_status"]
-    correct_answer = quiz_event_cursor.find_one({"_id": 0}, {"correct_answer": 1})["correct_answer"]
+    quiz_status = quiz_event_cursor.find_one({"_id": 0})["event_status"]
+    correct_answer = quiz_event_cursor.find_one({"_id": 0})["correct_answer"]
 
     await cmd_channel.send(
         f'Quiz Event status set to {quiz_status}, '
@@ -140,6 +195,13 @@ async def quiz_start(bot):
     await main_channel.send(msg)
     await main_channel.send(f'活動開始於 {func.now_time_info("whole")}')
 
+    question_link = quiz_data["qns_link"]
+    if question_link != '':
+        await main_channel.send(
+            f'以下為題目：\n'
+            f'{question_link}'
+        )
+
     await main_channel.set_permissions(guild.default_role, send_messages=True)
 
 
@@ -150,24 +212,24 @@ async def quiz_end(bot):
     cmd_channel = discord.utils.get(guild.text_channels, name='總指令區')
 
     quiz_event_cursor = client["quiz_data"]
-    execute = {
-        "$set": {
-            "event_status": 0
-        }
-    }
-    quiz_event_cursor.update_one({"_id": 0}, execute)
 
-    old_correct_ans = quiz_event_cursor.find_one({"_id": 0}, {"correct_answer": 1})["correct_answer"]
+    quiz_data = quiz_event_cursor.find_one({"_id": 0})
+    old_correct_ans = quiz_data["correct_answer"]
+    answer_link = quiz_data["ans_link"]
+
     execute = {
         "$set": {
-            "correct_answer": 'N/A'
+            "correct_answer": 'N/A',
+            "event_status": 0,
+            "qns_link": '',
+            "ans_link": ''
         }
     }
     quiz_event_cursor.update_one({"_id": 0}, execute)
 
     # data re-check
-    quiz_status = quiz_event_cursor.find_one({"_id": 0}, {"event_status": 1})["event_status"]
-    correct_answer = quiz_event_cursor.find_one({"_id": 0}, {"correct_answer": 1})["correct_answer"]
+    quiz_status = quiz_event_cursor.find_one({"_id": 0})["event_status"]
+    correct_answer = quiz_event_cursor.find_one({"_id": 0})["correct_answer"]
 
     await cmd_channel.send(
         f'Quiz Event status set to {quiz_status}, '
@@ -180,8 +242,8 @@ async def quiz_end(bot):
     msg += f':white_check_mark: 這次的答案呢...是 `{old_correct_ans}`！\n'
     msg += '\n'.join(rsp["quiz"]["end"]["main"]["pt_2"]) + '\n'
 
-    attend_count = len(list(quiz_cursor.find({})))
-    quiz_attend_per = len(list(fluctlight_cursor.find({"deep_freeze": {"$eq": 0}})))
+    attend_count = quiz_cursor.find({}).count()
+    quiz_attend_per = fluctlight_cursor.find({"deep_freeze": {"$eq": 0}}).count()
     quiz_attend_level = int(attend_count / quiz_attend_per)
 
     quiz_attend_level = min(quiz_attend_level, 7)
@@ -190,6 +252,12 @@ async def quiz_end(bot):
     msg += rsp["quiz"]["end"]["reactions"][quiz_attend_level]
     await main_channel.send(msg)
     await main_channel.send(f':stopwatch: 活動結束於 {func.now_time_info("whole")}')
+
+    if answer_link != '':
+        await main_channel.send(
+            f'以下為解答：\n'
+            f'{answer_link}'
+        )
 
     await main_channel.set_permissions(guild.default_role, send_messages=False)
 
