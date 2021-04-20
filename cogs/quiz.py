@@ -69,7 +69,7 @@ class Quiz(CogExtension):
             await ctx.send(':exclamation: New result must be one of 0 or 1!')
             return
 
-        quiz_cursor = client["quiz"]
+        quiz_cursor = client["quiz_data"]
         execute = {
             "$set": {
                 "correct": new_result
@@ -83,26 +83,28 @@ class Quiz(CogExtension):
     @quiz.command()
     async def repost_qns(self, ctx):
         await ctx.message.delete()
-        quiz_cursor = client["quiz"]
+        quiz_cursor = client["quiz_data"]
+        qns_link = quiz_cursor.find_one({"_id": 0})["qns_link"]
         await ctx.send(
             f':exclamation: 以下為更新後的問題！\n'
-            f'{quiz_cursor["qns_link"]}'
+            f'{qns_link}'
         )
 
     @quiz.command()
     async def repost_ans(self, ctx):
         await ctx.message.delete()
-        quiz_cursor = client["quiz"]
+        quiz_cursor = client["quiz_data"]
+        ans_link = quiz_cursor.find_one({"_id": 0})["ans_link"]
         await ctx.send(
             f':exclamation: 以下為更新後的解答！\n'
-            f'{quiz_cursor["ans_link"]}'
+            f'{ans_link}'
         )
 
     # event answer listen function
     @commands.Cog.listener()
     async def on_message(self, msg):
         main_channel = discord.utils.get(self.bot.guilds[0].text_channels, name='💎懸賞區')
-        if msg.author == self.bot.user or msg.channel != main_channel or msg.content[0] == '~':
+        if msg.author == self.bot.user or msg.channel != main_channel or msg.content[0] == '~' or msg.content[0] == '+':
             return
 
         quiz_data_cursor = client["quiz_data"]
