@@ -104,7 +104,10 @@ class Quiz(CogExtension):
     @commands.Cog.listener()
     async def on_message(self, msg):
         main_channel = discord.utils.get(self.bot.guilds[0].text_channels, name='💎懸賞區')
-        if msg.author == self.bot.user or msg.channel != main_channel or msg.content[0] == '~' or msg.content[0] == '+':
+        if msg.author == self.bot.user or msg.channel != main_channel:
+            return
+
+        if msg.content[0] == '~' or msg.content[0] == '+':
             return
 
         quiz_data_cursor = client["quiz_data"]
