@@ -71,8 +71,7 @@ class React(CogExtension):
         try:
             fluctlight_cursor.insert_one(member_fluctlight)
         except:
-            fluctlight_cursor.delete_one({"_id": member.id})
-            fluctlight_cursor.insert_one(member_fluctlight)
+            pass
 
         end_time = time.time()
 
