@@ -1,6 +1,6 @@
-from core.classes import CogExtension, JsonApi
 from discord.ext import commands
 import random
+from core.classes import CogExtension, JsonApi
 
 
 class Picture(CogExtension):
@@ -28,7 +28,7 @@ class Picture(CogExtension):
             return
 
         del_object = pic_json['picture_link'][index]
-        del(pic_json['picture_link'][index])
+        del pic_json['picture_link'][index]
 
         JsonApi().put_json('DynamicSetting', pic_json)
 

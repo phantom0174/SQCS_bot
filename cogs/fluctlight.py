@@ -1,7 +1,7 @@
 from discord.ext import commands
+import time
 from core.classes import CogExtension
 from core.setup import client, fluctlight_client
-import time
 
 
 class PersonalInfo(CogExtension):
@@ -59,8 +59,6 @@ class PersonalInfo(CogExtension):
         except:
             await ctx.send(':exclamation: Operation failed')
             return
-
-
 
 
 def setup(bot):

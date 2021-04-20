@@ -1,8 +1,8 @@
-from core.classes import CogExtension, JsonApi
 from discord.ext import commands
+import random
 import core.functions as func
 from core.setup import client, fluctlight_client
-import random
+from core.classes import CogExtension, JsonApi
 
 
 class Query(CogExtension):

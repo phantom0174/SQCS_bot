@@ -1,7 +1,7 @@
-from core.classes import CogExtension
 from discord.ext import commands
 from core.setup import client, rsp, fluctlight_client
 import core.score_module as sm
+from core.classes import CogExtension
 
 
 class Main(CogExtension):

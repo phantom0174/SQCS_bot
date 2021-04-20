@@ -1,5 +1,5 @@
-from core.classes import CogExtension
 from discord.ext import commands
+from core.classes import CogExtension
 from core.setup import client, rsp, fluctlight_client
 
 

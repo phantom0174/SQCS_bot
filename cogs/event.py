@@ -1,7 +1,7 @@
-from core.classes import CogExtension, JsonApi
-from discord.ext import commands
 import discord
+from discord.ext import commands
 import core.functions as func
+from core.classes import CogExtension, JsonApi
 
 
 class Event(CogExtension):

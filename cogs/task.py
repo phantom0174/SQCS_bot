@@ -1,9 +1,9 @@
-from core.setup import client
-import core.functions as func
-from cogs.quiz import quiz_start, quiz_end
 import discord
 from discord.ext import tasks
 from core.classes import CogExtension, JsonApi
+from cogs.quiz import quiz_start, quiz_end
+from core.setup import client
+import core.functions as func
 
 
 class Task(CogExtension):

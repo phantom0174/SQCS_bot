@@ -1,9 +1,9 @@
 from datetime import datetime, timezone, timedelta
 import math
 import discord
-from core.setup import client, fluctlight_client
 import core.score_module as sm
 from core.classes import JsonApi
+from core.setup import client, fluctlight_client
 
 
 def sgn(num):

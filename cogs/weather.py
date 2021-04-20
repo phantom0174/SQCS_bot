@@ -1,7 +1,7 @@
 from discord.ext import commands
-from core.classes import CogExtension
 import requests
 import os
+from core.classes import CogExtension
 
 data_prefix = {
   "0": "天氣描述",

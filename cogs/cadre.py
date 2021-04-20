@@ -1,8 +1,8 @@
+from discord.ext import commands
+import os
 from core.classes import CogExtension
 from core.setup import client
-from discord.ext import commands
 import core.functions as func
-import os
 
 
 class Cadre(CogExtension):
@@ -88,7 +88,8 @@ class Cadre(CogExtension):
         data = cadre_cursor.find_one({"_id": permit_id})
 
         if not data:
-            await ctx.send(f':exclamation: There exists no applicant whose id is {permit_id}!')
+            await ctx.send(
+                f':exclamation: There exists no applicant whose id is {permit_id}!')
             return
 
         member = await ctx.guild.fetch_member(data["_id"])

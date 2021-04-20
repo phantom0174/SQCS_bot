@@ -1,10 +1,10 @@
-from core.classes import CogExtension
 from discord.ext import commands
+import discord
 from core.setup import client, rsp, fluctlight_client
 import core.functions as func
-import discord
 import core.score_module as sm
 from core.vi_update import guild_weekly_update
+from core.classes import CogExtension
 
 
 class Quiz(CogExtension):
