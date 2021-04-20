@@ -169,9 +169,7 @@ async def quiz_start(bot):
     cmd_channel = discord.utils.get(guild.text_channels, name='總指令區')
 
     quiz_event_cursor = client["quiz_data"]
-
     quiz_data = quiz_event_cursor.find_one({"_id": 0})
-
     stand_by_answer = quiz_data["stand_by_answer"]
 
     new_quiz_info = {
@@ -184,8 +182,9 @@ async def quiz_start(bot):
     quiz_event_cursor.update({"_id": 0}, new_quiz_info)
 
     # data re-check
-    quiz_status = quiz_event_cursor.find_one({"_id": 0})["event_status"]
-    correct_answer = quiz_event_cursor.find_one({"_id": 0})["correct_answer"]
+    new_quiz_data = quiz_event_cursor.find_one({"_id": 0})
+    quiz_status = new_quiz_data["event_status"]
+    correct_answer = new_quiz_data["correct_answer"]
 
     await cmd_channel.send(
         f'Quiz Event status set to {quiz_status}, '
@@ -215,7 +214,6 @@ async def quiz_end(bot):
     cmd_channel = discord.utils.get(guild.text_channels, name='總指令區')
 
     quiz_event_cursor = client["quiz_data"]
-
     quiz_data = quiz_event_cursor.find_one({"_id": 0})
     old_correct_ans = quiz_data["correct_answer"]
     answer_link = quiz_data["ans_link"]
@@ -231,8 +229,9 @@ async def quiz_end(bot):
     quiz_event_cursor.update_one({"_id": 0}, execute)
 
     # data re-check
-    quiz_status = quiz_event_cursor.find_one({"_id": 0})["event_status"]
-    correct_answer = quiz_event_cursor.find_one({"_id": 0})["correct_answer"]
+    new_quiz_dara = quiz_event_cursor.find_one({"_id": 0})
+    quiz_status = new_quiz_dara["event_status"]
+    correct_answer = new_quiz_dara["correct_answer"]
 
     await cmd_channel.send(
         f'Quiz Event status set to {quiz_status}, '
