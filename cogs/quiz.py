@@ -170,8 +170,7 @@ async def quiz_end(bot):
     quiz_attend_per = len(list(fluctlight_cursor.find({"deep_freeze": {"$eq": 0}})))
     quiz_attend_level = int(attend_count / quiz_attend_per)
 
-    if quiz_attend_level > 7:
-        quiz_attend_level = 7
+    quiz_attend_level = min(quiz_attend_level, 7)
 
     msg += f'我這次有 {round((attend_count / quiz_attend_per) * 100, 1)} 分飽！\n'
     msg += rsp["quiz"]["end"]["reactions"][quiz_attend_level]
