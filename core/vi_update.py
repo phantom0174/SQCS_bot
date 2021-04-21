@@ -1,7 +1,6 @@
-from pymongo import MongoClient
 import statistics
 import discord
-from core.setup import client, link, fluctlight_client
+from core.setup import client, fluctlight_client
 import core.functions as func
 
 
@@ -25,7 +24,7 @@ async def guild_weekly_update(bot):
     score_parameters_cursor.update({"_id": 0}, {"$set": {"minimum_score": min_score}})
 
     # improved sum method
-    without_frozen_member_cursor = fluctlight_cursor.find({"deep_freeze": {"$ne": 1}}, {"score": 1})
+    without_frozen_member_cursor = fluctlight_cursor.find({"deep_freeze": {"$ne": 1}})
     total_score = sum(map(lambda item: item["score"], without_frozen_member_cursor))
 
     # save total score to week score log -> used in score weight update
@@ -85,14 +84,14 @@ async def active_logs_update(fluctlight_cursor, active_logs_cursor):
             if member["deep_freeze"] == 0:
                 execute = {
                     "$set": {
-                        "log": str(member_active + old_log)
+                        "log": str(member_active) + old_log
                     }
                 }
                 active_logs_cursor.update_one({"_id": member_id}, execute)
             elif member["deep_freeze"] == 1:
                 execute = {
                     "$set": {
-                        "log": str(member_active + '1')
+                        "log": '1' + old_log
                     }
                 }
                 active_logs_cursor.update_one({"_id": member_id}, execute)
@@ -105,7 +104,7 @@ async def contribution_update(fluctlight_cursor, active_logs_cursor):
     data = active_logs_cursor.find({})
 
     for member in data:
-        member_frozen = fluctlight_cursor.find_one({"_id": member["_id"]}, {"deep_freeze": 1})["deep_freeze"]
+        member_frozen = fluctlight_cursor.find_one({"_id": member["_id"]})["deep_freeze"]
 
         if member_frozen == 1:
             continue
@@ -117,7 +116,7 @@ async def contribution_update(fluctlight_cursor, active_logs_cursor):
         fluctlight_cursor.update_one({"_id": member["_id"]}, {"$inc": {"contrib": total_contrib}})
         avr_contrib += total_contrib
 
-    total_member_count = len(list(fluctlight_cursor.find({"deep_freeze": {"$eq": 0}})))
+    total_member_count = fluctlight_cursor.find({"deep_freeze": {"$eq": 0}}).count()
     avr_contrib /= total_member_count
 
     return avr_contrib
@@ -146,8 +145,7 @@ async def lvl_ind_update(fluctlight_cursor, active_logs_cursor, avr_contrib):
 async def lvl_ind_detect(bot, fluctlight_cursor):
     data = fluctlight_cursor.find({}, {"contrib": 1, "lvl_ind": 1})
 
-    sqcs_client = MongoClient(link)["sqcs-bot"]
-    kick_member_cursor = sqcs_client["kick_member_list"]
+    kick_member_cursor = client["kick_member_list"]
 
     for member in data:
         if 1 <= member["lvl_ind"] < 1.5:
