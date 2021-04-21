@@ -1,9 +1,10 @@
+from core.setup import client
+import core.functions as func
+from cogs.quiz import quiz_start, quiz_end
 import discord
 from discord.ext import tasks
 from core.classes import CogExtension, JsonApi
-from cogs.quiz import quiz_start, quiz_end
-from core.setup import client
-import core.functions as func
+from core.setup import fluctlight_client
 
 
 class Task(CogExtension):
@@ -14,6 +15,7 @@ class Task(CogExtension):
 
         self.quiz_auto.start()
         self.nt_auto.start()
+        self.bot_activity.start()
 
     @tasks.loop(minutes=10)
     async def quiz_auto(self):
@@ -39,6 +41,20 @@ class Task(CogExtension):
             if member.id in nt_list:
                 await member.send(':recycle:')
                 await member.ban()
+
+    @tasks.loop(minutes=10)
+    async def bot_activity(self):
+        await self.bot.wait_until_ready()
+
+        fluctlight_cursor = fluctlight_client["light-cube-info"]
+        member_count = fluctlight_cursor.find({}).count()
+
+        await self.bot.change_presence(
+            activity=discord.Activity(
+                type=discord.ActivityType.watching,
+                name=f'{member_count} 個活生生的搖光...'
+            )
+        )
 
 
 def setup(bot):
