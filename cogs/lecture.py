@@ -247,6 +247,25 @@ class Lecture(CogExtension):
 
         lecture_event_cursor.delete_many({})
 
+        # kick member from the voice channel
+        countdown_duration = 60
+        channel_name = lecture_list_cursor.find_one({"_id": week})["name"]
+        voice_channel = discord.utils.get(ctx.guild.voice_channels, name=channel_name)
+
+        def content(s):
+            return f':exclamation: 所有成員將在 {s} 秒後被移出 {voice_channel.name}'
+
+        message = await ctx.send(content(countdown_duration))
+        while countdown_duration > 0:
+            await message.edit(content=content(countdown_duration))
+            await asyncio.sleep(1)
+            countdown_duration -= 1
+
+        await message.delete()
+
+        for member in voice_channel.members:
+            await member.move_to(None)
+
 
 def setup(bot):
     bot.add_cog(Lecture(bot))
