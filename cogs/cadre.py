@@ -37,7 +37,7 @@ class Cadre(CogExtension):
         apply_time = func.now_time_info('whole')
         apply_info = {
             "_id": appl.id,
-            "name": func.get_member_nick_name(ctx.guild, appl.id),
+            "name": await func.get_member_nick_name(ctx.guild, appl.id),
             "apply_cadre": cadre,
             "apply_time": apply_time
         }

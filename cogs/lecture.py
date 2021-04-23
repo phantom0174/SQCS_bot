@@ -235,7 +235,7 @@ class Lecture(CogExtension):
 
         for rank, member in enumerate(answered_member_list):
             medal = ranking_medal_prefix.get(rank, ':medal:')
-            member_name = func.get_member_nick_name(ctx.guild, member["_id"])
+            member_name = await func.get_member_nick_name(ctx.guild, member["_id"])
 
             member_rank_list += (
                 f'{medal}{member_name} | '
