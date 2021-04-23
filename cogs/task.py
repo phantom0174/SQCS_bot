@@ -11,7 +11,7 @@ class Task(CogExtension):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.quiz_data_cursor = client["quiz_data"]
+        self.quiz_set_cursor = client["QuizSetting"]
 
         self.quiz_auto.start()
         self.nt_auto.start()
@@ -23,12 +23,12 @@ class Task(CogExtension):
 
         report_channel = discord.utils.get(self.bot.guilds[1].text_channels, name='sqcs-report')
 
-        quiz_status = self.quiz_data_cursor.find_one({"_id": 0})["event_status"]
+        quiz_status = self.quiz_set_cursor.find_one({"_id": 0})["event_status"]
 
-        if func.now_time_info('date') == 1 and func.now_time_info('hour') >= 6 and quiz_status == 0:
+        if func.now_time_info('date') == 1 and func.now_time_info('hour') >= 6 and not quiz_status:
             await quiz_start(self.bot)
             await report_channel.send(f'[AUTO QUIZ START][{func.now_time_info("whole")}]')
-        elif func.now_time_info('date') == 7 and func.now_time_info('hour') >= 23 and quiz_status == 1:
+        elif func.now_time_info('date') == 7 and func.now_time_info('hour') >= 23 and quiz_status:
             await quiz_end(self.bot)
             await report_channel.send(f'[AUTO QUIZ END][{func.now_time_info("whole")}]')
 
@@ -46,13 +46,13 @@ class Task(CogExtension):
     async def bot_activity(self):
         await self.bot.wait_until_ready()
 
-        fluctlight_cursor = fluctlight_client["light-cube-info"]
+        fluctlight_cursor = fluctlight_client["MainFluctlights"]
         member_count = fluctlight_cursor.find({}).count()
 
         await self.bot.change_presence(
             activity=discord.Activity(
                 type=discord.ActivityType.watching,
-                name=f'{member_count} 個活生生的搖光...'
+                name=f'{member_count} 個活生生的搖光'
             )
         )
 
