@@ -32,16 +32,16 @@ class React(CogExtension):
 
             if deep_freeze_status == 'y':
                 msg = '\n'.join(rsp["join"]["df_1"])
-                deep_freeze_status = 1
+                deep_freeze_status = True
             elif deep_freeze_status == 'n':
                 msg = '\n'.join(rsp["join"]["df_0"])
-                deep_freeze_status = 0
+                deep_freeze_status = False
             else:
                 msg = '\n'.join(rsp["join"]["invalid_syntax"])
-                deep_freeze_status = 0
+                deep_freeze_status = False
         except asyncio.TimeoutError:
             msg = '\n'.join(rsp["join"]["time_out"])
-            deep_freeze_status = 0
+            deep_freeze_status = False
 
         # another \n for last un-inserted \n
         msg += '\n' + '\n'.join(rsp["join"]["contact_method"])
@@ -51,25 +51,43 @@ class React(CogExtension):
         # create personal fluctlight data
         start_time = time.time()
 
-        fluctlight_cursor = fluctlight_client["light-cube-info"]
+        main_fluct_cursor = fluctlight_client["MainFluctlights"]
+        vice_fluct_cursor = fluctlight_client["ViceFluctlights"]
+        act_cursor = fluctlight_client["active-logs"]
 
-        member_fluctlight = {
+        default_main_fluctlight = {
             "_id": member.id,
+            "name": await func.get_member_nick_name(self.bot.guilds[0], member.id),
             "score": 0,
+            "week_active": False,
+            "contrib": 0,
+            "lvl_ind": 0,
+            "deep_freeze": deep_freeze_status
+        }
+        default_vice_fluctlight = {
+            "_id": member.id,
             "du": 0,
+            "mdu": 0,
             "oc_auth": 0,
             "sc_auth": 0,
-            "lvl_ind": 0,
-            "mdu": 0,
-            "odu": 0,
-            "odu_time": time.time(),
-            "contrib": 0,
-            "week_active": 0,
-            "deep_freeze": deep_freeze_status
+        }
+        default_act = {
+            "_id": member.id,
+            "log": ''
         }
 
         try:
-            fluctlight_cursor.insert_one(member_fluctlight)
+            main_fluct_cursor.insert_one(default_main_fluctlight)
+        except:
+            pass
+
+        try:
+            vice_fluct_cursor.insert_one(default_vice_fluctlight)
+        except:
+            pass
+
+        try:
+            act_cursor.insert_one(default_act)
         except:
             pass
 
