@@ -17,50 +17,50 @@ class Quiz(CogExtension):
     # push back stand by answer
     @quiz.command()
     async def alter_standby_ans(self, ctx, alter_answer: str):
-        quiz_data_cursor = client["quiz_data"]
+        quiz_set_cursor = client["QuizSetting"]
 
         execute = {
             "$set": {
                 "stand_by_answer": alter_answer
             }
         }
-        quiz_data_cursor.update_one({"_id": 0}, execute)
+        quiz_set_cursor.update_one({"_id": 0}, execute)
         await ctx.send(f':white_check_mark: The stand-by answer has been set as {alter_answer}!')
 
     @quiz.command()
     async def alter_formal_ans(self, ctx, alter_answer: str):
-        quiz_data_cursor = client["quiz_data"]
+        quiz_set_cursor = client["QuizSetting"]
 
         execute = {
             "$set": {
                 "correct_answer": alter_answer
             }
         }
-        quiz_data_cursor.update_one({"_id": 0}, execute)
+        quiz_set_cursor.update_one({"_id": 0}, execute)
         await ctx.send(f':white_check_mark: The stand-by answer has been set as {alter_answer}!')
 
     @quiz.command()
     async def set_qns_link(self, ctx, qns_link: str):
-        quiz_data_cursor = client["quiz_data"]
+        quiz_set_cursor = client["QuizSetting"]
 
         execute = {
             "$set": {
                 "qns_link": qns_link
             }
         }
-        quiz_data_cursor.update_one({"_id": 0}, execute)
+        quiz_set_cursor.update_one({"_id": 0}, execute)
         await ctx.send(f':white_check_mark: The question link has been set as {qns_link}!')
 
     @quiz.command()
     async def set_ans_link(self, ctx, ans_link: str):
-        quiz_data_cursor = client["quiz_data"]
+        quiz_set_cursor = client["QuizSetting"]
 
         execute = {
             "$set": {
                 "ans_link": ans_link
             }
         }
-        quiz_data_cursor.update_one({"_id": 0}, execute)
+        quiz_set_cursor.update_one({"_id": 0}, execute)
         await ctx.send(f':white_check_mark: The question link has been set as {ans_link}!')
 
     @quiz.command()
@@ -68,22 +68,22 @@ class Quiz(CogExtension):
         if new_result not in [0, 1]:
             return await ctx.send(':exclamation: New result must be one of 0 or 1!')
 
-        quiz_cursor = client["quiz_data"]
+        quiz_set_cursor = client["QuizSetting"]
         execute = {
             "$set": {
-                "correct": new_result
+                "correct": bool(new_result)
             }
         }
-        quiz_cursor.update_one({"_id": member_id}, execute)
+        quiz_set_cursor.update_one({"_id": member_id}, execute)
 
-        member_name = (await self.bot.fetch_user(member_id)).name
+        member_name = await func.get_member_nick_name(ctx.guild, member_id)
         await ctx.send(f"Member {member_name}'s correctness has been set as {new_result}!")
 
     @quiz.command()
     async def repost_qns(self, ctx):
         await ctx.message.delete()
-        quiz_cursor = client["quiz_data"]
-        qns_link = quiz_cursor.find_one({"_id": 0})["qns_link"]
+        quiz_set_cursor = client["QuizSetting"]
+        qns_link = quiz_set_cursor.find_one({"_id": 0})["qns_link"]
         await ctx.send(
             f':exclamation: 以下為更新後的問題！\n'
             f'{qns_link}'
@@ -92,8 +92,8 @@ class Quiz(CogExtension):
     @quiz.command()
     async def repost_ans(self, ctx):
         await ctx.message.delete()
-        quiz_cursor = client["quiz_data"]
-        ans_link = quiz_cursor.find_one({"_id": 0})["ans_link"]
+        quiz_set_cursor = client["QuizSetting"]
+        ans_link = quiz_set_cursor.find_one({"_id": 0})["ans_link"]
         await ctx.send(
             f':exclamation: 以下為更新後的解答！\n'
             f'{ans_link}'
@@ -109,23 +109,24 @@ class Quiz(CogExtension):
         if msg.content[0] == '~' or msg.content[0] == '+':
             return
 
-        quiz_data_cursor = client["quiz_data"]
-        quiz_status = quiz_data_cursor.find_one({"_id": 0})["event_status"]
+        quiz_set_cursor = client["QuizSetting"]
+        score_set_cursor = client["ScoreSetting"]
+        fl_cursor = fluctlight_client["MainFluctlights"]
 
-        if quiz_status == 0:
+        quiz_status = quiz_set_cursor.find_one({"_id": 0})["event_status"]
+        if not quiz_status:
             return
 
         await msg.delete()
 
-        correct_answer = quiz_data_cursor.find_one({"_id": 0})["correct_answer"]
+        correct_answer = quiz_set_cursor.find_one({"_id": 0})["correct_answer"]
 
-        quiz_score_cursor = client["score_parameters"]
-        quiz_score = quiz_score_cursor.find_one({"_id": 0})["quiz_point"]
-        score_weight = quiz_score_cursor.find_one({"_id": 0})["score_weight"]
+        quiz_score = score_set_cursor.find_one({"_id": 0})["quiz_point"]
+        score_weight = score_set_cursor.find_one({"_id": 0})["score_weight"]
 
-        quiz_cursor = client["quiz_event"]
+        quiz_cursor = client["QuizOngoing"]
+
         data = quiz_cursor.find_one({"_id": msg.author.id})
-
         if data:
             message = ':no_entry_sign: ' + '\n'.join(rsp["quiz"]["repeat_answer"])
             return await msg.author.send(message)
@@ -135,20 +136,18 @@ class Quiz(CogExtension):
             await msg.author.send(message)
 
             answer_correctness = (msg.content[2:-2] == correct_answer)
-            member_quiz_info = {
+            member_quiz_result = {
                 "_id": msg.author.id,
                 "correct": answer_correctness
             }
-            quiz_cursor.insert_one(member_quiz_info)
+            quiz_cursor.insert_one(member_quiz_result)
             await sm.active_log_update(msg.author.id)
 
             # add score to member fluctlight
             if answer_correctness:
-                fl_cursor = fluctlight_client["light-cube-info"]
-
                 execute = {
                     "$inc": {
-                        "score": quiz_score * score_weight
+                        "score": round(quiz_score * score_weight, 2)
                     }
                 }
                 fl_cursor.update_one({"_id": msg.author.id}, execute)
@@ -166,21 +165,21 @@ async def quiz_start(bot):
     main_channel = discord.utils.get(guild.text_channels, name='💎懸賞區')
     cmd_channel = discord.utils.get(guild.text_channels, name='總指令區')
 
-    quiz_event_cursor = client["quiz_data"]
-    quiz_data = quiz_event_cursor.find_one({"_id": 0})
+    quiz_set_cursor = client["QuizSetting"]
+    quiz_data = quiz_set_cursor.find_one({"_id": 0})
     stand_by_answer = quiz_data["stand_by_answer"]
 
     new_quiz_info = {
         "$set": {
-            "event_status": 1,
+            "event_status": True,
             "correct_answer": stand_by_answer,
             "stand_by_answer": 'N/A'
         }
     }
-    quiz_event_cursor.update({"_id": 0}, new_quiz_info)
+    quiz_set_cursor.update({"_id": 0}, new_quiz_info)
 
     # data re-check
-    new_quiz_data = quiz_event_cursor.find_one({"_id": 0})
+    new_quiz_data = quiz_set_cursor.find_one({"_id": 0})
     quiz_status = new_quiz_data["event_status"]
     correct_answer = new_quiz_data["correct_answer"]
 
@@ -211,8 +210,8 @@ async def quiz_end(bot):
     main_channel = discord.utils.get(guild.text_channels, name='💎懸賞區')
     cmd_channel = discord.utils.get(guild.text_channels, name='總指令區')
 
-    quiz_event_cursor = client["quiz_data"]
-    quiz_data = quiz_event_cursor.find_one({"_id": 0})
+    quiz_set_cursor = client["QuizSetting"]
+    quiz_data = quiz_set_cursor.find_one({"_id": 0})
     old_correct_ans = quiz_data["correct_answer"]
     answer_link = quiz_data["ans_link"]
 
@@ -224,10 +223,10 @@ async def quiz_end(bot):
             "ans_link": ''
         }
     }
-    quiz_event_cursor.update_one({"_id": 0}, execute)
+    quiz_set_cursor.update_one({"_id": 0}, execute)
 
     # data re-check
-    new_quiz_dara = quiz_event_cursor.find_one({"_id": 0})
+    new_quiz_dara = quiz_set_cursor.find_one({"_id": 0})
     quiz_status = new_quiz_dara["event_status"]
     correct_answer = new_quiz_dara["correct_answer"]
 
@@ -236,19 +235,19 @@ async def quiz_end(bot):
         f'correct answer set to {correct_answer}!'
     )
 
-    quiz_cursor = client["quiz_event"]
+    quiz_ongoing_cursor = client["QuizOngoing"]
     fluctlight_cursor = fluctlight_client["light-cube-info"]
     msg = '\n'.join(rsp["quiz"]["end"]["main"]["pt_1"]) + '\n'
     msg += f':white_check_mark: 這次的答案呢...是 `{old_correct_ans}`！\n'
     msg += '\n'.join(rsp["quiz"]["end"]["main"]["pt_2"]) + '\n'
 
-    attend_count = quiz_cursor.find({}).count()
-    quiz_attend_per = fluctlight_cursor.find({"deep_freeze": {"$eq": 0}}).count()
-    quiz_attend_level = int(attend_count / quiz_attend_per)
+    attend_count = quiz_ongoing_cursor.find({}).count()
+    countable_member_count = fluctlight_cursor.find({"deep_freeze": {"$eq": 0}}).count()
+    quiz_attend_level = int(attend_count / countable_member_count)
 
     quiz_attend_level = min(quiz_attend_level, 7)
 
-    msg += f'我這次有 {round((attend_count / quiz_attend_per) * 100, 1)} 分飽！\n'
+    msg += f'我這次有 {round((attend_count / countable_member_count) * 100, 1)} 分飽！\n'
     msg += rsp["quiz"]["end"]["reactions"][quiz_attend_level]
     await main_channel.send(msg)
     await main_channel.send(f':stopwatch: 活動結束於 {func.now_time_info("whole")}')
@@ -262,19 +261,17 @@ async def quiz_end(bot):
     await main_channel.set_permissions(guild.default_role, send_messages=False)
 
     # list the winners
-    data = quiz_cursor.find({"correct": {"$eq": True}})
+    data = quiz_ongoing_cursor.find({"correct": {"$eq": True}})
 
     winners = str()
     for winner in data:
-        winner_name = (await bot.guilds[0].fetch_member(winner["_id"])).nick
-        if winner_name is None:
-            winner_name = (await bot.fetch_user(winner["_id"])).name
+        winner_name = await func.get_member_nick_name(bot.gulids[0], winner["_id"])
         winners += f'{winner_name}\n'
 
     if winners == '':
         winners = 'None'
 
-    quiz_cursor.delete_many({})
+    quiz_ongoing_cursor.delete_many({})
 
     embed_para = [
         ':scroll: Quiz Event Result',
