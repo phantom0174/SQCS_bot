@@ -57,6 +57,7 @@ async def reload(ctx, msg):
 @commands.has_any_role('總召')
 async def shut_down(ctx):
     await ctx.send(':white_check_mark: The bot is shutting down...')
+    await bot.logout()
     await asyncio.sleep(1)
     sys.exit(0)
 
