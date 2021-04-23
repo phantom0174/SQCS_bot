@@ -23,20 +23,21 @@ class Cadre(CogExtension):
                 content=f':exclamation: {appl.mention}, 沒有名為 `{cadre}` 的職位！', delete_after=5.0
             )
 
-        cadre_cursor = client["cadre"]
+        cadre_cursor = client["Cadre"]
         data = cadre_cursor.find_one({"_id": appl.id})
 
         if data:
             return await appl.send(
                 f':exclamation: {appl.mention} (id: {data["_id"]}),\n'
                 f'您已經於 {data["apply_time"]} 申請 `{data["apply_cadre"]}` 職位！\n'
-                f'請確認是否發生以下狀況 `重複申請；同時申請兩職位；申請錯誤`\n'
-                f'如有疑問請洽 @總召'
+                f'請確認是否發生以下狀況 `重複申請` `同時申請兩職位` `申請錯誤`\n'
+                f'如有疑問請洽總召'
             )
 
         apply_time = func.now_time_info('whole')
         apply_info = {
             "_id": appl.id,
+            "name": func.get_member_nick_name(ctx.guild, appl.id),
             "apply_cadre": cadre,
             "apply_time": apply_time
         }
@@ -55,7 +56,7 @@ class Cadre(CogExtension):
     @commands.has_any_role('總召', 'Administrator')
     async def list(self, ctx):
 
-        cadre_cursor = client["cadre"]
+        cadre_cursor = client["Cadre"]
         data = cadre_cursor.find({})
 
         if data.count() == 0:
@@ -63,10 +64,8 @@ class Cadre(CogExtension):
 
         apply_info = str()
         for item in data:
-            member_name = await ctx.guild.fetch_member(item["_id"])
-
             apply_info += (
-                f'{member_name}({item["_id"]}): '
+                f'{item["name"]}({item["_id"]}): '
                 f'{item["apply_cadre"]}, '
                 f'{item["apply_time"]}\n'
             )
@@ -82,7 +81,7 @@ class Cadre(CogExtension):
     @commands.has_any_role('總召', 'Administrator')
     async def permit(self, ctx, permit_id: int):
 
-        cadre_cursor = client["cadre"]
+        cadre_cursor = client["Cadre"]
         data = cadre_cursor.find_one({"_id": permit_id})
 
         if not data:
@@ -90,12 +89,11 @@ class Cadre(CogExtension):
                 f':exclamation: There exists no applicant whose id is {permit_id}!'
             )
 
-        member = await ctx.guild.fetch_member(data["_id"])
-
         await ctx.author.send(
-            f':white_check_mark: You\'ve permitted user {member.name} to join cadre {data["apply_cadre"]}!'
+            f':white_check_mark: You\'ve permitted user {data["name"]} to join cadre {data["apply_cadre"]}!'
         )
 
+        member = await ctx.guild.fetch_member(data["_id"])
         await member.send(
             f':white_check_mark: 您於 {data["apply_time"]} 申請 {data["apply_cadre"]} 的程序已通過！\n'
             f'此為幹部群的連結，請在加入之後使用指令領取屬於你的身分組\n'
@@ -108,15 +106,14 @@ class Cadre(CogExtension):
     @commands.has_any_role('總召', 'Administrator')
     async def search(self, ctx, search_id: int):
 
-        cadre_cursor = client["cadre"]
+        cadre_cursor = client["Cadre"]
         data = cadre_cursor.find_one({"_id": search_id})
 
         if not data:
             return await ctx.send(f':exclamation: There are no applicant whose Id is {search_id}!')
 
-        member = await ctx.guild.fetch_member(data["_id"])
         await ctx.send(
-            f'{member.name}: '
+            f'{data["name"]}({data["_id"]}): '
             f'{data["apply_cadre"]}, '
             f'{data["apply_time"]}'
         )
@@ -124,16 +121,14 @@ class Cadre(CogExtension):
     @ca.command()
     async def remove(self, ctx, delete_id: int):
 
-        cadre_cursor = client["cadre"]
+        cadre_cursor = client["Cadre"]
         data = cadre_cursor.find_one({"_id": delete_id})
 
         if not data:
             await ctx.send(f':exclamation: There exists no applicant whose id is {delete_id}!')
 
-        member_name = await ctx.guild.fetch_member(data["_id"])
-
         cadre_cursor.delete_one({"_id": delete_id})
-        await ctx.send(f'Member {member_name}({delete_id})\'s application has been removed!')
+        await ctx.send(f'Member {data["name"]}({delete_id})\'s application has been removed!')
 
 
 def setup(bot):
