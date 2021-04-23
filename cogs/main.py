@@ -89,19 +89,17 @@ class Main(CogExtension):
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
     async def remedy(self, ctx, member_id: int, delta_value: float):
-
-        fluctlight_cursor = fluctlight_client["light-cube-info"]
-        score_parameters_cursor = client["score_parameters"]
-
-        score_weight = score_parameters_cursor.find_one({"_id": 0})["score_weight"]
+        fl_cursor = fluctlight_client["MainFluctlights"]
+        score_set_cursor = client["ScoreSetting"]
+        score_weight = score_set_cursor.find_one({"_id": 0})["score_weight"]
 
         try:
             execute = {
                 "$inc": {
-                    "score": delta_value * score_weight
+                    "score": round(delta_value * score_weight, 2)
                 }
             }
-            fluctlight_cursor.update_one({"_id": member_id}, execute)
+            fl_cursor.update_one({"_id": member_id}, execute)
             await sm.active_log_update(member_id)
 
             member = ctx.guild.fetch_member(member_id)
@@ -111,23 +109,27 @@ class Main(CogExtension):
         except:
             await ctx.send(f':exclamation: Error when remedying {member_id}, value: {delta_value}!')
 
-        await ctx.send(':white_check_mark: Ok!')
+        await ctx.send(':white_check_mark: Operation finished!')
 
     # active percentage
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
     async def active_query(self, ctx):
-
-        fluctlight_cursor = fluctlight_client["light-cube-info"]
-        active_data = list(fluctlight_cursor.find({"deep_freeze": {"$ne": 1}, "week_active": {"$ne": 0}}))
-        true_data = list(fluctlight_cursor.find({"deep_freeze": {"$ne": 1}}))
-
-        active = len(active_data)
-        true = len(true_data)
+        fluct_cursor = fluctlight_client["MainFluctlights"]
+        week_active_match = {
+            "deep_freeze": {
+                "$ne": True
+            },
+            "week_active": {
+                "$ne": False
+            }
+        }
+        week_active_count = fluct_cursor.find(week_active_match).count()
+        countable_member_count = fluct_cursor.find({"deep_freeze": {"$ne": 1}}).count()
 
         await ctx.send(
-            f':scroll: Weekly activeness until now is {(active / true) * 100} %\n'
-            f'Active: {active}, Total: {true}'
+            f':scroll: Weekly activeness until now is {(week_active_count / countable_member_count) * 100} %\n'
+            f'Active: {week_active_count}, Total: {countable_member_count}'
         )
 
     @commands.command()
