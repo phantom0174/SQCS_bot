@@ -66,8 +66,7 @@ class Quiz(CogExtension):
     @quiz.command()
     async def alt_member_result(self, ctx, member_id: int, new_result: int):
         if new_result not in [0, 1]:
-            await ctx.send(':exclamation: New result must be one of 0 or 1!')
-            return
+            return await ctx.send(':exclamation: New result must be one of 0 or 1!')
 
         quiz_cursor = client["quiz_data"]
         execute = {
@@ -129,8 +128,7 @@ class Quiz(CogExtension):
 
         if data:
             message = ':no_entry_sign: ' + '\n'.join(rsp["quiz"]["repeat_answer"])
-            await msg.author.send(message)
-            return
+            return await msg.author.send(message)
 
         if msg.content[:2] == '||' and msg.content[-2:] == '||':
             message = ':white_check_mark: ' + '\n'.join(rsp["quiz"]["get_answer"])

@@ -24,8 +24,7 @@ class Picture(CogExtension):
         pic_json = JsonApi().get_json('DynamicSetting')
 
         if index >= int(len(pic_json['picture_link'])):
-            await ctx.send('Index out of range!')
-            return
+            return await ctx.send('Index out of range!')
 
         del_object = pic_json['picture_link'][index]
         del pic_json['picture_link'][index]

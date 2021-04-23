@@ -19,8 +19,7 @@ class KickMember(CogExtension):
         data = kick_member_cursor.find({})
 
         if data.count() == 0:
-            await ctx.send(':exclamation: There are no member in the kick list!')
-            return
+            return await ctx.send(':exclamation: There are no member in the kick list!')
 
         kick_member_list = str()
         for member in data:
@@ -49,8 +48,7 @@ class KickMember(CogExtension):
         data = fluctlight_cursor.find_one({"_id": member_id}, {"contrib": 1, "lvl_ind": 1})
 
         if not data:
-            await ctx.send(f':exclamation: There\'re no data of member whose id is {member_id}')
-            return
+            return await ctx.send(f":exclamation: There's no data of member whose id is {member_id}")
 
         member_contrib = data["contrib"]
         member_lvl_ind = data["lvl_ind"]
@@ -79,8 +77,7 @@ class KickMember(CogExtension):
         data = kick_member_cursor.find_one({"_id": member_id})
 
         if not data:
-            await ctx.send(f':exclamation: Member {member_id} isn\'t in the kick list!')
-            return
+            return await ctx.send(f":exclamation: Member {member_id} isn't in the kick list!")
 
         kick_member_cursor.delete_one({"_id": member_id})
 
@@ -93,8 +90,7 @@ class KickMember(CogExtension):
         data = kick_member_cursor.find_one({"_id": member_id})
 
         if not data:
-            await ctx.send(f':exclamation: Member {member_id} isn\'t in the kick list!')
-            return
+            return await ctx.send(f":exclamation: Member {member_id} isn't in the kick list!")
 
         kick_user = await ctx.guild.fetch_member(member_id)
 
@@ -132,8 +128,7 @@ class KickMember(CogExtension):
         data = kick_member_cursor.find({})
 
         if data.count() == 0:
-            await ctx.send(':exclamation: Kick member list is empty!')
-            return
+            return await ctx.send(':exclamation: Kick member list is empty!')
 
         fluctlight_cursor = fluctlight_client["light-cube-info"]
         active_logs_cursor = fluctlight_client["active_logs"]

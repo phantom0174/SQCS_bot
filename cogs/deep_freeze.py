@@ -27,8 +27,7 @@ class DeepFreeze(CogExtension):
             await member.send(f':exclamation: 你的 `deep freeze` 狀態被設定為 {status} 了！')
             await ctx.send(':white_check_mark: Manipulation finished!')
         except Exception as e:
-            await ctx.send(content=e, delete_after=5.0)
-            return
+            return await ctx.send(content=e, delete_after=5.0)
 
     @df.command()
     async def list(self, ctx):
@@ -38,8 +37,7 @@ class DeepFreeze(CogExtension):
         data = fluctlight_cursor.find({"deep_freeze": {"$eq": 1}})
 
         if data.count() == 0:
-            await ctx.send(':exclamation: There are no member in deep_freeze status!')
-            return
+            return await ctx.send(':exclamation: There are no member in deep_freeze status!')
 
         member_list = str()
         for member in data:

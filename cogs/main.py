@@ -82,8 +82,7 @@ class Main(CogExtension):
                 continue
 
             if member.name is None:
-                await ctx.send(f'{member.name} {member.id}')
-                return
+                return await ctx.send(f'{member.name} {member.id}')
 
             await ctx.send(f'{member.nick} {member.id}')
 

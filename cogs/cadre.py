@@ -19,21 +19,20 @@ class Cadre(CogExtension):
             return
 
         if cadre not in ['副召', '網管', '議程', '公關', '美宣', '學術']:
-            await ctx.send(content=f':exclamation: {appl.mention}, 沒有名為 `{cadre}` 的職位！', delete_after=5.0)
-            return
+            return await ctx.send(
+                content=f':exclamation: {appl.mention}, 沒有名為 `{cadre}` 的職位！', delete_after=5.0
+            )
 
         cadre_cursor = client["cadre"]
         data = cadre_cursor.find_one({"_id": appl.id})
 
         if data:
-            await appl.send(
+            return await appl.send(
                 f':exclamation: {appl.mention} (id: {data["_id"]}),\n'
                 f'您已經於 {data["apply_time"]} 申請 `{data["apply_cadre"]}` 職位！\n'
                 f'請確認是否發生以下狀況 `重複申請；同時申請兩職位；申請錯誤`\n'
                 f'如有疑問請洽 @總召'
             )
-
-            return
 
         apply_time = func.now_time_info('whole')
         apply_info = {
@@ -60,8 +59,7 @@ class Cadre(CogExtension):
         data = cadre_cursor.find({})
 
         if data.count() == 0:
-            await ctx.send(':exclamation: There is no data in the list!')
-            return
+            return await ctx.send(':exclamation: There is no data in the list!')
 
         apply_info = str()
         for item in data:
@@ -88,9 +86,9 @@ class Cadre(CogExtension):
         data = cadre_cursor.find_one({"_id": permit_id})
 
         if not data:
-            await ctx.send(
-                f':exclamation: There exists no applicant whose id is {permit_id}!')
-            return
+            return await ctx.send(
+                f':exclamation: There exists no applicant whose id is {permit_id}!'
+            )
 
         member = await ctx.guild.fetch_member(data["_id"])
 
@@ -114,8 +112,7 @@ class Cadre(CogExtension):
         data = cadre_cursor.find_one({"_id": search_id})
 
         if not data:
-            await ctx.send(f':exclamation: There are no applicant whose Id is {search_id}!')
-            return
+            return await ctx.send(f':exclamation: There are no applicant whose Id is {search_id}!')
 
         member = await ctx.guild.fetch_member(data["_id"])
         await ctx.send(

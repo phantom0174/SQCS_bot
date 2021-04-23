@@ -22,8 +22,7 @@ class Lecture(CogExtension):
         data = lecture_list_cursor.find({})
 
         if data.count() == 0:
-            await ctx.send(':exclamation: No data!')
-            return
+            return await ctx.send(':exclamation: No data!')
 
         # improved code
         lecture_list = '\n'.join(
@@ -42,8 +41,7 @@ class Lecture(CogExtension):
         # find if already exists
         data = lecture_list_cursor.find_one({"_id": lect_week})
         if data:
-            await ctx.send('There already exists a lecture on the same day!')
-            return
+            return await ctx.send('There already exists a lecture on the same day!')
 
         lecture_info = {
             "_id": lect_week,
@@ -76,12 +74,10 @@ class Lecture(CogExtension):
         data = lecture_list_cursor.find_one({"_id": week})
 
         if not data:
-            await ctx.send(f':exclamation: There exists no lecture on week {week}!')
-            return
+            return await ctx.send(f':exclamation: There exists no lecture on week {week}!')
 
         if data["status"] == 1:
-            await ctx.send(':exclamation: The lecture has already started!')
-            return
+            return await ctx.send(':exclamation: The lecture has already started!')
 
         msg = '\n'.join(rsp["lecture"]["start"]["pt_1"]) + '\n'
         msg += f'星期 `{week}` 的講座 - `{data["name"]}` 開始了呦 \\^~^' + '\n'
@@ -186,8 +182,7 @@ class Lecture(CogExtension):
         data = lecture_list_cursor.find_one({"_id": week})
 
         if data["status"] == 0:
-            await ctx.send(':exclamation: The lecture has already ended!')
-            return
+            return await ctx.send(':exclamation: The lecture has already ended!')
 
         msg = '\n'.join(rsp["lecture"]["end"]["main"]) + '\n'
         population_level = int(round(data["population"] / 10))
@@ -207,8 +202,7 @@ class Lecture(CogExtension):
         data = lecture_event_cursor.find({}).sort("score", -1)
 
         if data.count() == 0:
-            await ctx.send(':exclamation: There are no data to show!')
-            return
+            return await ctx.send(':exclamation: There are no data to show!')
 
         data_members = str()
 

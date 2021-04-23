@@ -53,8 +53,7 @@ class Event(CogExtension):
         }
 
         if title not in logging_channel.keys():
-            await ctx.send(f'There is no such logging named {title}!')
-            return
+            return await ctx.send(f'There is no such logging named {title}!')
 
         buffer_channel = discord.utils.get(self.bot.guilds[1].text_channels, name=logging_channel[title])
         logs_json = JsonApi().get_json(title)

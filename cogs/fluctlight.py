@@ -19,11 +19,9 @@ class PersonalInfo(CogExtension):
         try:
             fluct_cursor.delete_one({"_id": member_id})
             active_log_cursor.delete_one({"_id": member_id})
-            await ctx.send(':white_check_mark: Successfully deleted!')
-            return
+            return await ctx.send(':white_check_mark: Successfully deleted!')
         except:
-            await ctx.send(':exclamation: Operation failed')
-            return
+            return await ctx.send(':exclamation: Operation failed')
 
     @fluct.command()
     async def reset(self, ctx, member_id: int):
@@ -54,11 +52,9 @@ class PersonalInfo(CogExtension):
             fluct_cursor.insert_one(default_fluctlight)
             active_log_cursor.delete_one({"_id": member_id})
             active_log_cursor.insert_one(default_log)
-            await ctx.send(':white_check_mark: Operation finished!')
-            return
+            return await ctx.send(':white_check_mark: Operation finished!')
         except:
-            await ctx.send(':exclamation: Operation failed')
-            return
+            return await ctx.send(':exclamation: Operation failed')
 
 
 def setup(bot):

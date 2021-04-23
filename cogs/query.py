@@ -19,8 +19,7 @@ class Query(CogExtension):
         data = quiz_cursor.find({})
 
         if data.count() == 0:
-            await ctx.send(':exclamation: There is no data!')
-            return
+            return await ctx.send(':exclamation: There is no data!')
 
         status = str()
         for item in data:
@@ -52,7 +51,14 @@ async def personal_info(member_id):
 
     # method used when checking a dict is empty or not
     if not data:
-        return func.create_embed('Object info', 'default', 0xe46bf9, ['Error'], ['Logging error'])
+        embed_para = [
+            'Object info',
+            'default',
+            0xe46bf9,
+            ['Error'],
+            ['Logging error']
+        ]
+        return func.create_embed(*embed_para)
 
     value_title = [
         'Object Id',
