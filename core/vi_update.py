@@ -15,7 +15,7 @@ async def guild_weekly_update(bot):
     # set-up client
     fluctlight_cursor = fluctlight_client["light-cube-info"]
     score_parameters_cursor = client["score_parameters"]
-    active_logs_cursor = client["active-logs"]
+    active_logs_cursor = fluctlight_client["active-logs"]
 
     # calculate total score, max, min score
     max_score = fluctlight_cursor.find_one({}, {"score": 1}, sort=[("score", -1)])["score"]
