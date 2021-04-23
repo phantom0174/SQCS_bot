@@ -1,5 +1,4 @@
 from discord.ext import commands
-import discord
 import asyncio
 import random
 import core.score_module as sm
@@ -18,15 +17,23 @@ class Lecture(CogExtension):
     @commands.has_any_role('總召', 'Administrator')
     async def list(self, ctx):
 
-        lecture_list_cursor = client["lecture_list"]
-        data = lecture_list_cursor.find({})
+        lect_set_cursor = client["LectureSetting"]
+        data = lect_set_cursor.find({})
 
         if data.count() == 0:
-            return await ctx.send(':exclamation: No data!')
+            return await ctx.send(':exclamation: 沒有資料！')
 
         # improved code
         lecture_list = '\n'.join(
-            map(lambda item: f'Name: {item["name"]}, Week: {item["_id"]}', data)
+            map(
+                lambda item: f'name: {item["name"]}\n'
+                             f'week: {item["week"]}\n'
+                             f'status: {item["status"]}\n'
+                             f'population: {item["population"]}\n'
+                             f'text_id: {item["text_id"]}\n'
+                             f'voice_id: {item["voice_id"]}\n',
+                data
+            )
         )
 
         await ctx.send(lecture_list)
@@ -34,66 +41,80 @@ class Lecture(CogExtension):
 
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def add(self, ctx, lect_week: int, lect_name: str):
+    async def add(self, ctx):
 
-        lecture_list_cursor = client["lecture_list"]
+        # ask for arguments
+        def check(message):
+            return message.channel == ctx.channel and message.author == ctx.author
 
-        # find if already exists
-        data = lecture_list_cursor.find_one({"_id": lect_week})
-        if data:
-            return await ctx.send('There already exists a lecture on the same day!')
+        await ctx.send(':question: 請問講座名稱是什麼呢？')
+        name = (await self.bot.wait_for('message', check=check, timeout=30)).content
 
-        lecture_info = {
-            "_id": lect_week,
-            "name": lect_name,
-            "status": 0
+        await ctx.send(':question: 請問在星期幾舉辦呢？')
+        week = (await self.bot.wait_for('message', check=check, timeout=30)).content
+
+        await ctx.send(':question: 請問使用的文字頻道id為多少呢？')
+        text_channel_id = (await self.bot.wait_for('message', check=check, timeout=30)).content
+
+        await ctx.send(':question: 請問使用的語音頻道id為多少呢？')
+        voice_channel_id = (await self.bot.wait_for('message', check=check, timeout=30)).content
+
+        # left _id for random
+        lecture_config = {
+            "name": name,
+            "week": int(week),
+            "status": False,
+            "population": 0,
+            "text_id": int(text_channel_id),
+            "voice_id": int(voice_channel_id)
         }
 
-        lecture_list_cursor.insert_one(lecture_info)
+        lect_set_cursor = client["LectureSetting"]
+        lect_set_cursor.insert_one(lecture_config)
 
-        await ctx.send(f'Lecture {lect_name}, on week {lect_week} has been added!')
+        await ctx.send(':white_check_mark: 資料建檔完畢，謝謝你的配合！')
 
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def remove(self, ctx, del_lect_week: int):
 
-        lecture_list_cursor = client["lecture_list"]
+        lect_set_cursor = client["LectureSetting"]
 
         try:
-            lecture_list_cursor.delete_one({"week": del_lect_week})
-            await ctx.send(f':white_check_mark: The lecture on week `{del_lect_week}` has been removed!')
+            lect_set_cursor.delete_one({"week": del_lect_week})
+            await ctx.send(f':white_check_mark: 星期 `{del_lect_week}` 的講座資料已被移除！')
         except Exception as e:
-            await ctx.send(f':exclamation: Error occurred when deleting lecture on week {del_lect_week}!')
+            await ctx.send(f':exclamation: 移除星期 `{del_lect_week}` 的講座資料時發生了錯誤！')
             await ctx.send(content=e, delete_after=5.0)
 
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def start(self, ctx, week: int):
 
-        lecture_list_cursor = client["lecture_list"]
-        data = lecture_list_cursor.find_one({"_id": week})
+        lect_set_cursor = client["LectureSetting"]
+        lect_config = lect_set_cursor.find_one({"week": week})
 
-        if not data:
-            return await ctx.send(f':exclamation: There exists no lecture on week {week}!')
+        if not lect_config:
+            return await ctx.send(f':exclamation: 星期 `{week}` 沒有講座！')
 
-        if data["status"] == 1:
-            return await ctx.send(':exclamation: The lecture has already started!')
+        if lect_config["status"]:
+            return await ctx.send(':exclamation: 講座已經開始了！')
 
         msg = '\n'.join(rsp["lecture"]["start"]["pt_1"]) + '\n'
-        msg += f'星期 `{week}` 的講座 - `{data["name"]}` 開始了呦 \\^~^' + '\n'
+        msg += f'星期 `{week}` 的講座 - `{lect_config["name"]}` 開始了呦 \\^~^\n'
         msg += '\n'.join(rsp["lecture"]["start"]["pt_2"])
         await ctx.send(msg)
 
         execute = {
             "$set": {
-                "status": 1
+                "status": True
             }
         }
-
-        lecture_list_cursor.update({"_id": week}, execute)
+        lect_set_cursor.update({"week": week}, execute)
 
         # delete previous special message
-        msg_logs = await ctx.channel.history(limit=200).flatten()
+        text_channel = self.bot.get_channel(lect_config["text_id"])
+        msg_logs = await text_channel.history(limit=200).flatten()
         for msg in msg_logs:
             if len(msg.content) > 0 and msg.content[0] == '&':
                 await msg.delete()
@@ -103,8 +124,7 @@ class Lecture(CogExtension):
         random.seed(func.now_time_info('hour') * 92384)
         await asyncio.sleep(random.randint(30, 180))
 
-        channel_name = lecture_list_cursor.find_one({"_id": week})["name"]
-        voice_channel = discord.utils.get(ctx.guild.voice_channels, name=channel_name)
+        voice_channel = self.bot.get_channel(lect_config["voice_id"])
 
         attendants = [member.id for member in voice_channel.members]
 
@@ -114,14 +134,14 @@ class Lecture(CogExtension):
                 "population": len(attendants)
             }
         }
-        lecture_list_cursor.update_one({"_id": week}, execute)
+        lect_set_cursor.update_one({"week": week}, execute)
 
     # lecture ans check
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def ans_check(self, ctx, *, msg):
 
-        correct_answer = msg.split(' ')
+        answer_alias = msg.split(' ')
         msg_logs = await ctx.channel.history(limit=100).flatten()
         correct_msgs = []  # correct message
 
@@ -131,7 +151,7 @@ class Lecture(CogExtension):
 
             if (not log.author.bot) and log.content[0] == '&':
                 await log.delete()
-                for ans in correct_answer:
+                for ans in answer_alias:
                     # correct answer is a subset of member answer
                     if log.content.find(ans) != -1:
                         correct_msgs.append(log)
@@ -139,27 +159,28 @@ class Lecture(CogExtension):
 
         correct_msgs.reverse()
 
+        crt_member_id_list = [crt_msg.author.id for crt_msg in correct_msgs]
+
         # add score to correct members
-        lecture_event_cursor = client["lecture_event"]
-        score_cursor = client["score_parameters"]
+        lect_ongoing_cursor = client["LectureOngoing"]
+        score_cursor = client["ScoreSetting"]
 
         score_weight = score_cursor.find_one({"_id": 0})["score_weight"]
 
         top_score = float(5)
-        for crt_msg in correct_msgs:
-            target_id = crt_msg.author.id
-            delta_score = top_score * score_weight
+        for member_id in crt_member_id_list:
+            delta_score = round(top_score * score_weight, 2)
 
-            data = lecture_event_cursor.find_one({"_id": target_id})
+            data = lect_ongoing_cursor.find_one({"_id": member_id})
 
             if not data:
                 member_info = {
-                    "_id": target_id,
+                    "_id": member_id,
                     "score": delta_score,
                     "count": 1
                 }
 
-                lecture_event_cursor.insert_one(member_info)
+                lect_ongoing_cursor.insert_one(member_info)
             else:
                 execute = {
                     "$inc": {
@@ -167,9 +188,9 @@ class Lecture(CogExtension):
                         "count": 1
                     }
                 }
-                lecture_event_cursor.update_one({"_id": target_id}, execute)
+                lect_ongoing_cursor.update_one({"_id": member_id}, execute)
 
-            await sm.active_log_update(target_id)
+            await sm.active_log_update(member_id)
 
             if top_score > 1:
                 top_score -= 1
@@ -178,33 +199,33 @@ class Lecture(CogExtension):
     @commands.has_any_role('總召', 'Administrator')
     async def end(self, ctx, week: int):
 
-        lecture_list_cursor = client["lecture_list"]
-        data = lecture_list_cursor.find_one({"_id": week})
+        lect_set_cursor = client["LectureSetting"]
+        lect_config = lect_set_cursor.find_one({"week": week})
 
-        if data["status"] == 0:
-            return await ctx.send(':exclamation: The lecture has already ended!')
+        if not lect_set_cursor["status"]:
+            return await ctx.send(':exclamation: 講座已經結束了！')
 
         msg = '\n'.join(rsp["lecture"]["end"]["main"]) + '\n'
-        population_level = int(round(data["population"] / 10))
+        population_level = int(round(lect_config["population"] / 10))
         msg += rsp["lecture"]["end"]["reactions"][population_level]
         await ctx.send(msg)
         execute = {
             "$set": {
-                "status": 0
+                "status": False
             }
         }
-        lecture_list_cursor.update_one({"_id": week}, execute)
+        lect_set_cursor.update_one({"week": week}, execute)
 
         # adding scores and show lecture final data
-        fl_cursor = fluctlight_client["light-cube-info"]
+        fl_cursor = fluctlight_client["MainFluctlights"]
 
-        lecture_event_cursor = client["lecture_event"]
-        data = lecture_event_cursor.find({}).sort("score", -1)
+        lect_ongoing_cursor = client["LectureOngoing"]
+        answered_member_list = lect_ongoing_cursor.find({}).sort("score", -1)
 
-        if data.count() == 0:
+        if answered_member_list.count() == 0:
             return await ctx.send(':exclamation: There are no data to show!')
 
-        data_members = str()
+        member_rank_list = str()
 
         ranking_medal_prefix = {
             0: ':first_place:',
@@ -212,14 +233,15 @@ class Lecture(CogExtension):
             2: ':third_place:'
         }
 
-        for rank, member in enumerate(data):
+        for rank, member in enumerate(answered_member_list):
             medal = ranking_medal_prefix.get(rank, ':medal:')
+            member_name = func.get_member_nick_name(ctx.guild, member["_id"])
 
-            member_name = (await ctx.guild.fetch_member(member["_id"])).nick
-            if member_name is None:
-                member_name = (await ctx.guild.fetch_member[member["_id"]]).name
-
-            data_members += f'{medal}{member_name}:: Score: {member["score"]}, Answer Count: {member["count"]}\n'
+            member_rank_list += (
+                f'{medal}{member_name} | '
+                f'Score: {member["score"]}, '
+                f'Answer Count: {member["count"]}\n'
+            )
 
             execute = {
                 "$inc": {
@@ -234,17 +256,16 @@ class Lecture(CogExtension):
             'default',
             0x42fcff,
             ['Lecture final info'],
-            [data_members]
+            [member_rank_list]
         ]
 
         await ctx.send(embed=func.create_embed(*embed_para))
 
-        lecture_event_cursor.delete_many({})
+        lect_ongoing_cursor.delete_many({})
 
         # kick member from the voice channel
         countdown_duration = 60
-        channel_name = lecture_list_cursor.find_one({"_id": week})["name"]
-        voice_channel = discord.utils.get(ctx.guild.voice_channels, name=channel_name)
+        voice_channel = self.bot.get_channel(lect_config["voice_id"])
 
         def content(s):
             return f':exclamation: 所有成員將在 {s} 秒後被移出 {voice_channel.name}'

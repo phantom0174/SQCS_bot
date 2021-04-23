@@ -130,3 +130,11 @@ def score_weight_update(t_score, avr_score, max_score, min_score):
     pt1 = float(1/2)
     pt2 = float(3/(2*(1 + pow(math.e, -5 * alpha + math.log(2)))))
     return pt1 + pt2
+
+
+async def get_member_nick_name(guild, member_id):
+    member_name = (await guild.fetch_member(member_id)).nick
+    if member_name is None:
+        member_name = (await guild.fetch_member[member_id]).name
+
+    return member_name
