@@ -6,6 +6,7 @@ from pymongo import MongoClient
 
 class DataBase(CogExtension):
     @commands.group()
+    @commands.has_any_role('總召', 'Administrator')
     async def db(self, ctx):
         pass
 
