@@ -264,7 +264,7 @@ async def quiz_end(bot):
     await main_channel.set_permissions(guild.default_role, send_messages=False)
 
     # list the winners
-    data = quiz_cursor.find({"correct": {"$eq": 1}})
+    data = quiz_cursor.find({"correct": {"$eq": True}})
 
     winners = str()
     for winner in data:
