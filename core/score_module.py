@@ -1,25 +1,29 @@
 from core.setup import fluctlight_client
+
+
+"""
 from core.classes import JsonApi
 import math
 import asyncio
 import threading
 import time
+"""
 
 
 async def active_log_update(member_id):
-    fluctlight_cursor = fluctlight_client["light-cube-info"]
+    fluctlight_cursor = fluctlight_client["MainFluctlights"]
 
     # week active update
-    data = fluctlight_cursor.find_one({"_id": member_id}, {"week_active": 1})
-    if data["week_active"] == 0:
+    data = fluctlight_cursor.find_one({"_id": member_id}, {"week_active": True})
+    if not data["week_active"]:
         execute = {
             "$set": {
-                "week_active": 1
+                "week_active": True
             }
         }
         fluctlight_cursor.update_one({"_id": member_id}, execute)
 
-
+"""
 async def hurt(member_id, delta_du):
     fluct_cursor = fluctlight_client["light-cube-info"]
     member_fluctlight = fluct_cursor.find_one({"_id": member_id})
@@ -76,3 +80,4 @@ def regeneration(member_id):
 
         # wait 1 tic
         time.sleep(10)
+"""
