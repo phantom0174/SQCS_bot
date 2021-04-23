@@ -15,18 +15,15 @@ class Query(CogExtension):
     @commands.has_any_role('總召', 'Administrator')
     async def quiz(self, ctx):
 
-        quiz_cursor = client["quiz_event"]
-        data = quiz_cursor.find({})
+        quiz_ongoing_cursor = client["QuizOngoing"]
+        data = quiz_ongoing_cursor.find({})
 
         if data.count() == 0:
             return await ctx.send(':exclamation: There is no data!')
 
         status = str()
         for item in data:
-            member_name = (await ctx.guild.fetch_member(item["_id"])).nick
-            if member_name is None:
-                member_name = (await ctx.guild.fetch_member(item["_id"])).name
-
+            member_name = await func.get_member_nick_name(ctx.guild, item["_id"])
             status += f'{member_name}: {item["correct"]}\n'
 
             if len(status) > 1600:
@@ -46,8 +43,8 @@ class Query(CogExtension):
 
 
 async def personal_info(member_id):
-    fluctlight_cursor = fluctlight_client["light-cube-info"]
-    data = fluctlight_cursor.find_one({"_id": member_id})
+    fluct_cursor = fluctlight_client["MainFluctlights"]
+    data = fluct_cursor.find_one({"_id": member_id})
 
     # method used when checking a dict is empty or not
     if not data:
@@ -61,21 +58,19 @@ async def personal_info(member_id):
         return func.create_embed(*embed_para)
 
     value_title = [
-        'Object Id',
+        'Member id',
+        'Name',
         'Score',
-        'Durability',
-        'Object Control Authority',
-        'System Control Authority',
+        'Weekly activeness',
         'Contribution',
-        'Levelling Index',
+        'Levelling index',
         'Deep Freeze'
     ]
     obj_info = [
         data["_id"],
+        data["name"],
         data["score"],
-        data["du"],
-        data["oc_auth"],
-        data["sc_auth"],
+        data["week_active"],
         data["contrib"],
         data["lvl_ind"],
         data["deep_freeze"]
