@@ -11,6 +11,9 @@ class DataBase(CogExtension):
 
     @db.command()
     async def copy(self, ctx, ori_db_name: str, ori_coll_name: str, target_db_name: str, target_coll_name: str):
+        if ori_db_name == '' or ori_coll_name == '' or target_db_name == '' or target_coll_name == '':
+            return await ctx.send(':exclamation: Four arguments must not be null string')
+
         # origin
         ori_db = MongoClient(link)[ori_db_name]
         ori_coll_cursor = ori_db[ori_coll_name]
@@ -31,6 +34,9 @@ class DataBase(CogExtension):
 
     @db.command()
     async def move(self, ctx, ori_db_name: str, ori_coll_name: str, target_db_name: str, target_coll_name: str):
+        if ori_db_name == '' or ori_coll_name == '' or target_db_name == '' or target_coll_name == '':
+            return await ctx.send(':exclamation: Four arguments must not be null string')
+
         # origin
         ori_db = MongoClient(link)[ori_db_name]
         ori_coll_cursor = ori_db[ori_coll_name]
