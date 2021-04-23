@@ -2,6 +2,7 @@ from discord.ext import commands
 import time
 from core.classes import CogExtension
 from core.setup import client, fluctlight_client
+import core.functions as func
 
 
 class PersonalInfo(CogExtension):
@@ -13,48 +14,66 @@ class PersonalInfo(CogExtension):
 
     @fluct.command()
     async def delete(self, ctx, member_id: int):
-        fluct_cursor = fluctlight_client["light-cube-info"]
-        active_log_cursor = fluctlight_client["active-logs"]
+        cursors = [
+            fluctlight_client["MainFluctlights"],
+            fluctlight_client["ViceFluctlights"],
+            fluctlight_client["ActiveLogs"]
+        ]
 
-        try:
-            fluct_cursor.delete_one({"_id": member_id})
-            active_log_cursor.delete_one({"_id": member_id})
-            return await ctx.send(':white_check_mark: Successfully deleted!')
-        except:
-            return await ctx.send(':exclamation: Operation failed')
+        for cursor in cursors:
+            try:
+                cursor.delete_one({"_id": member_id})
+            except:
+                return await ctx.send(f':exclamation: Error when manipulating cursor {cursor}')
+
+        await ctx.send(':white_check_mark: Operation finished!')
 
     @fluct.command()
     async def reset(self, ctx, member_id: int):
-        fluct_cursor = fluctlight_client["light-cube-info"]
-        active_log_cursor = fluctlight_client["active-logs"]
+        main_fluct_cursor = fluctlight_client["MainFluctlights"]
+        vice_fluct_cursor = fluctlight_client["ViceFluctlights"]
+        act_cursor = fluctlight_client["active-logs"]
 
-        default_fluctlight = {
+        default_main_fluctlight = {
             "_id": member_id,
+            "name": await func.get_member_nick_name(ctx.guild, member_id),
             "score": 0,
+            "week_active": False,
+            "contrib": 0,
+            "lvl_ind": 0,
+            "deep_freeze": False
+        }
+        default_vice_fluctlight = {
+            "_id": member_id,
             "du": 0,
+            "mdu": 0,
             "oc_auth": 0,
             "sc_auth": 0,
-            "lvl_ind": 0,
-            "mdu": 0,
-            "odu": 0,
-            "odu_time": time.time(),
-            "contrib": 0,
-            "week_active": 0,
-            "deep_freeze": 0
         }
-        default_log = {
+        default_act = {
             "_id": member_id,
             "log": ''
         }
 
         try:
-            fluct_cursor.delete_one({"_id": member_id})
-            fluct_cursor.insert_one(default_fluctlight)
-            active_log_cursor.delete_one({"_id": member_id})
-            active_log_cursor.insert_one(default_log)
-            return await ctx.send(':white_check_mark: Operation finished!')
+            main_fluct_cursor.delete_one({"_id": member_id})
+            main_fluct_cursor.insert_one(default_main_fluctlight)
         except:
-            return await ctx.send(':exclamation: Operation failed')
+            await ctx.send(':exclamation: Error when manipulating collection MainFluctlights')
+
+        try:
+            vice_fluct_cursor.delete_one({"_id": member_id})
+            vice_fluct_cursor.insert_one(default_vice_fluctlight)
+        except:
+            await ctx.send(':exclamation: Error when manipulating collection ViceFluctlights')
+
+        try:
+            act_cursor.delete_one({"_id": member_id})
+            act_cursor.insert_one(default_act)
+        except:
+            await ctx.send(':exclamation: Error when manipulating collection ActiveLogs')
+
+        await ctx.send(':white_check_mark: Operation finished!')
 
 
 def setup(bot):
