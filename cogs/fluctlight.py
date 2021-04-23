@@ -1,7 +1,6 @@
 from discord.ext import commands
-import time
 from core.classes import CogExtension
-from core.setup import client, fluctlight_client
+from core.setup import fluctlight_client
 import core.functions as func
 
 
@@ -24,7 +23,7 @@ class PersonalInfo(CogExtension):
             try:
                 cursor.delete_one({"_id": member_id})
             except:
-                return await ctx.send(f':exclamation: Error when manipulating cursor {cursor}')
+                await ctx.send(f':exclamation: Error when manipulating cursor {cursor}')
 
         await ctx.send(':white_check_mark: Operation finished!')
 
