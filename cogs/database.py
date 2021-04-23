@@ -1,6 +1,6 @@
 from discord.ext import commands
 from core.classes import CogExtension
-from core.setup import link
+from core.setup import link, fluctlight_client
 from pymongo import MongoClient
 
 
@@ -9,6 +9,22 @@ class DataBase(CogExtension):
     @commands.has_any_role('總召', 'Administrator')
     async def db(self, ctx):
         pass
+
+    @db.command()
+    async def refresh_db(self, ctx):
+        cursors = [
+            fluctlight_client["MainFluctlights"],
+            fluctlight_client["ViceFluctlights"],
+            fluctlight_client["ActiveLogs"]
+        ]
+        for cursor in cursors:
+            data = cursor.find({})
+            members_id = [member.id for member in ctx.guild.members]
+            for datum in data:
+                if datum["_id"] not in members_id:
+                    cursor.delete_one({"_id": datum["_id"]})
+
+        await ctx.send(':white_check_mark: Operation finished!')
 
     @db.command()
     async def copy(self, ctx, ori_db_name: str, ori_coll_name: str, target_db_name: str, target_coll_name: str):
