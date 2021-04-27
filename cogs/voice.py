@@ -58,7 +58,7 @@ class Voice(CogExtension):
     async def on_voice_state_update(self, member, before, after):
         voice_in_protect = JsonApi().get_json('DynamicSetting')["voice_in_protect"]
 
-        if after.channel is not None and after.channel in voice_in_protect:
+        if after.channel is not None and after.channel.id in voice_in_protect:
             await member.move_to(None)
 
 
