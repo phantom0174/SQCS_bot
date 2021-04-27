@@ -1,6 +1,6 @@
 # 📜 ChangeLog
 
-`version 1.21.4.23`
+`version 1.22.4.27`
 
 ```markdown
 - 2020/11/18: Bot 24/7 online.
@@ -24,4 +24,5 @@
 - 2021/04/12: Add NT module.
 - 2021/04/14: Detach logging system from SQCS Working Bot.
 - 2021/04/23: Database reconstruct.
+- 2021/04/27: Add voice and text channel tools.
 ```
