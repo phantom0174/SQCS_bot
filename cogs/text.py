@@ -11,7 +11,7 @@ class Text(CogExtension):
 
     @text.command()
     async def trans(self, ctx, start_id: int, end_id: int, to_channel: discord.TextChannel):
-        msg_logs = await ctx.channel.history(limit=100).flatten()
+        msg_logs = await ctx.channel.history(limit=500).flatten()
         msg_logs.reverse()
 
         interval = bool(False)
