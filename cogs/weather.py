@@ -3,6 +3,11 @@ import requests
 import os
 from core.classes import CogExtension
 
+"""
+The extension is for school h.w. of phantom1074
+"""
+
+
 data_prefix = {
   "0": "天氣描述",
   "1": "最高溫度",

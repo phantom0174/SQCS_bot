@@ -151,10 +151,9 @@ async def lvl_ind_detect(bot, fluctlight_cursor):
             user = await bot.guilds[0].fetch_member(member["_id"])
             await user.send(f'Your levelling index has reached danger range!({member["lvl_ind"]});')
 
-            member_name = await func.get_member_nick_name(bot.guilds[0], user.id)
             member_info = {
                 "_id": user.id,
-                "name": member_name,
+                "name": user.display_name,
                 "contrib": member["contrib"],
                 "lvl_ind": member["lvl_ind"]
             }

@@ -1,8 +1,5 @@
 from discord.ext import commands
-from core.setup import client, rsp, fluctlight_client
-import core.score_module as sm
 from core.classes import CogExtension
-import asyncio
 
 
 class Main(CogExtension):
@@ -85,72 +82,6 @@ class Main(CogExtension):
                 return await ctx.send(f'{member.name} {member.id}')
 
             await ctx.send(f'{member.nick} {member.id}')
-
-    @commands.command()
-    @commands.has_any_role('總召', 'Administrator')
-    async def remedy(self, ctx, member_id: int, delta_value: float):
-        fl_cursor = fluctlight_client["MainFluctlights"]
-        score_set_cursor = client["ScoreSetting"]
-        score_weight = score_set_cursor.find_one({"_id": 0})["score_weight"]
-
-        try:
-            execute = {
-                "$inc": {
-                    "score": round(delta_value * score_weight, 2)
-                }
-            }
-            fl_cursor.update_one({"_id": member_id}, execute)
-            await sm.active_log_update(member_id)
-
-            member = ctx.guild.fetch_member(member_id)
-            msg = f'耶！你被管理員加了 {delta_value} 分！' + '\n'
-            msg += rsp["main"]["mibu"]["pt_1"]
-            await member.send(msg)
-        except:
-            await ctx.send(f':exclamation: Error when remedying {member_id}, value: {delta_value}!')
-
-        await ctx.send(':white_check_mark: Operation finished!')
-
-    # active percentage
-    @commands.command()
-    @commands.has_any_role('總召', 'Administrator')
-    async def active_query(self, ctx):
-        fluct_cursor = fluctlight_client["MainFluctlights"]
-        week_active_match = {
-            "deep_freeze": {
-                "$ne": True
-            },
-            "week_active": {
-                "$ne": False
-            }
-        }
-        week_active_count = fluct_cursor.find(week_active_match).count()
-        countable_member_count = fluct_cursor.find({"deep_freeze": {"$ne": 1}}).count()
-
-        await ctx.send(
-            f':scroll: Weekly activeness until now is {(week_active_count / countable_member_count) * 100} %\n'
-            f'Active: {week_active_count}, Total: {countable_member_count}'
-        )
-
-    @commands.command()
-    @commands.has_any_role('總召', 'Administrator')
-    async def rmvc(self, ctx, channel_id: int, countdown: int):  # remove member in voice channel
-        countdown_duration = countdown
-        voice_channel = self.bot.get_channel(channel_id)
-
-        def content(s):
-            return f':exclamation: 所有成員將在 {s} 秒後被移出 {voice_channel.name}'
-
-        message = await ctx.send(content(countdown_duration))
-        while countdown_duration > 0:
-            await message.edit(content=content(countdown_duration))
-            await asyncio.sleep(1)
-            countdown_duration -= 1
-
-        await message.delete()
-
-        for member in voice_channel.members:
-            await member.move_to(None)
 
 
 def setup(bot):

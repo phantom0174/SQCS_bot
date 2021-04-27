@@ -22,23 +22,28 @@ class React(CogExtension):
         await asyncio.sleep(60)
 
         msg = '\n'.join(rsp["join"]["hackmd_read"])
-        await member.send(msg)
+        reaction_msg = await member.send(msg)
+        await reaction_msg.add_reaction('⭕')
+        await reaction_msg.add_reaction('❌')
 
-        def check(message):
-            return message.channel == member.dm_channel and message.author == member
+        def check(reaction, user):
+            return reaction.message.id == reaction_msg.id and user.id == member.id
 
+        deep_freeze_status = bool()
         try:
-            deep_freeze_status = (await self.bot.wait_for('message', check=check, timeout=60.0)).content
+            reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=60.0)
 
-            if deep_freeze_status == 'y':
+            if reaction.emoji == '⭕':
                 msg = '\n'.join(rsp["join"]["df_1"])
                 deep_freeze_status = True
-            elif deep_freeze_status == 'n':
+            elif reaction.emoji == '❌':
                 msg = '\n'.join(rsp["join"]["df_0"])
                 deep_freeze_status = False
-            else:
-                msg = '\n'.join(rsp["join"]["invalid_syntax"])
-                deep_freeze_status = False
+
+            # remember to delete the invalid_syntax part of humanity ext.
+            # else:
+            #     msg = '\n'.join(rsp["join"]["invalid_syntax"])
+            #     deep_freeze_status = False
         except asyncio.TimeoutError:
             msg = '\n'.join(rsp["join"]["time_out"])
             deep_freeze_status = False
@@ -57,7 +62,7 @@ class React(CogExtension):
 
         default_main_fluctlight = {
             "_id": member.id,
-            "name": await func.get_member_nick_name(self.bot.guilds[0], member.id),
+            "name": member.display_name,
             "score": 0,
             "week_active": False,
             "contrib": 0,

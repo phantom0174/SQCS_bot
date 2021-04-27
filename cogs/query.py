@@ -41,6 +41,26 @@ class Query(CogExtension):
     async def member_data(self, ctx, target_id: int):
         await ctx.author.send(embed=(await personal_info(target_id)))
 
+    # guild active percentage
+    @query.command()
+    async def guild_active(self, ctx):
+        fluct_cursor = fluctlight_client["MainFluctlights"]
+        week_active_match = {
+            "deep_freeze": {
+                "$ne": True
+            },
+            "week_active": {
+                "$ne": False
+            }
+        }
+        week_active_count = fluct_cursor.find(week_active_match).count()
+        countable_member_count = fluct_cursor.find({"deep_freeze": {"$ne": 1}}).count()
+
+        await ctx.send(
+            f':scroll: Weekly activeness until now is {(week_active_count / countable_member_count) * 100} %\n'
+            f'Active: {week_active_count}, Total: {countable_member_count}'
+        )
+
 
 async def personal_info(member_id):
     fluct_cursor = fluctlight_client["MainFluctlights"]

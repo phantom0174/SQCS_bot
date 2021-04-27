@@ -15,7 +15,7 @@ class Cadre(CogExtension):
     async def apply(self, ctx, cadre: str):
         appl = ctx.author  # applicant
 
-        if ctx.channel.name != '📝幹部申請區':
+        if ctx.channel.id != 774794670034124850:
             return
 
         if cadre not in ['副召', '網管', '議程', '公關', '美宣', '學術']:
@@ -37,7 +37,7 @@ class Cadre(CogExtension):
         apply_time = func.now_time_info('whole')
         apply_info = {
             "_id": appl.id,
-            "name": await func.get_member_nick_name(ctx.guild, appl.id),
+            "name": appl.display_name,
             "apply_cadre": cadre,
             "apply_time": apply_time
         }
@@ -46,10 +46,10 @@ class Cadre(CogExtension):
 
         await appl.send(
             f':white_check_mark: 我收到你的申請了！請耐心等待\n'
-            f'申請人名字: {appl.name}, '
-            f'申請人id: {appl.id}, '
-            f'申請職位: {cadre}, '
-            f'申請時間: {apply_time}'
+            f'申請人名字: `{appl.display_name}`,\n'
+            f'申請人id: `{appl.id}`,\n'
+            f'申請職位: `{cadre}`,\n'
+            f'申請時間: `{apply_time}`'
         )
 
     @ca.command()

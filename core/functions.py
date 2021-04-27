@@ -128,6 +128,6 @@ def score_weight_update(t_score, avr_score, max_score, min_score):
 async def get_member_nick_name(guild, member_id):
     member_name = (await guild.fetch_member(member_id)).nick
     if member_name is None:
-        member_name = (await guild.fetch_member[member_id]).name
+        member_name = (await guild.fetch_member(member_id)).name
 
     return member_name
