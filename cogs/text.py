@@ -9,6 +9,19 @@ class Text(CogExtension):
     async def text(self, ctx):
         pass
 
+    # delete message
+    @text.command()
+    @commands.has_any_role('總召', 'Administrator')
+    async def clear(self, ctx, msg_id: int):
+        find = bool(False)
+        while not find:
+            msg_logs = await ctx.channel.history(limit=50).flatten()
+            for msg in msg_logs:
+                await msg.delete()
+                if msg.id == msg_id:
+                    find = bool(True)
+                    break
+
     @text.command()
     async def trans(self, ctx, start_id: int, end_id: int, to_channel: discord.TextChannel):
         msg_logs = await ctx.channel.history(limit=500).flatten()

@@ -18,36 +18,6 @@ class Main(CogExtension):
 
         await ctx.send(':white_check_mark: Operation finished!')
 
-    # delete message
-    @commands.command()
-    @commands.has_any_role('總召', 'Administrator')
-    async def clear(self, ctx, msg_id: int):
-
-        find = bool(False)
-        while not find:
-            msg_logs = await ctx.channel.history(limit=50).flatten()
-            for msg in msg_logs:
-                await msg.delete()
-                if msg.id == msg_id:
-                    find = bool(True)
-                    break
-
-    @commands.command()
-    async def msg_repeat(self, ctx, *, msg):
-
-        re_msg = msg.split('\n')
-        for log in re_msg:
-            await ctx.send(log)
-
-    # member check
-    @commands.command()
-    @commands.has_any_role('總召', 'Administrator')
-    async def member_check(self, ctx):
-
-        await ctx.send('The result can only be seen at the console!')
-        for member in ctx.guild.members:
-            print(member)
-
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
     async def findvname(self, ctx, search_via_name: str):
