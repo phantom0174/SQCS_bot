@@ -40,6 +40,7 @@ class Voice(CogExtension):
 
         dyn_json["voice_in_protect"].append(channel_id)
         JsonApi().put_json('DynamicSetting', dyn_json)
+        await ctx.send(':white_check_mark: Operation finished!')
 
     @voice.command()
     async def protect_remove(self, ctx, channel_id: int):
@@ -53,6 +54,7 @@ class Voice(CogExtension):
 
         dyn_json["voice_in_protect"].remove(channel_id)
         JsonApi().put_json('DynamicSetting', dyn_json)
+        await ctx.send(':white_check_mark: Operation finished!')
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
