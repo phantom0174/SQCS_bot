@@ -29,6 +29,7 @@ class Voice(CogExtension):
             await member.move_to(None)
 
     @voice.command()
+    @commands.has_any_role('總召', 'Administrator')
     async def protect_add(self, ctx, channel_id: int):
         dyn_json = JsonApi().get_json('DynamicSetting')
 
@@ -43,6 +44,7 @@ class Voice(CogExtension):
         await ctx.send(':white_check_mark: Operation finished!')
 
     @voice.command()
+    @commands.has_any_role('總召', 'Administrator')
     async def protect_remove(self, ctx, channel_id: int):
         dyn_json = JsonApi().get_json('DynamicSetting')
 
