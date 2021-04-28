@@ -119,6 +119,7 @@ class Cadre(CogExtension):
         )
 
     @ca.command()
+    @commands.has_any_role('總召', 'Administrator')
     async def remove(self, ctx, delete_id: int):
 
         cadre_cursor = client["Cadre"]

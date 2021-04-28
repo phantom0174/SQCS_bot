@@ -30,28 +30,54 @@ class Voice(CogExtension):
 
     @voice.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def protect_add(self, ctx, channel_id: int):
+    async def norm(self, ctx, channel_id: int, mode: int):
+        protect_target_channel = ctx.guild.get_channel(channel_id)
+        await protect_target_channel.set_permissions(ctx.guild.default_role, connect=bool(mode))
+
+    @voice.command()
+    @commands.has_any_role('總召', 'Administrator')
+    async def collect_on(self, ctx, channel_id: int):
+        target_channel = ctx.guild.get_channel(channel_id)
+        if target_channel is None:
+            return await ctx.send(
+                ':exclamation: There exists no such channel'
+            )
+
         dyn_json = JsonApi().get_json('DynamicSetting')
 
         if channel_id in dyn_json["voice_in_protect"]:
             return await ctx.send(
-                ':exclamation: The channel is already in protection;\n'
-                'or there exists no channel with this id'
+                f':exclamation: {target_channel.name} is already in collect mode'
             )
 
         dyn_json["voice_in_protect"].append(channel_id)
         JsonApi().put_json('DynamicSetting', dyn_json)
+        for member in ctx.guild.members:
+            if member.voice is None:
+                continue
+
+            if member.voice.channel != target_channel:
+                try:
+                    await member.move_to(target_channel)
+                except:
+                    pass
+
         await ctx.send(':white_check_mark: Operation finished!')
 
     @voice.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def protect_remove(self, ctx, channel_id: int):
+    async def collect_off(self, ctx, channel_id: int):
+        target_channel = ctx.guild.get_channel(channel_id)
+        if target_channel is None:
+            return await ctx.send(
+                ':exclamation: There exists no such channel'
+            )
+
         dyn_json = JsonApi().get_json('DynamicSetting')
 
         if channel_id not in dyn_json["voice_in_protect"]:
             return await ctx.send(
-                ':exclamation: The channel is already out of protection;\n'
-                'or there exists no channel with this id'
+                f':exclamation: {target_channel.name} is already out of collect mode'
             )
 
         dyn_json["voice_in_protect"].remove(channel_id)
@@ -62,8 +88,8 @@ class Voice(CogExtension):
     async def on_voice_state_update(self, member, before, after):
         voice_in_protect = JsonApi().get_json('DynamicSetting')["voice_in_protect"]
 
-        if after.channel is not None and after.channel.id in voice_in_protect:
-            await member.move_to(None)
+        if before.channel is not None and after.channel != before.channel and before.channel.id in voice_in_protect:
+            await member.move_to(before.channel)
 
 
 def setup(bot):
