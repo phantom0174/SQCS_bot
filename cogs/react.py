@@ -2,7 +2,7 @@ from discord.ext import commands
 import asyncio
 import time
 from core.setup import rsp, fluctlight_client
-import core.functions as func
+from core.functions import Time
 from core.classes import CogExtension, JsonApi
 
 
@@ -14,7 +14,7 @@ class React(CogExtension):
         if (member.id in nts) or member.bot:
             return
 
-        time_status = await func.get_time_title(func.now_time_info('hour'))
+        time_status = await Time.get_range(Time.get_info('hour'))
 
         msg = '\n'.join(rsp["join"]["opening"][time_status]) + '\n'
         msg += '\n'.join(rsp["join"]["opening"]["main"])
@@ -26,8 +26,8 @@ class React(CogExtension):
         await reaction_msg.add_reaction('⭕')
         await reaction_msg.add_reaction('❌')
 
-        def check(reaction, user):
-            return reaction.message.id == reaction_msg.id and user.id == member.id
+        def check(check_reaction, check_user):
+            return check_reaction.message.id == reaction_msg.id and check_user.id == member.id
 
         deep_freeze_status = bool()
         try:

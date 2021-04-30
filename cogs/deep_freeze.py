@@ -1,7 +1,7 @@
 from discord.ext import commands
 from core.classes import CogExtension
 from core.setup import fluctlight_client
-import core.functions as func
+from core.functions import DiscordExt
 
 
 class DeepFreeze(CogExtension):
@@ -44,7 +44,7 @@ class DeepFreeze(CogExtension):
 
         member_list = str()
         for member in data:
-            member_name = await func.get_member_nick_name(ctx.guild, member["_id"])
+            member_name = await DiscordExt.get_member_nick_name(ctx.guild, member["_id"])
 
             member_list += member_name + '\n'
 

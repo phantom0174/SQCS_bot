@@ -1,7 +1,7 @@
 from discord.ext import commands
 import discord
 from core.setup import client, rsp, fluctlight_client
-import core.functions as func
+from core.functions import Time, DiscordExt
 import core.score_module as sm
 from core.vi_update import guild_weekly_update
 from core.classes import CogExtension
@@ -76,7 +76,7 @@ class Quiz(CogExtension):
         }
         quiz_set_cursor.update_one({"_id": member_id}, execute)
 
-        member_name = await func.get_member_nick_name(ctx.guild, member_id)
+        member_name = await DiscordExt.get_member_nick_name(ctx.guild, member_id)
         await ctx.send(f"Member {member_name}'s correctness has been set as {new_result}!")
 
     @quiz.command()
@@ -192,7 +192,7 @@ async def quiz_start(bot):
     msg += '\n'.join(rsp["quiz"]["answer_tut"]) + '\n'
     msg += '\n'.join(rsp["quiz"]["start"]["pt_2"])
     await main_channel.send(msg)
-    await main_channel.send(f'活動開始於 {func.now_time_info("whole")}')
+    await main_channel.send(f'活動開始於 {Time.get_info("whole")}')
 
     question_link = quiz_data["qns_link"]
     if question_link != '':
@@ -250,7 +250,7 @@ async def quiz_end(bot):
     msg += f'我這次有 {round((attend_count / countable_member_count) * 100, 1)} 分飽！\n'
     msg += rsp["quiz"]["end"]["reactions"][quiz_attend_level]
     await main_channel.send(msg)
-    await main_channel.send(f':stopwatch: 活動結束於 {func.now_time_info("whole")}')
+    await main_channel.send(f':stopwatch: 活動結束於 {Time.get_info("whole")}')
 
     if answer_link != '':
         await main_channel.send(
@@ -265,7 +265,7 @@ async def quiz_end(bot):
 
     winners = str()
     for winner in data:
-        winner_name = await func.get_member_nick_name(bot.gulids[0], winner["_id"])
+        winner_name = await DiscordExt.get_member_nick_name(bot.gulids[0], winner["_id"])
         winners += f'{winner_name}\n'
 
     if winners == '':
@@ -280,7 +280,7 @@ async def quiz_end(bot):
         ['Winner'],
         [winners]
     ]
-    await main_channel.send(embed=func.create_embed(*embed_para))
+    await main_channel.send(embed=DiscordExt.create_embed(*embed_para))
 
     await guild_weekly_update(bot)
 

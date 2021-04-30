@@ -1,7 +1,7 @@
 import statistics
 import discord
 from core.setup import client, fluctlight_client
-import core.functions as func
+from core.functions import Time, FluctExt
 
 
 # main function
@@ -51,11 +51,11 @@ async def guild_weekly_update(bot):
     week_score_log = list(score_set_cursor.find_one({"_id": 0})["week_score_log"])
     avr_score_log = float(statistics.mean(week_score_log))
 
-    new_weight = func.score_weight_update(total_score, avr_score_log, max_score, min_score)
+    new_weight = FluctExt.score_weight_update(total_score, avr_score_log, max_score, min_score)
     score_set_cursor.update_one({"_id": 0}, {"$set": {"score_weight": new_weight}})
 
     report_channel = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-report')
-    await report_channel.send(f'[Auto]Very important update. {func.now_time_info("whole")}')
+    await report_channel.send(f'[Auto]Very important update. {Time.get_info("whole")}')
 
 
 # vice functions
@@ -128,7 +128,7 @@ async def lvl_ind_update(fluctlight_cursor, active_logs_cursor, avr_contrib):
 
         member_week_count = len(member_active_logs["log"])
         active_logs = member_active_logs["log"]
-        delta_lvl_ind = func.lvl_ind_calc(
+        delta_lvl_ind = FluctExt.lvl_ind_calc(
             active_logs,
             member_week_count,
             member["contrib"],

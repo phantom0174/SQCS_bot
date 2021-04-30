@@ -1,6 +1,5 @@
-import discord
 from discord.ext import commands
-import core.functions as func
+from core.functions import Time
 from core.classes import CogExtension, JsonApi
 
 
@@ -29,7 +28,7 @@ class Event(CogExtension):
             f'[{message}]\n'
         )
 
-        full_log = f'[cmd exec]{log_msg}[{func.now_time_info("whole")}]'
+        full_log = f'[cmd exec]{log_msg}[{Time.get_info("whole")}]'
 
         log_json = JsonApi().get_json('CmdLogging')
         log_json['logs'].append(full_log)

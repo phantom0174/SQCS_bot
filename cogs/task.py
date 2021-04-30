@@ -1,5 +1,5 @@
 from core.setup import client
-import core.functions as func
+from core.functions import Time
 from cogs.quiz import quiz_start, quiz_end
 import discord
 from discord.ext import tasks
@@ -25,12 +25,12 @@ class Task(CogExtension):
 
         quiz_status = self.quiz_set_cursor.find_one({"_id": 0})["event_status"]
 
-        if func.now_time_info('date') == 1 and func.now_time_info('hour') >= 6 and not quiz_status:
+        if Time.get_info('date') == 1 and Time.get_info('hour') >= 6 and not quiz_status:
             await quiz_start(self.bot)
-            await report_channel.send(f'[AUTO QUIZ START][{func.now_time_info("whole")}]')
-        elif func.now_time_info('date') == 7 and func.now_time_info('hour') >= 23 and quiz_status:
+            await report_channel.send(f'[AUTO QUIZ START][{Time.get_info("whole")}]')
+        elif Time.get_info('date') == 7 and Time.get_info('hour') >= 23 and quiz_status:
             await quiz_end(self.bot)
-            await report_channel.send(f'[AUTO QUIZ END][{func.now_time_info("whole")}]')
+            await report_channel.send(f'[AUTO QUIZ END][{Time.get_info("whole")}]')
 
     @tasks.loop(minutes=5)
     async def nt_auto(self):

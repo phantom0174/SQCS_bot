@@ -1,6 +1,6 @@
 from discord.ext import commands
 import random
-import core.functions as func
+from core.functions import DiscordExt
 from core.setup import client, fluctlight_client
 from core.classes import CogExtension, JsonApi
 
@@ -23,7 +23,7 @@ class Query(CogExtension):
 
         status = str()
         for item in data:
-            member_name = await func.get_member_nick_name(ctx.guild, item["_id"])
+            member_name = await DiscordExt.get_member_nick_name(ctx.guild, item["_id"])
             status += f'{member_name}: {item["correct"]}\n'
 
             if len(status) > 1600:
@@ -75,7 +75,7 @@ async def personal_info(member_id):
             ['Error'],
             ['Logging error']
         ]
-        return func.create_embed(*embed_para)
+        return DiscordExt.create_embed(*embed_para)
 
     value_title = [
         'Member id',
@@ -106,7 +106,7 @@ async def personal_info(member_id):
         value_title,
         obj_info
     ]
-    return func.create_embed(*embed_para)
+    return DiscordExt.create_embed(*embed_para)
 
 
 def setup(bot):

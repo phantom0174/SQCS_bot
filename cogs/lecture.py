@@ -3,7 +3,7 @@ import asyncio
 import random
 import core.score_module as sm
 from core.setup import client, rsp, fluctlight_client
-import core.functions as func
+from core.functions import Time, FluctExt, DiscordExt
 from core.classes import CogExtension
 
 
@@ -121,14 +121,14 @@ class Lecture(CogExtension):
 
         # cd time from preventing member leave at once
         # need to fix for stable pattern
-        random.seed(func.now_time_info('hour') * 92384)
+        random.seed(Time.get_info('hour') * 92384)
         await asyncio.sleep(random.randint(30, 180))
 
         voice_channel = self.bot.get_channel(lect_config["voice_id"])
 
         attendants = [member.id for member in voice_channel.members]
 
-        await func.report_lect_attend(self.bot, attendants, week)
+        await FluctExt.report_lect_attend(self.bot, attendants, week)
         execute = {
             "$set": {
                 "population": len(attendants)
@@ -235,7 +235,7 @@ class Lecture(CogExtension):
 
         for rank, member in enumerate(answered_member_list):
             medal = ranking_medal_prefix.get(rank, ':medal:')
-            member_name = await func.get_member_nick_name(ctx.guild, member["_id"])
+            member_name = await DiscordExt.get_member_nick_name(ctx.guild, member["_id"])
 
             member_rank_list += (
                 f'{medal}{member_name} | '
@@ -259,7 +259,7 @@ class Lecture(CogExtension):
             [member_rank_list]
         ]
 
-        await ctx.send(embed=func.create_embed(*embed_para))
+        await ctx.send(embed=DiscordExt.create_embed(*embed_para))
 
         lect_ongoing_cursor.delete_many({})
 

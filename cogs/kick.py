@@ -1,7 +1,7 @@
 from discord.ext import commands
 from core.classes import CogExtension
 from core.setup import client, rsp, fluctlight_client
-import core.functions as func
+from core.functions import DiscordExt
 
 
 class KickMember(CogExtension):
@@ -49,7 +49,7 @@ class KickMember(CogExtension):
         if not data:
             return await ctx.send(f":exclamation: There's no data of member whose id is {member_id}")
 
-        member_name = await func.get_member_nick_name(ctx.guild, member_id)
+        member_name = await DiscordExt.get_member_nick_name(ctx.guild, member_id)
         member_info = {
             "_id": member_id,
             "name": member_name,

@@ -2,7 +2,7 @@ from discord.ext import commands
 import os
 from core.classes import CogExtension
 from core.setup import client
-import core.functions as func
+from core.functions import Time
 
 
 class Cadre(CogExtension):
@@ -34,7 +34,7 @@ class Cadre(CogExtension):
                 f'如有疑問請洽總召'
             )
 
-        apply_time = func.now_time_info('whole')
+        apply_time = Time.get_info('whole')
         apply_info = {
             "_id": appl.id,
             "name": appl.display_name,
