@@ -33,11 +33,13 @@ class JsonApi:
 
 
 class Fluct:
-    def __init__(self, member_id: int):
+    def __init__(self, member_id=None):
         self.main_fluct_cursor = fluctlight_client["MainFluctlights"]
         self.vice_fluct_cursor = fluctlight_client["ViceFluctlights"]
         self.act_cursor = fluctlight_client["active-logs"]
-        self.member_fluctlight = self.main_fluct_cursor.find_one({"_id": member_id})
+
+        if member_id is not None:
+            self.member_fluctlight = self.main_fluct_cursor.find_one({"_id": member_id})
 
     async def reset_main(self, member_id, guild):
         default_main_fluctlight = {
