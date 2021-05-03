@@ -15,7 +15,7 @@
 
 ## ☘️ Introduction
 - This bot handles comprehensive tasks in [SQCS](https://sqcs.ckcsc.net) Discord Guild.
-- Inspired by the tutorial from `@Proladon`.
+- Inspired by [the tutorial](https://youtube.com/playlist?list=PLSCgthA1Anif1w6mKM3O6xlBGGypXtrtN) from `@Proladon`.
 
 ## ✅ Open-source
 - The developer spend lots of time on it, so even it isn't necessary to cite the source while using relevant data, the developer will thank you if doing so. 
