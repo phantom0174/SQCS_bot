@@ -24,7 +24,7 @@
 - There's a brand-new document for commands, check [it](https://github.com/SQCS-TW/Community-Structure/blob/main/Discord%20Guild%20Bot%20Team/SQCS%20Bot%20Command.md) out!
 
 ## 💖 Thanks
-- Thanks for `@esenciamorii`, the very person who make me the chance to learn Discord Bot.
+- Thanks for `@esenciamorii`, the very person who let me have the chance to learn Discord Bot.
 - Thanks for all contributers to this project.
 - Thanks for the lecture from `@Proladon`.
 - Thanks for the help from member in the Shelter-Zone.
