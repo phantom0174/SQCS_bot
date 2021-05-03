@@ -6,7 +6,7 @@
 ![](https://img.shields.io/uptimerobot/status/m786417212-72995a6e32a6e120933f8255)
 ![](https://img.shields.io/uptimerobot/ratio/7/m786417212-72995a6e32a6e120933f8255)
 <br>
-<img src="https://upload.cc/i1/2021/01/04/y0wpXS.jpg" width=200> 　　　　<img src="https://upload.cc/i1/2021/01/04/N8sInJ.png" width=200>
+<img src="" width=200> 　　　　<img src="" width=200>
 <br>
 
 ## 🔧 Developer
