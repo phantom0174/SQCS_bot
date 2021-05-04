@@ -1,6 +1,7 @@
 from discord.ext import commands
 from core.classes import CogExtension, JsonApi
 import discord
+from core.functions import Time
 
 
 class Channel(CogExtension):
@@ -80,20 +81,57 @@ class Channel(CogExtension):
         if channel.id not in dyn_json['channel_in_protect']:
             return
 
-        respawn_channel = await channel.guild.create_text_channel(
-            name=channel.name,
-            category=channel.category,
-            overwrites=channel.overwrites
-        )
+        respawn_config = {
+            "name": channel.name,
+            "category": channel.category,
+            "position": channel.position,
+            "overwrites": channel.overwrites,
+            "permissions_synced": channel.permissions_synced
+        }
+
+        if str(channel.type) == 'text':
+            delete_time = Time.get_info('whole')
+
+            text_config = {
+                "topic": channel.topic
+            }
+            respawn_channel = await channel.guild.create_text_channel(
+                **respawn_config,
+                **text_config
+            )
+            await respawn_channel.send(':exclamation: The channel has been respawned')
+            entry = await channel.guild.audit_logs(action=discord.AuditLogAction.channel_delete, limit=1).get()
+            await respawn_channel.send(
+                f'Deleted by {entry.user.mention} at {delete_time}'
+            )
+        elif str(channel.type) == 'voice':
+            voice_config = {
+                "bitrate": channel.bitrate,
+                "rtc_region": channel.rtc_region,
+                "user_limit": channel.user_limit
+            }
+            respawn_channel = await channel.guild.create_voice_channel(
+                **respawn_config,
+                **voice_config
+            )
+        elif str(channel.type) == 'stage_voice':
+            stage_config = {
+                "bitrate": channel.bitrate,
+                "rtc_region": channel.rtc_region,
+                "user_limit": channel.user_limit,
+                "topic": channel.topic,
+                "requesting_to_speak": channel.requesting_to_speak
+            }
+            respawn_channel = await channel.guild.create_stage_channel(
+                **respawn_config,
+                **stage_config
+            )
+        else:
+            return
+
         dyn_json['channel_in_protect'].remove(channel.id)
         dyn_json['channel_in_protect'].append(respawn_channel.id)
         JsonApi().put_json('DynamicSetting', dyn_json)
-
-        await respawn_channel.send(':exclamation: The channel has been respawned')
-        entry = await channel.guild.audit_logs(action=discord.AuditLogAction.channel_delete, limit=1).get()
-        await respawn_channel.send(
-            f'Deleted by {entry.user.mention} at {entry.created_at}'
-        )
 
 
 def setup(bot):
