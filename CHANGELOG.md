@@ -1,8 +1,11 @@
 # 📜 ChangeLog
 
-`version 1.21.4.27`
+`version 1.22.5.5`
 
 ```markdown
+- 2021/05/05: Upgrade channel tools.
+  > Partial idea comes from the features of @MiniAppleTheApple's bot.
+
 - 2021/04/27: Add voice and text channel tools.
   > Tools for guild management.
 
