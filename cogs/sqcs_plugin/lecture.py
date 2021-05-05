@@ -2,9 +2,9 @@ from discord.ext import commands
 import asyncio
 import random
 import core.score_module as sm
-from core.setup import client, rsp, fluctlight_client
-from core.functions import Time, FluctExt, DiscordExt
-from core.classes import CogExtension
+from core.db import self_client, rsp, fluctlight_client
+from core.utils import Time, FluctExt, DiscordExt
+from core.cog_config import CogExtension
 
 
 class Lecture(CogExtension):
@@ -17,7 +17,7 @@ class Lecture(CogExtension):
     @commands.has_any_role('總召', 'Administrator')
     async def list(self, ctx):
 
-        lect_set_cursor = client["LectureSetting"]
+        lect_set_cursor = self_client["LectureSetting"]
         data = lect_set_cursor.find({})
 
         if data.count() == 0:
@@ -69,7 +69,7 @@ class Lecture(CogExtension):
             "voice_id": int(voice_channel_id)
         }
 
-        lect_set_cursor = client["LectureSetting"]
+        lect_set_cursor = self_client["LectureSetting"]
         lect_set_cursor.insert_one(lecture_config)
 
         await ctx.send(':white_check_mark: 資料建檔完畢，謝謝你的配合！')
@@ -78,7 +78,7 @@ class Lecture(CogExtension):
     @commands.has_any_role('總召', 'Administrator')
     async def remove(self, ctx, del_lect_week: int):
 
-        lect_set_cursor = client["LectureSetting"]
+        lect_set_cursor = self_client["LectureSetting"]
 
         try:
             lect_set_cursor.delete_one({"week": del_lect_week})
@@ -91,7 +91,7 @@ class Lecture(CogExtension):
     @commands.has_any_role('總召', 'Administrator')
     async def start(self, ctx, week: int):
 
-        lect_set_cursor = client["LectureSetting"]
+        lect_set_cursor = self_client["LectureSetting"]
         lect_config = lect_set_cursor.find_one({"week": week})
 
         if not lect_config:
@@ -162,8 +162,8 @@ class Lecture(CogExtension):
         crt_member_id_list = [crt_msg.author.id for crt_msg in correct_msgs]
 
         # add score to correct members
-        lect_ongoing_cursor = client["LectureOngoing"]
-        score_cursor = client["ScoreSetting"]
+        lect_ongoing_cursor = self_client["LectureOngoing"]
+        score_cursor = self_client["ScoreSetting"]
 
         score_weight = score_cursor.find_one({"_id": 0})["score_weight"]
 
@@ -199,7 +199,7 @@ class Lecture(CogExtension):
     @commands.has_any_role('總召', 'Administrator')
     async def end(self, ctx, week: int):
 
-        lect_set_cursor = client["LectureSetting"]
+        lect_set_cursor = self_client["LectureSetting"]
         lect_config = lect_set_cursor.find_one({"week": week})
 
         if not lect_set_cursor["status"]:
@@ -219,7 +219,7 @@ class Lecture(CogExtension):
         # adding scores and show lecture final data
         fl_cursor = fluctlight_client["MainFluctlights"]
 
-        lect_ongoing_cursor = client["LectureOngoing"]
+        lect_ongoing_cursor = self_client["LectureOngoing"]
         answered_member_list = lect_ongoing_cursor.find({}).sort("score", -1)
 
         if answered_member_list.count() == 0:

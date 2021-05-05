@@ -1,7 +1,7 @@
 from discord.ext import commands
-from core.classes import CogExtension, JsonApi
+from core.cog_config import CogExtension, JsonApi
 import discord
-from core.functions import Time
+from core.utils import Time
 
 
 class Channel(CogExtension):

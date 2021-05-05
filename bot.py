@@ -4,7 +4,7 @@ import sys
 import os
 import keep_alive
 import asyncio
-import core.functions as func
+import core.utils as func
 
 
 intents = discord.Intents.all()
@@ -16,39 +16,75 @@ async def on_ready():
     print(">> Bot is online <<")
 
 
-@bot.command()
-@commands.has_any_role('總召', 'Administrator')
-async def load(ctx, msg):
-    try:
-        bot.load_extension(f'cogs.{msg}')
-        await ctx.send(f':white_check_mark: Extension {msg} loaded.')
-    except:
-        await ctx.send(f':exclamation: There are no extension called {msg}!')
+# a short function for load and unload cogs
+def find_cog(path: str, target_cog: str, mode: str) -> (bool, str):
+    trans_path = {
+        "./cogs": "cogs.",
+        "./cogs/sqcs_plugin": "cogs/sqcs."
+    }
+    for item in os.listdir(path):
+        if item.startswith(target_cog) and item.endswith('.py'):
+            if mode == 'load':
+                bot.load_extension(
+                    f'{trans_path.get(path)}{item[:-3]}'
+                )
+                return True, f':white_check_mark: Extension {item} loaded!'
+            elif mode == 'unload':
+                bot.unload_extension(
+                    f'{trans_path.get(path)}{item[:-3]}'
+                )
+                return True, f':white_check_mark: Extension {item} unloaded!'
+    return False, ''
 
 
 @bot.command()
 @commands.has_any_role('總召', 'Administrator')
-async def unload(ctx, msg):
-    try:
-        bot.unload_extension(f'cogs.{msg}')
-        await ctx.send(f':white_check_mark: Extension {msg} unloaded.')
-    except:
-        await ctx.send(f':exclamation: There are no extension called {msg}!')
+async def load(ctx, target_cog: str):
+    find, msg = find_cog('./cogs', target_cog, 'load')
+    if find:
+        return await ctx.send(msg)
+
+    find, msg = find_cog('./cogs/sqcs_plugin', target_cog, 'load')
+    if find:
+        return await ctx.send(msg)
+
+    return await ctx.send(
+        f':exclamation: There are no extension called {target_cog}!'
+    )
 
 
 @bot.command()
 @commands.has_any_role('總召', 'Administrator')
-async def reload(ctx, msg):
-    if msg != 'all':
-        try:
-            bot.reload_extension(f'cogs.{msg}')
-            await ctx.send(f':white_check_mark: Extension {msg} reloaded.')
-        except:
-            await ctx.send(f':exclamation: There are no extension called {msg}!')
-    else:
+async def unload(ctx, target_cog: str):
+    find, msg = find_cog('./cogs', target_cog, 'unload')
+    if find:
+        return await ctx.send(msg)
+
+    find, msg = find_cog('./cogs/sqcs_plugin', target_cog, 'unload')
+    if find:
+        return await ctx.send(msg)
+
+    return await ctx.send(
+        f':exclamation: There are no extension called {target_cog}!'
+    )
+
+
+@bot.command()
+@commands.has_any_role('總召', 'Administrator')
+async def reload(ctx, target_package: str):
+    if target_package not in ['main', 'sqcs']:
+        return await ctx.send(
+            ':x: `target_package` can only be `main` or `sqcs`!'
+        )
+
+    if target_package == 'all':
         for reload_filename in os.listdir('./cogs'):
             if reload_filename.endswith('.py'):
                 bot.reload_extension(f'cogs.{reload_filename[:-3]}')
+    elif target_package == 'sqcs':
+        for reload_filename in os.listdir('./cogs/sqcs_plugin'):
+            if reload_filename.endswith('.py'):
+                bot.reload_extension(f'cogs/sqcs_plugin.{reload_filename[:-3]}')
 
         await ctx.send(':white_check_mark: Reload finished!')
 
@@ -65,7 +101,7 @@ async def shut_down(ctx):
 @bot.event
 async def on_disconnect():
     report_channel = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-report')
-    await report_channel.send(f':exclamation: Bot disconnected! {func.now_time_info("whole")}')
+    await report_channel.send(f':exclamation: Bot disconnected! {func.Time.get_info("whole")}')
 
 
 for filename in os.listdir('./cogs'):

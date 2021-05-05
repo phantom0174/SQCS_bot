@@ -1,17 +1,17 @@
-from core.setup import client
-from core.functions import Time
-from cogs.quiz import quiz_start, quiz_end
+from core.db import self_client
+from core.utils import Time
+from cogs.sqcs_plugin.quiz import quiz_start, quiz_end
 import discord
 from discord.ext import tasks
-from core.classes import CogExtension, JsonApi
-from core.setup import fluctlight_client
+from core.cog_config import CogExtension, JsonApi
+from core.db import fluctlight_client
 
 
 class Task(CogExtension):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.quiz_set_cursor = client["QuizSetting"]
+        self.quiz_set_cursor = self_client["QuizSetting"]
 
         self.quiz_auto.start()
         self.nt_auto.start()

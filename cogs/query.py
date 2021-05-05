@@ -1,8 +1,8 @@
 from discord.ext import commands
 import random
-from core.functions import DiscordExt
-from core.setup import client, fluctlight_client
-from core.classes import CogExtension, JsonApi
+from core.utils import DiscordExt
+from core.db import self_client, fluctlight_client
+from core.cog_config import CogExtension, JsonApi
 
 
 class Query(CogExtension):
@@ -15,7 +15,7 @@ class Query(CogExtension):
     @commands.has_any_role('總召', 'Administrator')
     async def quiz(self, ctx):
 
-        quiz_ongoing_cursor = client["QuizOngoing"]
+        quiz_ongoing_cursor = self_client["QuizOngoing"]
         data = quiz_ongoing_cursor.find({})
 
         if data.count() == 0:

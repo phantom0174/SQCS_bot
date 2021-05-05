@@ -1,8 +1,8 @@
 from discord.ext import commands
 import os
 import requests
-from core.setup import fluctlight_client
-from core.functions import DiscordExt
+from core.db import fluctlight_client
+from core.utils import DiscordExt
 
 
 class CogExtension(commands.Cog):

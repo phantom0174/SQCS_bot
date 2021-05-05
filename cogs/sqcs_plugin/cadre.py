@@ -1,8 +1,8 @@
 from discord.ext import commands
 import os
-from core.classes import CogExtension
-from core.setup import client
-from core.functions import Time
+from core.cog_config import CogExtension
+from core.db import self_client
+from core.utils import Time
 
 
 class Cadre(CogExtension):
@@ -23,7 +23,7 @@ class Cadre(CogExtension):
                 content=f':exclamation: {appl.mention}, 沒有名為 `{cadre}` 的職位！', delete_after=5.0
             )
 
-        cadre_cursor = client["Cadre"]
+        cadre_cursor = self_client["Cadre"]
         data = cadre_cursor.find_one({"_id": appl.id})
 
         if data:
@@ -56,7 +56,7 @@ class Cadre(CogExtension):
     @commands.has_any_role('總召', 'Administrator')
     async def list(self, ctx):
 
-        cadre_cursor = client["Cadre"]
+        cadre_cursor = self_client["Cadre"]
         data = cadre_cursor.find({})
 
         if data.count() == 0:
@@ -81,7 +81,7 @@ class Cadre(CogExtension):
     @commands.has_any_role('總召', 'Administrator')
     async def permit(self, ctx, permit_id: int):
 
-        cadre_cursor = client["Cadre"]
+        cadre_cursor = self_client["Cadre"]
         data = cadre_cursor.find_one({"_id": permit_id})
 
         if not data:
@@ -106,7 +106,7 @@ class Cadre(CogExtension):
     @commands.has_any_role('總召', 'Administrator')
     async def search(self, ctx, search_id: int):
 
-        cadre_cursor = client["Cadre"]
+        cadre_cursor = self_client["Cadre"]
         data = cadre_cursor.find_one({"_id": search_id})
 
         if not data:
@@ -122,7 +122,7 @@ class Cadre(CogExtension):
     @commands.has_any_role('總召', 'Administrator')
     async def remove(self, ctx, delete_id: int):
 
-        cadre_cursor = client["Cadre"]
+        cadre_cursor = self_client["Cadre"]
         data = cadre_cursor.find_one({"_id": delete_id})
 
         if not data:

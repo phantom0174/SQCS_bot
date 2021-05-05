@@ -1,4 +1,4 @@
-from core.setup import fluctlight_client
+from core.db import fluctlight_client
 
 
 """

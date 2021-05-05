@@ -1,7 +1,7 @@
 from discord.ext import commands
 import requests
 import os
-from core.classes import CogExtension
+from core.cog_config import CogExtension
 
 """
 The extension is for school h.w. of phantom1074

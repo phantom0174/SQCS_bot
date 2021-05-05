@@ -1,7 +1,7 @@
 import statistics
 import discord
-from core.setup import client, fluctlight_client
-from core.functions import Time, FluctExt
+from core.db import self_client, fluctlight_client
+from core.utils import Time, FluctExt
 
 
 # main function
@@ -12,9 +12,9 @@ async def guild_weekly_update(bot):
     # Very important update function
     # ------------------------------
 
-    # set-up client
+    # set-up self_client
     fluctlight_cursor = fluctlight_client["MainFluctlights"]
-    score_set_cursor = client["ScoreSetting"]
+    score_set_cursor = self_client["ScoreSetting"]
     active_logs_cursor = fluctlight_client["ActiveLogs"]
 
     # calculate total score, max, min score
@@ -141,7 +141,7 @@ async def lvl_ind_update(fluctlight_cursor, active_logs_cursor, avr_contrib):
 async def lvl_ind_detect(bot, fluctlight_cursor):
     data = fluctlight_cursor.find({})
 
-    kick_cursor = client["ReadyToKick"]
+    kick_cursor = self_client["ReadyToKick"]
 
     for member in data:
         if 1 <= member["lvl_ind"] < 1.5:

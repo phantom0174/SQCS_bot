@@ -1,5 +1,5 @@
 from discord.ext import commands
-from core.classes import CogExtension
+from core.cog_config import CogExtension
 
 
 class Main(CogExtension):

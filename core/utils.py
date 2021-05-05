@@ -2,8 +2,8 @@ from datetime import datetime, timezone, timedelta
 import math
 import discord
 import core.score_module as sm
-from core.classes import JsonApi
-from core.setup import client, fluctlight_client
+from core.cog_config import JsonApi
+from core.db import self_client, fluctlight_client
 
 
 def sgn(num):
@@ -55,7 +55,7 @@ class Time:
 class FluctExt:
     @staticmethod
     async def report_lect_attend(bot, attendants, week):
-        score_set_cursor = client["ScoreSetting"]
+        score_set_cursor = self_client["ScoreSetting"]
         score_weight = score_set_cursor.find_one({"_id": 0})["score_weight"]
         lect_attend_score = score_set_cursor.find_one({"_id": 0})["lecture_attend_point"]
 

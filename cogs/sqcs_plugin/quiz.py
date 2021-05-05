@@ -1,10 +1,10 @@
 from discord.ext import commands
 import discord
-from core.setup import client, rsp, fluctlight_client
-from core.functions import Time, DiscordExt
+from core.db import self_client, rsp, fluctlight_client
+from core.utils import Time, DiscordExt
 import core.score_module as sm
-from core.vi_update import guild_weekly_update
-from core.classes import CogExtension
+from core.fluctlight_ext import guild_weekly_update
+from core.cog_config import CogExtension
 
 
 class Quiz(CogExtension):
@@ -17,7 +17,7 @@ class Quiz(CogExtension):
     # push back stand by answer
     @quiz.command()
     async def alter_standby_ans(self, ctx, alter_answer: str):
-        quiz_set_cursor = client["QuizSetting"]
+        quiz_set_cursor = self_client["QuizSetting"]
 
         execute = {
             "$set": {
@@ -29,7 +29,7 @@ class Quiz(CogExtension):
 
     @quiz.command()
     async def alter_formal_ans(self, ctx, alter_answer: str):
-        quiz_set_cursor = client["QuizSetting"]
+        quiz_set_cursor = self_client["QuizSetting"]
 
         execute = {
             "$set": {
@@ -41,7 +41,7 @@ class Quiz(CogExtension):
 
     @quiz.command()
     async def set_qns_link(self, ctx, qns_link: str):
-        quiz_set_cursor = client["QuizSetting"]
+        quiz_set_cursor = self_client["QuizSetting"]
 
         execute = {
             "$set": {
@@ -53,7 +53,7 @@ class Quiz(CogExtension):
 
     @quiz.command()
     async def set_ans_link(self, ctx, ans_link: str):
-        quiz_set_cursor = client["QuizSetting"]
+        quiz_set_cursor = self_client["QuizSetting"]
 
         execute = {
             "$set": {
@@ -68,7 +68,7 @@ class Quiz(CogExtension):
         if new_result not in [0, 1]:
             return await ctx.send(':exclamation: New result must be one of 0 or 1!')
 
-        quiz_set_cursor = client["QuizSetting"]
+        quiz_set_cursor = self_client["QuizSetting"]
         execute = {
             "$set": {
                 "correct": bool(new_result)
@@ -82,7 +82,7 @@ class Quiz(CogExtension):
     @quiz.command()
     async def repost_qns(self, ctx):
         await ctx.message.delete()
-        quiz_set_cursor = client["QuizSetting"]
+        quiz_set_cursor = self_client["QuizSetting"]
         qns_link = quiz_set_cursor.find_one({"_id": 0})["qns_link"]
         await ctx.send(
             f':exclamation: 以下為更新後的問題！\n'
@@ -92,7 +92,7 @@ class Quiz(CogExtension):
     @quiz.command()
     async def repost_ans(self, ctx):
         await ctx.message.delete()
-        quiz_set_cursor = client["QuizSetting"]
+        quiz_set_cursor = self_client["QuizSetting"]
         ans_link = quiz_set_cursor.find_one({"_id": 0})["ans_link"]
         await ctx.send(
             f':exclamation: 以下為更新後的解答！\n'
@@ -109,8 +109,8 @@ class Quiz(CogExtension):
         if msg.content[0] == '~' or msg.content[0] == '+':
             return
 
-        quiz_set_cursor = client["QuizSetting"]
-        score_set_cursor = client["ScoreSetting"]
+        quiz_set_cursor = self_client["QuizSetting"]
+        score_set_cursor = self_client["ScoreSetting"]
         fl_cursor = fluctlight_client["MainFluctlights"]
 
         quiz_status = quiz_set_cursor.find_one({"_id": 0})["event_status"]
@@ -124,7 +124,7 @@ class Quiz(CogExtension):
         quiz_score = score_set_cursor.find_one({"_id": 0})["quiz_point"]
         score_weight = score_set_cursor.find_one({"_id": 0})["score_weight"]
 
-        quiz_cursor = client["QuizOngoing"]
+        quiz_cursor = self_client["QuizOngoing"]
 
         data = quiz_cursor.find_one({"_id": msg.author.id})
         if data:
@@ -165,7 +165,7 @@ async def quiz_start(bot):
     main_channel = discord.utils.get(guild.text_channels, name='💎懸賞區')
     cmd_channel = discord.utils.get(guild.text_channels, name='總指令區')
 
-    quiz_set_cursor = client["QuizSetting"]
+    quiz_set_cursor = self_client["QuizSetting"]
     quiz_data = quiz_set_cursor.find_one({"_id": 0})
     stand_by_answer = quiz_data["stand_by_answer"]
 
@@ -210,7 +210,7 @@ async def quiz_end(bot):
     main_channel = discord.utils.get(guild.text_channels, name='💎懸賞區')
     cmd_channel = discord.utils.get(guild.text_channels, name='總指令區')
 
-    quiz_set_cursor = client["QuizSetting"]
+    quiz_set_cursor = self_client["QuizSetting"]
     quiz_data = quiz_set_cursor.find_one({"_id": 0})
     old_correct_ans = quiz_data["correct_answer"]
     answer_link = quiz_data["ans_link"]
@@ -235,7 +235,7 @@ async def quiz_end(bot):
         f'correct answer set to {correct_answer}!'
     )
 
-    quiz_ongoing_cursor = client["QuizOngoing"]
+    quiz_ongoing_cursor = self_client["QuizOngoing"]
     fluctlight_cursor = fluctlight_client["light-cube-info"]
     msg = '\n'.join(rsp["quiz"]["end"]["main"]["pt_1"]) + '\n'
     msg += f':white_check_mark: 這次的答案呢...是 `{old_correct_ans}`！\n'

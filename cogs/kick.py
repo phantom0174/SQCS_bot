@@ -1,7 +1,7 @@
 from discord.ext import commands
-from core.classes import CogExtension
-from core.setup import client, rsp, fluctlight_client
-from core.functions import DiscordExt
+from core.cog_config import CogExtension
+from core.db import self_client, rsp, fluctlight_client
+from core.utils import DiscordExt
 
 
 class KickMember(CogExtension):
@@ -15,7 +15,7 @@ class KickMember(CogExtension):
     async def list(self, ctx):
         await ctx.send(':hourglass_flowing_sand: Finding...')
 
-        kick_cursor = client["ReadyToKick"]
+        kick_cursor = self_client["ReadyToKick"]
         data = kick_cursor.find({})
 
         if data.count() == 0:
@@ -57,14 +57,14 @@ class KickMember(CogExtension):
             "lvl_ind": data["lvl_ind"]
         }
 
-        kick_cursor = client["ReadyToKick"]
+        kick_cursor = self_client["ReadyToKick"]
         kick_cursor.insert_one(member_info)
 
         await ctx.send(f':white_check_mark: Member {member_name}({member_id}) has been added to the kick list!')
 
     @kick.command()
     async def remove(self, ctx, member_id: int):
-        kick_cursor = client["ReadyToKick"]
+        kick_cursor = self_client["ReadyToKick"]
         data = kick_cursor.find_one({"_id": member_id})
 
         if not data:
@@ -76,7 +76,7 @@ class KickMember(CogExtension):
 
     @kick.command()
     async def kick_single(self, ctx, member_id: int, kick_reason: str):
-        kick_cursor = client["ReadyToKick"]
+        kick_cursor = self_client["ReadyToKick"]
         data = kick_cursor.find_one({"_id": member_id})
 
         if not data:
@@ -117,7 +117,7 @@ class KickMember(CogExtension):
 
     @kick.command()
     async def kick_all(self, ctx):
-        kick_cursor = client["ReadyToKick"]
+        kick_cursor = self_client["ReadyToKick"]
         data = kick_cursor.find({})
 
         if data.count() == 0:

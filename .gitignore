@@ -4,9 +4,6 @@
 # JetBrain files
 .idea
 
-# JsonApi backup
-JsonApi.json
-
 # Buffer
 txts
 

@@ -1,6 +1,6 @@
 from discord.ext import commands
-from core.classes import CogExtension
-from core.setup import link, fluctlight_client
+from core.cog_config import CogExtension
+from core.db import link, fluctlight_client
 from pymongo import MongoClient
 
 
