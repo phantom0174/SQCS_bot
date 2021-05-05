@@ -1,9 +1,6 @@
 # Sensitive information
 .env
 
-# JetBrain files
-.idea
-
 # Buffer
 txts
 
