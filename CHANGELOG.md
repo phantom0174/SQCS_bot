@@ -1,8 +1,11 @@
 # 📜 ChangeLog
 
-`version 1.22.5.5`
+`version 1.23.5.7`
 
 ```markdown
+- 2021/05/07: Reconstruct project structure
+  > More maintainable, and fixed circular import issue.
+
 - 2021/05/05: Upgrade channel tools.
   > Partial idea comes from the features of @MiniAppleTheApple's bot.
 
