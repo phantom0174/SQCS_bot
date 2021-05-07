@@ -1,9 +1,6 @@
 from datetime import datetime, timezone, timedelta
 import math
 import discord
-import core.score_module as sm
-from core.cog_config import JsonApi
-from core.db import self_client, fluctlight_client
 
 
 def sgn(num):
@@ -52,42 +49,7 @@ class Time:
         return 'morning'
 
 
-class FluctExt:
-    @staticmethod
-    async def report_lect_attend(bot, attendants, week):
-        score_set_cursor = self_client["ScoreSetting"]
-        score_weight = score_set_cursor.find_one({"_id": 0})["score_weight"]
-        lect_attend_score = score_set_cursor.find_one({"_id": 0})["lecture_attend_point"]
-
-        # add score to the attendances
-        fluct_cursor = fluctlight_client["MainFluctlights"]
-
-        report_json = JsonApi().get_json('LectureLogging')
-        report_channel = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-lecture-attend')
-
-        for member_id in attendants:
-            delta_score = round(lect_attend_score * score_weight, 2)
-            try:
-                execute = {
-                    "$inc": {
-                        "score": delta_score
-                    }
-                }
-                fluct_cursor.update_one({"_id": member_id}, execute)
-                await sm.active_log_update(member_id)
-            except:
-                await report_channel.send(
-                    f'[DB MANI ERROR][to: {member_id}]'
-                    f'[inc_score: {delta_score}]'
-                )
-
-        report_json["logs"].append(
-            f'[LECT ATTEND][week: {week}][attendants:\n'
-            f'{attendants}\n'
-            f'[{Time.get_info("whole")}]'
-        )
-        JsonApi().put_json('LectureLogging', report_json)
-
+class FluctMath:
     @staticmethod
     def lvl_ind_calc(log, member_week_count, contrib, avr_contrib):
         theta1 = sgn(contrib - avr_contrib)

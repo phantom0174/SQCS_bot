@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 import os
-from core.cog_config import JsonApi
+import requests
 
 
 # database
@@ -10,6 +10,29 @@ link = f"mongodb+srv://{account}:{password}@light-cube-cluster.5wswq.mongodb.net
 
 fluctlight_client = MongoClient(link)["LightCube"]
 self_client = MongoClient(link)["sqcs-bot"]
+
+
+class JsonApi:
+    def __init__(self):
+        self.link_header = 'https://api.jsonstorage.net/v1/json/'
+
+        # json link switcher
+        self.json_links = str(os.environ.get("JsonApiLinks"))
+        self.link_dict = requests.get(self.link_header + self.json_links).json()["links"]
+
+    def get_json(self, name):
+        if name not in self.link_dict.keys():
+            return None
+
+        response = requests.get(self.link_header + self.link_dict[name])
+        return response.json()
+
+    def put_json(self, name, alter_json):
+        if name not in self.link_dict.keys():
+            return None
+
+        requests.put(self.link_header + self.link_dict[name], json=alter_json)
+
 
 # static json db
 rsp = JsonApi().get_json('HumanityExtension')

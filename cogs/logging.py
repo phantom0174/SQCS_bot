@@ -1,6 +1,7 @@
 from discord.ext import commands
-from core.cog_config import CogExtension, JsonApi
+from core.cog_config import CogExtension
 import discord
+from core.db import JsonApi
 
 
 class Log(CogExtension):

@@ -1,6 +1,7 @@
 from discord.ext import commands
 import random
-from core.cog_config import CogExtension, JsonApi
+from core.cog_config import CogExtension
+from core.db import JsonApi
 
 
 class Picture(CogExtension):

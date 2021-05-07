@@ -1,6 +1,7 @@
 from discord.ext import commands
 from core.utils import Time
-from core.cog_config import CogExtension, JsonApi
+from core.cog_config import CogExtension
+from core.db import JsonApi
 
 
 class Event(CogExtension):

@@ -1,9 +1,9 @@
 from discord.ext import commands
 import asyncio
 import time
-from core.db import rsp, fluctlight_client
+from core.db import rsp, fluctlight_client, JsonApi
 from core.utils import Time
-from core.cog_config import CogExtension, JsonApi
+from core.cog_config import CogExtension
 
 
 class React(CogExtension):

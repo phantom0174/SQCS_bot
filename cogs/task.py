@@ -3,8 +3,8 @@ from core.utils import Time
 from cogs.sqcs_plugin.quiz import quiz_start, quiz_end
 import discord
 from discord.ext import tasks
-from core.cog_config import CogExtension, JsonApi
-from core.db import fluctlight_client
+from core.cog_config import CogExtension
+from core.db import fluctlight_client, JsonApi
 
 
 class Task(CogExtension):

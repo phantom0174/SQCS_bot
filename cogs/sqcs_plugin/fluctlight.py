@@ -1,7 +1,7 @@
 from discord.ext import commands
-from core.cog_config import CogExtension, Fluct
+from core.cog_config import CogExtension
 from core.db import fluctlight_client, self_client, rsp
-import core.score_module as sm
+import core.sqcs_module as sm
 
 
 class PersonalInfo(CogExtension):

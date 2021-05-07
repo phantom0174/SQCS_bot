@@ -1,10 +1,11 @@
 from discord.ext import commands
 import asyncio
 import random
-import core.score_module as sm
+import core.sqcs_module as sm
 from core.db import self_client, rsp, fluctlight_client
-from core.utils import Time, FluctExt, DiscordExt
+from core.utils import Time, DiscordExt
 from core.cog_config import CogExtension
+from core.fluctlight_ext import Fluct
 
 
 class Lecture(CogExtension):
@@ -128,7 +129,7 @@ class Lecture(CogExtension):
 
         attendants = [member.id for member in voice_channel.members]
 
-        await FluctExt.report_lect_attend(self.bot, attendants, week)
+        await sm.report_lect_attend(self.bot, attendants, week)
         execute = {
             "$set": {
                 "population": len(attendants)
@@ -190,7 +191,7 @@ class Lecture(CogExtension):
                 }
                 lect_ongoing_cursor.update_one({"_id": member_id}, execute)
 
-            await sm.active_log_update(member_id)
+            await Fluct.active_log_update(member_id)
 
             if top_score > 1:
                 top_score -= 1
@@ -249,7 +250,7 @@ class Lecture(CogExtension):
                 }
             }
             fl_cursor.update_one({"_id": member["_id"]}, execute)
-            await sm.active_log_update(member["_id"])
+            await Fluct.active_log_update(member["_id"])
 
         embed_para = [
             ':scroll: Lecture Event Result',

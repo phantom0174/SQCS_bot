@@ -2,8 +2,7 @@ from discord.ext import commands
 import discord
 from core.db import self_client, rsp, fluctlight_client
 from core.utils import Time, DiscordExt
-import core.score_module as sm
-from core.fluctlight_ext import guild_weekly_update
+from core.fluctlight_ext import guild_weekly_update, Fluct
 from core.cog_config import CogExtension
 
 
@@ -141,7 +140,7 @@ class Quiz(CogExtension):
                 "correct": answer_correctness
             }
             quiz_cursor.insert_one(member_quiz_result)
-            await sm.active_log_update(msg.author.id)
+            await Fluct.active_log_update(msg.author.id)
 
             # add score to member fluctlight
             if answer_correctness:
