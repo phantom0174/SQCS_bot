@@ -10,12 +10,12 @@ class Log(CogExtension):
     async def log(self, ctx):
         pass
 
-    @log.command()
+    @log.command(aliases=['query', 'len'])
     async def query_len(self, ctx, title: str = "CmdLogging"):
         logs_list = JsonApi().get_json(title)["logs"]
         await ctx.send(f'There are currently {len(logs_list)} logs in the json file!')
 
-    @log.command()
+    @log.command(aliases=['get'])
     async def release(self, ctx, title: str = "CmdLogging"):
         logging_channel = {
             "CmdLogging": "sqcs-report",

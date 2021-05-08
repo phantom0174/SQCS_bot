@@ -41,7 +41,7 @@ class KickMember(CogExtension):
 
         await ctx.send(':white_check_mark: Logging finished!')
 
-    @kick.command()
+    @kick.command(aliases=['insert'])
     async def add(self, ctx, member_id: int):
         fluctlight_cursor = fluctlight_client["MainFluctlights"]
         data = fluctlight_cursor.find_one({"_id": member_id})
@@ -62,7 +62,7 @@ class KickMember(CogExtension):
 
         await ctx.send(f':white_check_mark: Member {member_name}({member_id}) has been added to the kick list!')
 
-    @kick.command()
+    @kick.command(aliases=['delete', 'del'])
     async def remove(self, ctx, member_id: int):
         kick_cursor = self_client["ReadyToKick"]
         data = kick_cursor.find_one({"_id": member_id})
@@ -74,7 +74,7 @@ class KickMember(CogExtension):
 
         await ctx.send(f':white_check_mark: Member {member_id} has been removed from the kick list!')
 
-    @kick.command()
+    @kick.command(aliases=['single'])
     async def kick_single(self, ctx, member_id: int, kick_reason: str):
         kick_cursor = self_client["ReadyToKick"]
         data = kick_cursor.find_one({"_id": member_id})
@@ -115,7 +115,7 @@ class KickMember(CogExtension):
         kick_cursor.delete_one({"_id": member_id})
         await ctx.send(f':white_check_mark: Kicked member {data["name"]}({data["_id"]})!')
 
-    @kick.command()
+    @kick.command(aliases=['all'])
     async def kick_all(self, ctx):
         kick_cursor = self_client["ReadyToKick"]
         data = kick_cursor.find({})

@@ -79,7 +79,7 @@ class DiscordExt:
     @staticmethod
     def create_embed(title, thumbnail, color, fields_name, values) -> discord.Embed:
         if thumbnail == 'default':
-            thumbnail = 'https://i.imgur.com/26skltl.png'
+            thumbnail = 'https://i.imgur.com/MbzRNTJ.png'
 
         embed = discord.Embed(title=title, color=color)
         embed.set_thumbnail(url=thumbnail)

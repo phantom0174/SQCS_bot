@@ -10,7 +10,7 @@ class Picture(CogExtension):
     async def pic(self, ctx):
         pass
 
-    @pic.command()
+    @pic.command(aliases=['insert'])
     async def add(self, ctx, link: str):
 
         pic_json = JsonApi().get_json('DynamicSetting')
@@ -19,7 +19,7 @@ class Picture(CogExtension):
 
         await ctx.send(f':white_check_mark: Object {link} successfully added!')
 
-    @pic.command()
+    @pic.command(aliases=['delete'])
     async def remove(self, ctx, index: int):
 
         pic_json = JsonApi().get_json('DynamicSetting')
@@ -49,7 +49,7 @@ class Picture(CogExtension):
         if len(pic_str) > 0:
             await ctx.send(pic_str)
 
-    @pic.command()
+    @pic.command(aliases=['get'])
     async def random(self, ctx):
 
         pic_json = JsonApi().get_json('DynamicSetting')
