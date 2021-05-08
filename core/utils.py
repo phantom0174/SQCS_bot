@@ -1,6 +1,7 @@
 from datetime import datetime, timezone, timedelta
 import math
 import discord
+from typing import Union
 
 
 def sgn(num):
@@ -14,7 +15,7 @@ def sgn(num):
 
 class Time:
     @staticmethod
-    def get_info(mode):
+    def get_info(mode) -> Union[str, int]:
         dt1 = datetime.utcnow().replace(tzinfo=timezone.utc)
         dt2 = dt1.astimezone(timezone(timedelta(hours=8)))  # 轉換時區 -> 東八區
 
@@ -28,7 +29,7 @@ class Time:
             return str(dt2.strftime("%A"))
 
     @staticmethod
-    def get_range(hour):
+    def get_range(hour) -> str:
         morning = range(6, 12)
         noon = range(12, 13)
         after_noon = range(13, 18)
@@ -51,7 +52,7 @@ class Time:
 
 class FluctMath:
     @staticmethod
-    def lvl_ind_calc(log, member_week_count, contrib, avr_contrib):
+    def lvl_ind_calc(log, member_week_count, contrib, avr_contrib) -> float:
         theta1 = sgn(contrib - avr_contrib)
 
         active_days = sum(map(int, log))
@@ -62,7 +63,7 @@ class FluctMath:
         )
 
     @staticmethod
-    def score_weight_update(t_score, avr_score, max_score, min_score):
+    def score_weight_update(t_score, avr_score, max_score, min_score) -> float:
 
         if max_score - min_score == 0:
             alpha = (t_score - avr_score)
@@ -76,7 +77,7 @@ class FluctMath:
 
 class DiscordExt:
     @staticmethod
-    def create_embed(title, thumbnail, color, fields_name, values):
+    def create_embed(title, thumbnail, color, fields_name, values) -> discord.Embed:
         if thumbnail == 'default':
             thumbnail = 'https://i.imgur.com/26skltl.png'
 
@@ -93,7 +94,7 @@ class DiscordExt:
         return embed
 
     @staticmethod
-    async def get_member_nick_name(guild, member_id):
+    async def get_member_nick_name(guild, member_id) -> str:
         member_name = (await guild.fetch_member(member_id)).nick
         if member_name is None:
             member_name = (await guild.fetch_member(member_id)).name

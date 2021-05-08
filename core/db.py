@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 import os
 import requests
+from typing import Union
 
 
 # database
@@ -8,8 +9,9 @@ password = os.environ.get("PW")
 account = os.environ.get("ACCOUNT")
 link = f"mongodb+srv://{account}:{password}@light-cube-cluster.5wswq.mongodb.net/sqcs?retryWrites=true&w=majority"
 
-fluctlight_client = MongoClient(link)["LightCube"]
+# set client
 self_client = MongoClient(link)["sqcs-bot"]
+fluctlight_client = MongoClient(link)["LightCube"]
 
 
 class JsonApi:
@@ -20,14 +22,14 @@ class JsonApi:
         self.json_links = str(os.environ.get("JsonApiLinks"))
         self.link_dict = requests.get(self.link_header + self.json_links).json()["links"]
 
-    def get_json(self, name):
+    def get_json(self, name) -> Union[dict, None]:
         if name not in self.link_dict.keys():
             return None
 
         response = requests.get(self.link_header + self.link_dict[name])
         return response.json()
 
-    def put_json(self, name, alter_json):
+    def put_json(self, name, alter_json) -> None:
         if name not in self.link_dict.keys():
             return None
 

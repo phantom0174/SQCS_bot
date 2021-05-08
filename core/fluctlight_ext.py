@@ -13,7 +13,7 @@ class Fluct:
         if member_id is not None:
             self.member_fluctlight = self.main_fluct_cursor.find_one({"_id": member_id})
 
-    def reset_main(self, member_id, guild):
+    def reset_main(self, member_id, guild) -> None:
         default_main_fluctlight = {
             "_id": member_id,
             "name": await DiscordExt.get_member_nick_name(guild, member_id),
@@ -33,7 +33,7 @@ class Fluct:
         except:
             pass
 
-    def reset_vice(self, member_id):
+    def reset_vice(self, member_id) -> None:
         default_vice_fluctlight = {
             "_id": member_id,
             "du": 0,
@@ -51,7 +51,7 @@ class Fluct:
         except:
             pass
 
-    def reset_active(self, member_id):
+    def reset_active(self, member_id) -> None:
         default_act = {
             "_id": member_id,
             "log": ''
@@ -66,18 +66,19 @@ class Fluct:
         except:
             pass
 
-    def active_log_update(self):
-        if not self.member_fluctlight["week_active"]:
+    def active_log_update(self, member_id: int) -> None:
+        active = self.main_fluct_cursor.find_one({"_id": member_id})["week_active"]
+        if not active:
             execute = {
                 "$set": {
                     "week_active": True
                 }
             }
-            self.main_fluct_cursor.update_one({"_id": self.member_fluctlight["_id"]}, execute)
+            self.main_fluct_cursor.update_one({"_id": member_id}, execute)
 
 
 # main function
-async def guild_weekly_update(bot):
+async def guild_weekly_update(bot) -> None:
 
     # ------------------------------
     # Very important update function
@@ -130,7 +131,7 @@ async def guild_weekly_update(bot):
 
 
 # vice functions
-async def active_logs_update(fluctlight_cursor, active_logs_cursor):
+async def active_logs_update(fluctlight_cursor, active_logs_cursor) -> None:
     data = fluctlight_cursor.find({})
 
     for member in data:
@@ -165,7 +166,7 @@ async def active_logs_update(fluctlight_cursor, active_logs_cursor):
     fluctlight_cursor.update_many({}, {"$set": {"week_active": False}})
 
 
-async def contribution_update(fluctlight_cursor, active_logs_cursor):
+async def contribution_update(fluctlight_cursor, active_logs_cursor) -> float:
     avr_contrib = float(0)
     data = active_logs_cursor.find({})
 
@@ -188,7 +189,7 @@ async def contribution_update(fluctlight_cursor, active_logs_cursor):
     return avr_contrib
 
 
-async def lvl_ind_update(fluctlight_cursor, active_logs_cursor, avr_contrib):
+async def lvl_ind_update(fluctlight_cursor, active_logs_cursor, avr_contrib) -> None:
     data = fluctlight_cursor.find({"deep_freeze": {"$eq": False}})
     for member in data:
         member_active_logs = active_logs_cursor.find_one({"_id": member["_id"]})
@@ -208,11 +209,10 @@ async def lvl_ind_update(fluctlight_cursor, active_logs_cursor, avr_contrib):
         fluctlight_cursor.update_one({"_id": member["_id"]}, {"$inc": {"lvl_ind": delta_lvl_ind}})
 
 
-async def lvl_ind_detect(bot, fluctlight_cursor):
-    data = fluctlight_cursor.find({})
-
+async def lvl_ind_detect(bot, fluctlight_cursor) -> None:
     kick_cursor = self_client["ReadyToKick"]
 
+    data = fluctlight_cursor.find({})
     for member in data:
         if 1 <= member["lvl_ind"] < 1.5:
             user = await bot.guilds[0].fetch_member(member["_id"])

@@ -1,7 +1,7 @@
 from discord.ext import commands
 from core.cog_config import CogExtension
 from core.db import fluctlight_client, self_client, rsp
-import core.sqcs_module as sm
+from core.fluctlight_ext import Fluct
 
 
 class PersonalInfo(CogExtension):
@@ -25,7 +25,7 @@ class PersonalInfo(CogExtension):
                 }
             }
             fl_cursor.update_one({"_id": member_id}, execute)
-            await sm.active_log_update(member_id)
+            Fluct().active_log_update(member_id)
 
             member = await ctx.guild.fetch_member(member_id)
             msg = f'耶！你被管理員加了 {delta_value} 分！' + '\n'
@@ -54,9 +54,9 @@ class PersonalInfo(CogExtension):
 
     @fluct.command()
     async def reset(self, ctx, member_id: int):
-        await Fluct(member_id).reset_main(member_id, ctx.guild)
-        await Fluct(member_id).reset_vice(member_id)
-        await Fluct(member_id).reset_active(member_id)
+        Fluct().reset_main(member_id, ctx.guild)
+        Fluct().reset_vice(member_id)
+        Fluct().reset_active(member_id)
 
         await ctx.send(':white_check_mark: Operation finished!')
 

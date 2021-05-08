@@ -1,7 +1,7 @@
 from discord.ext import commands
 import random
 from core.utils import DiscordExt
-from core.db import self_client, fluctlight_clientm, JsonApi
+from core.db import self_client, fluctlight_client, JsonApi
 from core.cog_config import CogExtension
 
 

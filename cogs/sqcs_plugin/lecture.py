@@ -191,7 +191,7 @@ class Lecture(CogExtension):
                 }
                 lect_ongoing_cursor.update_one({"_id": member_id}, execute)
 
-            await Fluct.active_log_update(member_id)
+            Fluct().active_log_update(member_id)
 
             if top_score > 1:
                 top_score -= 1
@@ -250,7 +250,7 @@ class Lecture(CogExtension):
                 }
             }
             fl_cursor.update_one({"_id": member["_id"]}, execute)
-            await Fluct.active_log_update(member["_id"])
+            Fluct().active_log_update(member["_id"])
 
         embed_para = [
             ':scroll: Lecture Event Result',

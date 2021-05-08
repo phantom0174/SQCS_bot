@@ -140,7 +140,7 @@ class Quiz(CogExtension):
                 "correct": answer_correctness
             }
             quiz_cursor.insert_one(member_quiz_result)
-            await Fluct.active_log_update(msg.author.id)
+            Fluct().active_log_update(msg.author.id)
 
             # add score to member fluctlight
             if answer_correctness:
