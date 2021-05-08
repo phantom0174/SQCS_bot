@@ -13,7 +13,7 @@ class Fluct:
         if member_id is not None:
             self.member_fluctlight = self.main_fluct_cursor.find_one({"_id": member_id})
 
-    def reset_main(self, member_id, guild) -> None:
+    async def reset_main(self, member_id, guild) -> None:
         default_main_fluctlight = {
             "_id": member_id,
             "name": await DiscordExt.get_member_nick_name(guild, member_id),

@@ -106,10 +106,10 @@ async def on_disconnect():
 
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
-        bot.reload_extension(f'cogs.{filename[:-3]}')
+        bot.load_extension(f'cogs.{filename[:-3]}')
 for filename in os.listdir('./cogs/sqcs_plugin'):
     if filename.endswith('.py'):
-        bot.reload_extension(f'cogs/sqcs_plugin.{filename[:-3]}')
+        bot.load_extension(f'cogs.sqcs_plugin.{filename[:-3]}')
 
 
 keep_alive.keep_alive()
