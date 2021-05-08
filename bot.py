@@ -89,7 +89,7 @@ async def reload(ctx, target_package: str):
         await ctx.send(':white_check_mark: Reload finished!')
 
 
-@bot.command()
+@bot.command(aliases=['logout', 'shutdown'])
 @commands.has_any_role('總召')
 async def shut_down(ctx):
     await ctx.send(':white_check_mark: The bot is shutting down...')
