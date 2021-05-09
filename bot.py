@@ -20,6 +20,26 @@ async def on_ready():
     print(">> Bot is online <<")
 
 
+@bot.command()
+async def info(ctx):
+    embed = discord.Embed(
+        title='Bot information',
+        colour=bot.user.colour
+    )
+    embed.set_thumbnail(url="https://i.imgur.com/MbzRNTJ.png")
+    embed.set_author(name=bot.user.display_name, icon_url=bot.user.avatar_url)
+
+    embed.add_field(
+        name='Join Time',
+        value=f'Joined at {bot.user.created_at}'
+    )
+    embed.add_field(
+        name='Source Code',
+        value='https://github.com/phantom0174/SQCS_bot'
+    )
+    await ctx.send(embed=embed)
+
+
 # a short function for load and unload cogs
 def find_cog(path: str, target_cog: str, mode: str) -> (bool, str):
     trans_path = {
