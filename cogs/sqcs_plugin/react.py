@@ -11,8 +11,11 @@ class React(CogExtension):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         nts = JsonApi().get_json('NT')["id_list"]
-        if (member.id in nts) or member.bot:
+        if (member.id in nts) or member.bot or member.guild.id != 743507979369709639:
             return
+
+        default_role = member.guild.get_role(823803958052257813)
+        await member.add_roles(default_role)
 
         time_status = Time.get_range(Time.get_info('hour'))
 

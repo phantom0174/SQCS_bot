@@ -141,12 +141,11 @@ class GuildRole(CogExtension):
 
     @role_level.command()
     async def init(self, ctx):
-        nts = JsonApi().get_json('NT')["id_list"]
-
         default_role = ctx.guild.get_role(743654256565026817)
         new_default_role = ctx.guild.get_role(823803958052257813)
+
         for member in ctx.guild.members:
-            if (member.id in nts) or member.bot:
+            if member.bot:
                 continue
 
             if default_role in member.roles:
@@ -154,11 +153,13 @@ class GuildRole(CogExtension):
                     await member.remove_roles(default_role)
                     await member.add_roles(new_default_role)
                 except:
-                    await ctx.send(
-                        f':exclamation: Error occurred when init member {member.display_name}'
-                    )
+                    pass
 
-    @role_level.commands()
+        await ctx.send(
+            f':white_check_mark: Role operation finished!'
+        )
+
+    @role_level.command()
     async def init_single(self, ctx, member: discord.Member):
         default_role = ctx.guild.get_role(823803958052257813)
 

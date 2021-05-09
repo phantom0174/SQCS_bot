@@ -100,3 +100,16 @@ class DiscordExt:
             member_name = (await guild.fetch_member(member_id)).name
 
         return member_name
+
+
+class ProgressDisplay:
+    def __init__(self, channel: discord.TextChannel, content, total):
+        self.channel = channel
+        self.content = content
+        self.total = total
+
+        message = await self.channel.send(f'{self.content} (0/{self.total})')
+        self.message = message
+
+    async def display(self, progress):
+        await self.message.edit(content=f'{self.content} ({progress}/{self.total})')

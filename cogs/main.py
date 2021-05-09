@@ -11,7 +11,7 @@ class Main(CogExtension):
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
     async def give_default_role(self, ctx):
-        common_role = ctx.guild.get_role(743654256565026817)
+        common_role = ctx.guild.get_role(823803958052257813)
         for member in ctx.guild.members:
             if len(member.roles) == 1 and member.roles[0].name == '@everyone':
                 await member.add_roles(common_role)

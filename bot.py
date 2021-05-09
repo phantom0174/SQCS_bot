@@ -90,7 +90,7 @@ async def reload(ctx, target_package: str):
             if reload_filename.endswith('.py'):
                 bot.reload_extension(f'cogs/sqcs_plugin.{reload_filename[:-3]}')
 
-        await ctx.send(':white_check_mark: Reload finished!')
+    await ctx.send(':white_check_mark: Reload finished!')
 
 
 @bot.command(aliases=['logout', 'shutdown'])
