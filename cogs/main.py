@@ -10,13 +10,29 @@ class Main(CogExtension):
 
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def give_default_role(self, ctx):
-        common_role = ctx.guild.get_role(823803958052257813)
+    async def fix_role(self, ctx):
+        decline_lvl_roles = [
+            ctx.guild.get_role(840633610256121867),
+            ctx.guild.get_role(823804274647236618),
+            ctx.guild.get_role(823804080199565342),
+            ctx.guild.get_role(823803958052257813),
+        ]
         for member in ctx.guild.members:
-            if len(member.roles) == 1 and member.roles[0].name == '@everyone':
-                await member.add_roles(common_role)
+            if member.bot:
+                continue
 
-        await ctx.send(':white_check_mark: Operation finished!')
+            for index, lvl_role in enumerate(decline_lvl_roles):
+                if member.top_role.position > lvl_role.position:
+                    for other_roles in decline_lvl_roles[index::]:
+                        if other_roles in member.roles:
+                            await member.remove_roles(other_roles)
+
+                    try:
+                        await member.add_roles(lvl_role)
+                    except:
+                        pass
+                    break
+        await ctx.send(':white_check_mark: Role fixing finished!')
 
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
