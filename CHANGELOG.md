@@ -1,8 +1,11 @@
 # 📜 ChangeLog
 
-`version 1.23.5.7`
+`version 1.24.5.9`
 
 ```markdown
+- 2021/05/09: Server rearrangement stage 1
+  > Add role management tools
+
 - 2021/05/07: Reconstruct project structure
   > More maintainable, and fixed circular import issue.
 
