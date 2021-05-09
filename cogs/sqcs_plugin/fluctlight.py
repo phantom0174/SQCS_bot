@@ -54,7 +54,7 @@ class PersonalInfo(CogExtension):
 
     @fluct.command()
     async def reset(self, ctx, member_id: int):
-        Fluct().reset_main(member_id, ctx.guild)
+        await Fluct().reset_main(member_id, ctx.guild)
         Fluct().reset_vice(member_id)
         Fluct().reset_active(member_id)
 

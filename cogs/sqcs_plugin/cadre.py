@@ -1,8 +1,9 @@
 from discord.ext import commands
 import os
 from core.cog_config import CogExtension
-from core.db import self_client
+from core.db import self_client, JsonApi
 from core.utils import Time
+import discord
 
 
 class Cadre(CogExtension):
@@ -132,5 +133,90 @@ class Cadre(CogExtension):
         await ctx.send(f'Member {data["name"]}({delete_id})\'s application has been removed!')
 
 
+class GuildRole(CogExtension):
+    @commands.group(aliases=['rl'])
+    @commands.has_any_role('總召', 'Administrator')
+    async def role_level(self, ctx):
+        pass
+
+    @role_level.command()
+    async def init(self, ctx):
+        nts = JsonApi().get_json('NT')["id_list"]
+
+        default_role = ctx.guild.get_role(743654256565026817)
+        new_default_role = ctx.guild.get_role(823803958052257813)
+        for member in ctx.guild.members:
+            if (member.id in nts) or member.bot:
+                continue
+
+            if default_role in member.roles:
+                try:
+                    await member.remove_roles(default_role)
+                    await member.add_roles(new_default_role)
+                except:
+                    await ctx.send(
+                        f':exclamation: Error occurred when init member {member.display_name}'
+                    )
+
+    @role_level.commands()
+    async def init_single(self, ctx, member: discord.Member):
+        default_role = ctx.guild.get_role(823803958052257813)
+
+        for role in member.roles:
+            if role.name != '@everyone':
+                await member.remove_roles(role)
+
+        await member.add_roles(default_role)
+        await ctx.send(':white_check_mark: Operation finished!')
+
+    @role_level.command()
+    async def advance(self, ctx, member: discord.Member):
+        if member not in ctx.guild.members:
+            return await ctx.send(
+                f':x: {member.display_name} is a invalid user!'
+            )
+
+        sta_json = JsonApi().get_json('StaticSetting')
+        name_to_index: dict = sta_json['level_role_id']
+
+        current_roles = member.roles
+        for role in current_roles:
+            if role.name in name_to_index.keys():
+
+                name_to_index: dict = sta_json['level_role_name_to_index']
+                index_to_name: dict = sta_json['level_role_index_to_name']
+                advance_index = int(name_to_index.get(role.name)) + 1
+                new_role_name = index_to_name.get(str(advance_index))
+                new_role = ctx.guild.get_role(name_to_index.get(new_role_name))
+
+                await member.remove_roles(role)
+                await member.add_roles(new_role)
+                break
+
+    @role_level.command()
+    async def retract(self, ctx, member: discord.Member):
+        if member not in ctx.guild.members:
+            return await ctx.send(
+                f':x: {member.display_name} is a invalid user!'
+            )
+
+        sta_json = JsonApi().get_json('StaticSetting')
+        name_to_index: dict = sta_json['level_role_id']
+
+        current_roles = member.roles
+        for role in current_roles:
+            if role.name in name_to_index.keys():
+                name_to_index: dict = sta_json['level_role_name_to_index']
+                index_to_name: dict = sta_json['level_role_index_to_name']
+                advance_index = int(name_to_index.get(role.name)) - 1
+                new_role_name = index_to_name.get(str(advance_index))
+                new_role = ctx.guild.get_role(name_to_index.get(new_role_name))
+
+                await member.remove_roles(role)
+                await member.add_roles(new_role)
+                break
+
+
 def setup(bot):
     bot.add_cog(Cadre(bot))
+    bot.add_cog(GuildRole(bot))

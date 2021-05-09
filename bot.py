@@ -4,11 +4,15 @@ import sys
 import os
 import keep_alive
 import asyncio
-import core.utils as func
+import core.utils as utl
 
 
 intents = discord.Intents.all()
-bot = commands.Bot(command_prefix='+', intents=intents)
+bot = commands.Bot(
+    command_prefix='+',
+    intents=intents,
+    owner_id=610327503671656449
+)
 
 
 @bot.event
@@ -101,7 +105,7 @@ async def shut_down(ctx):
 @bot.event
 async def on_disconnect():
     report_channel = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-report')
-    await report_channel.send(f':exclamation: Bot disconnected! {func.Time.get_info("whole")}')
+    await report_channel.send(f':exclamation: Bot disconnected! {utl.Time.get_info("whole")}')
 
 
 for filename in os.listdir('./cogs'):

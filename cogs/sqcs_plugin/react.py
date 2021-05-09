@@ -14,7 +14,7 @@ class React(CogExtension):
         if (member.id in nts) or member.bot:
             return
 
-        time_status = await Time.get_range(Time.get_info('hour'))
+        time_status = Time.get_range(Time.get_info('hour'))
 
         msg = '\n'.join(rsp["join"]["opening"][time_status]) + '\n'
         msg += '\n'.join(rsp["join"]["opening"]["main"])
