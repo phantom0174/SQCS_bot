@@ -141,6 +141,7 @@ class Quiz(CogExtension):
             }
             quiz_cursor.insert_one(member_quiz_result)
             Fluct().active_log_update(msg.author.id)
+            Fluct().quiz_submit_update(msg.author.id)
 
             # add score to member fluctlight
             if answer_correctness:
@@ -150,6 +151,7 @@ class Quiz(CogExtension):
                     }
                 }
                 fl_cursor.update_one({"_id": msg.author.id}, execute)
+                Fluct().quiz_correct_update(msg.author.id)
 
         else:
             message = ':exclamation: ' + '\n'.join(rsp["quiz"]["invalid_syntax"]["pt_1"]) + '\n'

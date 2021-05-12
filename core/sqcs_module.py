@@ -25,6 +25,7 @@ async def report_lect_attend(bot, attendants: list, week: int) -> None:
             }
             fluct_cursor.update_one({"_id": member_id}, execute)
             fluct_ext.Fluct().active_log_update(member_id)
+            fluct_ext.Fluct().lect_attend_update(member_id)
         except:
             await report_channel.send(
                 f'[DB MANI ERROR][to: {member_id}]'

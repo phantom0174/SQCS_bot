@@ -54,7 +54,10 @@ class Fluct:
     def reset_active(self, member_id) -> None:
         default_act = {
             "_id": member_id,
-            "log": ''
+            "log": '',
+            "lect_attend_count": 0,
+            "quiz_submit_count": 0,
+            "quiz_correct_count": 0
         }
         try:
             self.act_cursor.delete_one({"_id": member_id})
@@ -75,6 +78,42 @@ class Fluct:
                 }
             }
             self.main_fluct_cursor.update_one({"_id": member_id}, execute)
+
+    def lect_attend_update(self, member_id: int) -> None:
+        data = self.act_cursor.find_one({"_id": member_id})
+        if not data:
+            self.reset_active(member_id)
+
+        execute = {
+            "$inc": {
+                "lect_attend_count": 1
+            }
+        }
+        self.act_cursor.update_one({"_id": member_id}, execute)
+
+    def quiz_submit_update(self, member_id: int) -> None:
+        data = self.act_cursor.find_one({"_id": member_id})
+        if not data:
+            self.reset_active(member_id)
+
+        execute = {
+            "$inc": {
+                "quiz_submit_count": 1
+            }
+        }
+        self.act_cursor.update_one({"_id": member_id}, execute)
+
+    def quiz_correct_update(self, member_id: int) -> None:
+        data = self.act_cursor.find_one({"_id": member_id})
+        if not data:
+            self.reset_active(member_id)
+
+        execute = {
+            "$inc": {
+                "quiz_correct_count": 1
+            }
+        }
+        self.act_cursor.update_one({"_id": member_id}, execute)
 
 
 # main function
