@@ -5,6 +5,7 @@ import discord
 from discord.ext import tasks
 from core.cog_config import CogExtension
 from core.db import fluctlight_client, JsonApi
+from itertools import cycle
 
 
 class Task(CogExtension):
@@ -13,9 +14,51 @@ class Task(CogExtension):
 
         self.quiz_set_cursor = self_client["QuizSetting"]
 
+        self.member_count = int()
+        self.activity_percentage = float()
+        self.activity_loop = None
+
+        self.parameters_set.start()
         self.quiz_auto.start()
         self.nt_auto.start()
         self.bot_activity.start()
+
+    @tasks.loop(minutes=10)
+    async def parameters_set(self):
+        await self.bot.wait_until_ready()
+
+        # fetching current non-bot member count
+        fluctlight_cursor = fluctlight_client["MainFluctlights"]
+        self.member_count = fluctlight_cursor.find({}).count()
+
+        # fetching current guild activity percentage
+        fluct_cursor = fluctlight_client["MainFluctlights"]
+        week_active_match = {
+            "deep_freeze": {
+                "$ne": True
+            },
+            "week_active": {
+                "$ne": False
+            }
+        }
+        week_active_count = fluct_cursor.find(week_active_match).count()
+        countable_member_count = fluct_cursor.find({"deep_freeze": {"$ne": 1}}).count()
+        self.activity_percentage = round((week_active_count / countable_member_count) * 100, 4)
+
+        self.activity_loop = cycle([
+            discord.Activity(
+                type=discord.ActivityType.watching,
+                name=f'{self.member_count} 個活生生的搖光'
+            ),
+            discord.Activity(
+                type=discord.ActivityType.listening,
+                name=f'+help'
+            ),
+            discord.Activity(
+                type=discord.ActivityType.watching,
+                name=f'{self.activity_percentage}% 的活躍度...'
+            )
+        ])
 
     @tasks.loop(minutes=10)
     async def quiz_auto(self):
@@ -42,19 +85,12 @@ class Task(CogExtension):
                 await member.send(':recycle:')
                 await member.ban()
 
-    @tasks.loop(minutes=10)
+    @tasks.loop(seconds=5)
     async def bot_activity(self):
         await self.bot.wait_until_ready()
 
-        fluctlight_cursor = fluctlight_client["MainFluctlights"]
-        member_count = fluctlight_cursor.find({}).count()
-
-        await self.bot.change_presence(
-            activity=discord.Activity(
-                type=discord.ActivityType.watching,
-                name=f'{member_count} 個活生生的搖光'
-            )
-        )
+        if self.activity_loop is not None:
+            await self.bot.change_presence(activity=next(self.activity_loop))
 
 
 def setup(bot):
