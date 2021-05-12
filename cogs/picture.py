@@ -13,16 +13,16 @@ class Picture(CogExtension):
     @pic.command(aliases=['insert'])
     async def add(self, ctx, link: str):
 
-        pic_json = JsonApi().get_json('DynamicSetting')
+        pic_json = JsonApi().get('DynamicSetting')
         pic_json['picture_link'].append(link)
-        JsonApi().put_json('DynamicSetting', pic_json)
+        JsonApi().put('DynamicSetting', pic_json)
 
         await ctx.send(f':white_check_mark: Object {link} successfully added!')
 
     @pic.command(aliases=['delete'])
     async def remove(self, ctx, index: int):
 
-        pic_json = JsonApi().get_json('DynamicSetting')
+        pic_json = JsonApi().get('DynamicSetting')
 
         if index >= int(len(pic_json['picture_link'])):
             return await ctx.send('Index out of range!')
@@ -30,14 +30,14 @@ class Picture(CogExtension):
         del_object = pic_json['picture_link'][index]
         del pic_json['picture_link'][index]
 
-        JsonApi().put_json('DynamicSetting', pic_json)
+        JsonApi().put('DynamicSetting', pic_json)
 
         await ctx.send(f'Object {del_object} successfully deleted!')
 
     @pic.command()
     async def list(self, ctx):
 
-        pic_json = JsonApi().get_json('DynamicSetting')
+        pic_json = JsonApi().get('DynamicSetting')
 
         pic_str = str()
         for i, pic in enumerate(pic_json['picture_link']):
@@ -52,7 +52,7 @@ class Picture(CogExtension):
     @pic.command(aliases=['get'])
     async def random(self, ctx):
 
-        pic_json = JsonApi().get_json('DynamicSetting')
+        pic_json = JsonApi().get('DynamicSetting')
 
         random_picture = random.choice(pic_json['picture_link'])
         await ctx.send(random_picture)

@@ -31,9 +31,9 @@ class Event(CogExtension):
 
         full_log = f'[cmd exec]{log_msg}[{Time.get_info("whole")}]'
 
-        log_json = JsonApi().get_json('CmdLogging')
+        log_json = JsonApi().get('CmdLogging')
         log_json['logs'].append(full_log)
-        JsonApi().put_json('CmdLogging', log_json)
+        JsonApi().put('CmdLogging', log_json)
 
 
 def setup(bot):

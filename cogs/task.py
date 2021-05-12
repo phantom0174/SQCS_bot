@@ -79,7 +79,7 @@ class Task(CogExtension):
     async def nt_auto(self):
         await self.bot.wait_until_ready()
 
-        nt_list = JsonApi().get_json('NT')["id_list"]
+        nt_list = JsonApi().get('NT')["id_list"]
         for member in self.bot.guilds[0].members:
             if member.id in nt_list:
                 await member.send(':recycle:')

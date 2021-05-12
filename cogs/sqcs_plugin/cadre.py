@@ -177,7 +177,7 @@ class GuildRole(CogExtension):
                 f':x: {member.display_name} is a invalid user!'
             )
 
-        sta_json = JsonApi().get_json('StaticSetting')
+        sta_json = JsonApi().get('StaticSetting')
         name_to_index: dict = sta_json['level_role_id']
 
         current_roles = member.roles
@@ -201,7 +201,7 @@ class GuildRole(CogExtension):
                 f':x: {member.display_name} is a invalid user!'
             )
 
-        sta_json = JsonApi().get_json('StaticSetting')
+        sta_json = JsonApi().get('StaticSetting')
         name_to_index: dict = sta_json['level_role_id']
 
         current_roles = member.roles

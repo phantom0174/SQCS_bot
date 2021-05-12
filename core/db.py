@@ -22,14 +22,14 @@ class JsonApi:
         self.json_links = str(os.environ.get("JsonApiLinks"))
         self.link_dict = requests.get(self.link_header + self.json_links).json()["links"]
 
-    def get_json(self, name) -> Union[dict, None]:
+    def get(self, name) -> Union[dict, None]:
         if name not in self.link_dict.keys():
             return None
 
         response = requests.get(self.link_header + self.link_dict[name])
         return response.json()
 
-    def put_json(self, name, alter_json) -> None:
+    def put(self, name, alter_json) -> None:
         if name not in self.link_dict.keys():
             return None
 
@@ -37,4 +37,4 @@ class JsonApi:
 
 
 # static json db
-rsp = JsonApi().get_json('HumanityExtension')
+rsp = JsonApi().get('HumanityExtension')

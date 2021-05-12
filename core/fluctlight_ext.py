@@ -245,10 +245,10 @@ async def hurt(member_id, delta_du):
         }
         fluct_cursor.update_one({"_id": member_id}, execute)
 
-        regeneration_json = JsonApi().get_json('FluctlightEvent')
+        regeneration_json = JsonApi().get('FluctlightEvent')
         if member_id not in regeneration_json["regen_id_list"]:
             regeneration_json["id_list"].append(member_id)
-            JsonApi().put_json('FluctlightEvent', regeneration_json)
+            JsonApi().put('FluctlightEvent', regeneration_json)
 
             regeneration_task = threading.Thread(target=regeneration, args=(member_id,))
             regeneration_task.start()

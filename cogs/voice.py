@@ -45,7 +45,7 @@ class Voice(CogExtension):
                 ':exclamation: There exists no such channel'
             )
 
-        dyn_json = JsonApi().get_json('DynamicSetting')
+        dyn_json = JsonApi().get('DynamicSetting')
 
         if channel_id in dyn_json["voice_in_protect"]:
             return await ctx.send(
@@ -53,7 +53,7 @@ class Voice(CogExtension):
             )
 
         dyn_json["voice_in_protect"].append(channel_id)
-        JsonApi().put_json('DynamicSetting', dyn_json)
+        JsonApi().put('DynamicSetting', dyn_json)
         for member in ctx.guild.members:
             if member.voice is None:
                 continue
@@ -75,7 +75,7 @@ class Voice(CogExtension):
                 ':exclamation: There exists no such channel'
             )
 
-        dyn_json = JsonApi().get_json('DynamicSetting')
+        dyn_json = JsonApi().get('DynamicSetting')
 
         if channel_id not in dyn_json["voice_in_protect"]:
             return await ctx.send(
@@ -83,12 +83,12 @@ class Voice(CogExtension):
             )
 
         dyn_json["voice_in_protect"].remove(channel_id)
-        JsonApi().put_json('DynamicSetting', dyn_json)
+        JsonApi().put('DynamicSetting', dyn_json)
         await ctx.send(':white_check_mark: Operation finished!')
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
-        voice_in_protect = JsonApi().get_json('DynamicSetting')["voice_in_protect"]
+        voice_in_protect = JsonApi().get('DynamicSetting')["voice_in_protect"]
 
         if before.channel is not None and after.channel != before.channel and before.channel.id in voice_in_protect:
             await member.move_to(before.channel)

@@ -12,7 +12,7 @@ class Log(CogExtension):
 
     @log.command(aliases=['query', 'len'])
     async def query_len(self, ctx, title: str = "CmdLogging"):
-        logs_list = JsonApi().get_json(title)["logs"]
+        logs_list = JsonApi().get(title)["logs"]
         await ctx.send(f'There are currently {len(logs_list)} logs in the json file!')
 
     @log.command(aliases=['get'])
@@ -26,7 +26,7 @@ class Log(CogExtension):
             return await ctx.send(f'There is no such logging named {title}!')
 
         buffer_channel = discord.utils.get(self.bot.guilds[1].text_channels, name=logging_channel[title])
-        logs_json = JsonApi().get_json(title)
+        logs_json = JsonApi().get(title)
 
         if len(logs_json["logs"]) == 0:
             return
@@ -46,7 +46,7 @@ class Log(CogExtension):
             temp_file.write('')
 
         logs_json["logs"].clear()
-        JsonApi().put_json(title, logs_json)
+        JsonApi().put(title, logs_json)
 
 
 def setup(bot):

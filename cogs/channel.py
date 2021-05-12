@@ -13,7 +13,7 @@ class Channel(CogExtension):
 
     @cha.command(aliases=['p'])
     async def protect(self, ctx, channel_id: int = -1):
-        dyn_json = JsonApi().get_json('DynamicSetting')
+        dyn_json = JsonApi().get('DynamicSetting')
 
         if channel_id != -1:
             target_channel = ctx.guild.get_channel(channel_id)
@@ -26,11 +26,11 @@ class Channel(CogExtension):
             dyn_json['channel_in_protect'].append(ctx.channel.id)
             await ctx.send(f':white_check_mark: {ctx.channel.name} is in protect mode!')
 
-        JsonApi().put_json('DynamicSetting', dyn_json)
+        JsonApi().put('DynamicSetting', dyn_json)
 
     @cha.command(aliases=['d'])
     async def disarm(self, ctx, channel_id: int = -1):
-        dyn_json = JsonApi().get_json('DynamicSetting')
+        dyn_json = JsonApi().get('DynamicSetting')
 
         if channel_id != -1:
             target_channel = ctx.guild.get_channel(channel_id)
@@ -43,41 +43,41 @@ class Channel(CogExtension):
             dyn_json['channel_in_protect'].remove(ctx.channel.id)
             await ctx.send(f':white_check_mark: {ctx.channel.name} is in disarm mode!')
 
-        JsonApi().put_json('DynamicSetting', dyn_json)
+        JsonApi().put('DynamicSetting', dyn_json)
 
     @cha.command(aliases=['p_all'])
     async def protect_all(self, ctx):
-        dyn_json = JsonApi().get_json('DynamicSetting')
+        dyn_json = JsonApi().get('DynamicSetting')
 
         for channel in ctx.guild.channels:
             if channel.id not in dyn_json['channel_in_protect']:
                 dyn_json['channel_in_protect'].append(channel.id)
 
-        JsonApi().put_json('DynamicSetting', dyn_json)
+        JsonApi().put('DynamicSetting', dyn_json)
         await ctx.send(':white_check_mark: Operation finished!')
 
     @cha.command(aliases=['d_all'])
     async def disarm_all(self, ctx):
-        dyn_json = JsonApi().get_json('DynamicSetting')
+        dyn_json = JsonApi().get('DynamicSetting')
 
         for channel in ctx.guild.channels:
             if channel.id in dyn_json['channel_in_protect']:
                 dyn_json['channel_in_protect'].remove(channel.id)
 
-        JsonApi().put_json('DynamicSetting', dyn_json)
+        JsonApi().put('DynamicSetting', dyn_json)
         await ctx.send(':white_check_mark: Operation finished!')
 
     @cha.command(aliases=['cpl'])
     async def clear_protect_list(self, ctx):
-        dyn_json = JsonApi().get_json('DynamicSetting')
+        dyn_json = JsonApi().get('DynamicSetting')
         dyn_json['channel_in_protect'].clear()
 
-        JsonApi().put_json('DynamicSetting', dyn_json)
+        JsonApi().put('DynamicSetting', dyn_json)
         await ctx.send(':white_check_mark: Operation finished!')
 
     @commands.Cog.listener()
     async def on_guild_channel_delete(self, channel):
-        dyn_json = JsonApi().get_json('DynamicSetting')
+        dyn_json = JsonApi().get('DynamicSetting')
 
         if channel.id not in dyn_json['channel_in_protect']:
             return
@@ -132,7 +132,7 @@ class Channel(CogExtension):
 
         dyn_json['channel_in_protect'].remove(channel.id)
         dyn_json['channel_in_protect'].append(respawn_channel.id)
-        JsonApi().put_json('DynamicSetting', dyn_json)
+        JsonApi().put('DynamicSetting', dyn_json)
 
 
 def setup(bot):

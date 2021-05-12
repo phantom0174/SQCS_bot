@@ -96,7 +96,7 @@ async def personal_info(member_id):
         data["deep_freeze"]
     ]
 
-    icon_json = JsonApi().get_json('StaticSetting')
+    icon_json = JsonApi().get('StaticSetting')
     rand_icon = random.choice(icon_json['fluctlight_query_gifs'])
 
     embed_para = [
