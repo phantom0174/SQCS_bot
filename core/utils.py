@@ -107,9 +107,12 @@ class ProgressDisplay:
         self.channel = channel
         self.content = content
         self.total = total
+        self.message = None
 
+    async def active(self):
         message = await self.channel.send(f'{self.content} (0/{self.total})')
         self.message = message
 
     async def display(self, progress):
-        await self.message.edit(content=f'{self.content} ({progress}/{self.total})')
+        if self.message is not None:
+            await self.message.edit(content=f'{self.content} ({progress}/{self.total})')

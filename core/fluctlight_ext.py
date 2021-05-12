@@ -8,7 +8,7 @@ class Fluct:
     def __init__(self, member_id=None):
         self.main_fluct_cursor = fluctlight_client["MainFluctlights"]
         self.vice_fluct_cursor = fluctlight_client["ViceFluctlights"]
-        self.act_cursor = fluctlight_client["active-logs"]
+        self.act_cursor = fluctlight_client["ActiveLogs"]
 
         if member_id is not None:
             self.member_fluctlight = self.main_fluct_cursor.find_one({"_id": member_id})
@@ -234,7 +234,7 @@ async def lvl_ind_update(fluctlight_cursor, active_logs_cursor, avr_contrib) -> 
         member_active_logs = active_logs_cursor.find_one({"_id": member["_id"]})
 
         if not member_active_logs:
-            continue
+            Fluct().reset_active(member["_id"])
 
         member_week_count = len(member_active_logs["log"])
         active_logs = member_active_logs["log"]

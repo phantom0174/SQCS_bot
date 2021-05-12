@@ -61,7 +61,7 @@ class React(CogExtension):
 
         main_fluct_cursor = fluctlight_client["MainFluctlights"]
         vice_fluct_cursor = fluctlight_client["ViceFluctlights"]
-        act_cursor = fluctlight_client["active-logs"]
+        act_cursor = fluctlight_client["ActiveLogs"]
 
         default_main_fluctlight = {
             "_id": member.id,

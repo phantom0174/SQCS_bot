@@ -105,7 +105,7 @@ class Quiz(CogExtension):
         if msg.author == self.bot.user or msg.channel != main_channel:
             return
 
-        if msg.content[0] == '~' or msg.content[0] == '+':
+        if msg.content.startswith('~') or msg.content.startswith('+'):
             return
 
         quiz_set_cursor = self_client["QuizSetting"]
@@ -130,7 +130,7 @@ class Quiz(CogExtension):
             message = ':no_entry_sign: ' + '\n'.join(rsp["quiz"]["repeat_answer"])
             return await msg.author.send(message)
 
-        if msg.content[:2] == '||' and msg.content[-2:] == '||':
+        if msg.content.startswith('||') and msg.content.endswith('||'):
             message = ':white_check_mark: ' + '\n'.join(rsp["quiz"]["get_answer"])
             await msg.author.send(message)
 
