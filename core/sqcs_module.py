@@ -12,7 +12,7 @@ async def report_lect_attend(bot, attendants: list, week: int) -> None:
     # add score to the attendances
     fluct_cursor = fluctlight_client["MainFluctlights"]
 
-    report_json = JsonApi().get_json('LectureLogging')
+    report_json = JsonApi().get('LectureLogging')
     report_channel = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-lecture-attend')
 
     for member_id in attendants:
@@ -36,4 +36,4 @@ async def report_lect_attend(bot, attendants: list, week: int) -> None:
         f'{attendants}\n'
         f'[{Time.get_info("whole")}]'
     )
-    JsonApi().put_json('LectureLogging', report_json)
+    JsonApi().put('LectureLogging', report_json)
