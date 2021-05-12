@@ -14,8 +14,6 @@ class Task(CogExtension):
 
         self.quiz_set_cursor = self_client["QuizSetting"]
 
-        self.member_count = int()
-        self.activity_percentage = float()
         self.activity_loop = None
 
         self.parameters_set.start()
@@ -29,7 +27,7 @@ class Task(CogExtension):
 
         # fetching current non-bot member count
         fluctlight_cursor = fluctlight_client["MainFluctlights"]
-        self.member_count = fluctlight_cursor.find({}).count()
+        member_count = fluctlight_cursor.find({}).count()
 
         # fetching current guild activity percentage
         fluct_cursor = fluctlight_client["MainFluctlights"]
@@ -43,12 +41,12 @@ class Task(CogExtension):
         }
         week_active_count = fluct_cursor.find(week_active_match).count()
         countable_member_count = fluct_cursor.find({"deep_freeze": {"$ne": 1}}).count()
-        self.activity_percentage = round((week_active_count / countable_member_count) * 100, 4)
+        activity_percentage = round((week_active_count / countable_member_count) * 100, 4)
 
         self.activity_loop = cycle([
             discord.Activity(
                 type=discord.ActivityType.watching,
-                name=f'{self.member_count} 個活生生的搖光'
+                name=f'{member_count} 個活生生的搖光'
             ),
             discord.Activity(
                 type=discord.ActivityType.listening,
@@ -56,7 +54,7 @@ class Task(CogExtension):
             ),
             discord.Activity(
                 type=discord.ActivityType.watching,
-                name=f'{self.activity_percentage}% 的活躍度...'
+                name=f'{activity_percentage}% 的活躍度...'
             )
         ])
 
