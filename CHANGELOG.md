@@ -1,8 +1,11 @@
 # 📜 ChangeLog
 
-`version 1.24.5.9`
+`version 1.25.5.14`
 
 ```markdown
+- 2021/05/14: 漢化
+  > Better for reading
+
 - 2021/05/09: Server rearrangement stage 1
   > Add role management tools
 
