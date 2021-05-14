@@ -17,16 +17,14 @@ class Lecture(CogExtension):
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def list(self, ctx):
-
         lect_set_cursor = self_client["LectureSetting"]
         data = lect_set_cursor.find({})
 
         if data.count() == 0:
-            return await ctx.send(':exclamation: 沒有資料！')
+            return await ctx.send(':exclamation: 沒有講座資料！')
 
         # improved code
-        lecture_list = '\n'.join(
-            map(
+        lecture_list = '\n'.join(map(
                 lambda item: f'name: {item["name"]}\n'
                              f'week: {item["week"]}\n'
                              f'status: {item["status"]}\n'
@@ -34,31 +32,32 @@ class Lecture(CogExtension):
                              f'text_id: {item["text_id"]}\n'
                              f'voice_id: {item["voice_id"]}\n',
                 data
-            )
-        )
+        ))
 
         await ctx.send(lecture_list)
-        await ctx.send(':white_check_mark: Logging finished!')
+        await ctx.send(':white_check_mark: 紀錄尋找完畢！')
 
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def add(self, ctx):
-
         # ask for arguments
         def check(message):
             return message.channel == ctx.channel and message.author == ctx.author
 
-        await ctx.send(':question: 請問講座名稱是什麼呢？')
-        name = (await self.bot.wait_for('message', check=check, timeout=30)).content
+        try:
+            await ctx.send(':question: 請問講座名稱是什麼呢？')
+            name = (await self.bot.wait_for('message', check=check, timeout=30)).content
 
-        await ctx.send(':question: 請問在星期幾舉辦呢？')
-        week = (await self.bot.wait_for('message', check=check, timeout=30)).content
+            await ctx.send(':question: 請問在星期幾舉辦呢？')
+            week = (await self.bot.wait_for('message', check=check, timeout=30)).content
 
-        await ctx.send(':question: 請問使用的文字頻道id為多少呢？')
-        text_channel_id = (await self.bot.wait_for('message', check=check, timeout=30)).content
+            await ctx.send(':question: 請問使用的文字頻道id為多少呢？')
+            text_channel_id = (await self.bot.wait_for('message', check=check, timeout=30)).content
 
-        await ctx.send(':question: 請問使用的語音頻道id為多少呢？')
-        voice_channel_id = (await self.bot.wait_for('message', check=check, timeout=30)).content
+            await ctx.send(':question: 請問使用的語音頻道id為多少呢？')
+            voice_channel_id = (await self.bot.wait_for('message', check=check, timeout=30)).content
+        except asyncio.TimeoutError:
+            return
 
         # left _id for random
         lecture_config = {
@@ -69,40 +68,37 @@ class Lecture(CogExtension):
             "text_id": int(text_channel_id),
             "voice_id": int(voice_channel_id)
         }
-
         lect_set_cursor = self_client["LectureSetting"]
         lect_set_cursor.insert_one(lecture_config)
 
-        await ctx.send(':white_check_mark: 資料建檔完畢，謝謝你的配合！')
+        await ctx.send(':white_check_mark: 講座資料建檔完畢，謝謝你的配合！')
 
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def remove(self, ctx, del_lect_week: int):
-
         lect_set_cursor = self_client["LectureSetting"]
 
         try:
             lect_set_cursor.delete_one({"week": del_lect_week})
             await ctx.send(f':white_check_mark: 星期 `{del_lect_week}` 的講座資料已被移除！')
         except Exception as e:
-            await ctx.send(f':exclamation: 移除星期 `{del_lect_week}` 的講座資料時發生了錯誤！')
+            await ctx.send(f':x: 移除星期 `{del_lect_week}` 的講座資料時發生了錯誤！')
             await ctx.send(content=e, delete_after=5.0)
 
     @lect.command()
     @commands.has_any_role('總召', 'Administrator')
     async def start(self, ctx, week: int):
-
         lect_set_cursor = self_client["LectureSetting"]
         lect_config = lect_set_cursor.find_one({"week": week})
 
         if not lect_config:
-            return await ctx.send(f':exclamation: 星期 `{week}` 沒有講座！')
+            return await ctx.send(f':x: 星期 `{week}` 沒有講座！')
 
         if lect_config["status"]:
-            return await ctx.send(':exclamation: 講座已經開始了！')
+            return await ctx.send(':x: 講座已經開始了！')
 
         msg = '\n'.join(rsp["lecture"]["start"]["pt_1"]) + '\n'
-        msg += f'星期 `{week}` 的講座 - `{lect_config["name"]}` 開始了呦 \\^~^\n'
+        msg += f'星期 `{week}` 的講座－`{lect_config["name"]}` 開始了呦 \\^~^\n'
         msg += '\n'.join(rsp["lecture"]["start"]["pt_2"])
         await ctx.send(msg)
 
@@ -117,16 +113,13 @@ class Lecture(CogExtension):
         text_channel = self.bot.get_channel(lect_config["text_id"])
         msg_logs = await text_channel.history(limit=200).flatten()
         for msg in msg_logs:
-            if len(msg.content) > 0 and msg.content[0] == '&':
+            if msg.content and msg.content.startswith('&'):
                 await msg.delete()
 
-        # cd time from preventing member leave at once
-        # need to fix for stable pattern
-        random.seed(Time.get_info('hour') * 92384)
+        # cool-down to exclude member who leave at once
         await asyncio.sleep(random.randint(30, 180))
 
         voice_channel = self.bot.get_channel(lect_config["voice_id"])
-
         attendants = [member.id for member in voice_channel.members]
 
         await sm.report_lect_attend(self.bot, attendants, week)
@@ -147,19 +140,17 @@ class Lecture(CogExtension):
         correct_msgs = []  # correct message
 
         for log in msg_logs:
-            if len(log.content) == 0:
+            if not log.content or log.author.bot or not log.content.startswith('&'):
                 continue
 
-            if (not log.author.bot) and log.content[0] == '&':
-                await log.delete()
-                for ans in answer_alias:
-                    # correct answer is a subset of member answer
-                    if log.content.find(ans) != -1:
-                        correct_msgs.append(log)
-                        break
+            await log.delete()
+            for ans in answer_alias:
+                # correct answer is a subset of member answer
+                if log.content.find(ans) != -1:
+                    correct_msgs.append(log)
+                    break
 
         correct_msgs.reverse()
-
         crt_member_id_list = [crt_msg.author.id for crt_msg in correct_msgs]
 
         # add score to correct members
@@ -272,7 +263,7 @@ class Lecture(CogExtension):
             return f':exclamation: 所有成員將在 {s} 秒後被移出 {voice_channel.name}'
 
         message = await ctx.send(content(countdown_duration))
-        while countdown_duration > 0:
+        while countdown_duration:
             await message.edit(content=content(countdown_duration))
             await asyncio.sleep(1)
             countdown_duration -= 1

@@ -19,7 +19,7 @@ class Event(CogExtension):
         user_id = ctx.author.id
         message = ctx.message.content
 
-        if len(cmd_parents) == 0:
+        if not cmd_parents:
             cmd_parents = str('N/A')
 
         log_msg: str = (

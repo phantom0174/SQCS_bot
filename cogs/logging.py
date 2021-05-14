@@ -12,23 +12,30 @@ class Log(CogExtension):
 
     @log.command(aliases=['query', 'len'])
     async def query_len(self, ctx, title: str = "CmdLogging"):
+        title_options = ['CmdLogging', 'LectureLogging']
+        if title not in title_options:
+            return await ctx.send(
+                f':x: 參數必須在 {title_options} 中！'
+            )
+
         logs_list = JsonApi().get(title)["logs"]
-        await ctx.send(f'There are currently {len(logs_list)} logs in the json file!')
+        logs_length = len(logs_list)
+        await ctx.send(f':mag_right: 記錄檔中目前有 {logs_length} 筆記錄！')
 
     @log.command(aliases=['get'])
     async def release(self, ctx, title: str = "CmdLogging"):
         logging_channel = {
-            "CmdLogging": "sqcs-report",
-            "LectureLogging": "sqcs-lecture-report"
+            "CmdLogging": 785146879004508171,
+            "LectureLogging": 828286118420021250
         }
 
         if title not in logging_channel.keys():
-            return await ctx.send(f'There is no such logging named {title}!')
+            return await ctx.send(f':x: 參數必須在 {logging_channel.keys()} 中！')
 
-        buffer_channel = discord.utils.get(self.bot.guilds[1].text_channels, name=logging_channel[title])
+        buffer_channel = self.bot.fetch_channel(logging_channel.get(title))
         logs_json = JsonApi().get(title)
 
-        if len(logs_json["logs"]) == 0:
+        if not logs_json["logs"]:
             return
 
         logs = '\n'.join(logs_json["logs"])
@@ -36,10 +43,8 @@ class Log(CogExtension):
         with open('./txts/report_buffer.txt', mode='w', encoding='utf8') as temp_file:
             temp_file.write(logs)
 
-        # clear the string -> unnecessary
-        # logs = ''
-
         await buffer_channel.send(file=discord.File('./txts/report_buffer.txt'))
+        await ctx.send(f':white_check_mark: 記錄檔 {title} 已釋出！')
 
         # clear buffer content
         with open('./txts/report_buffer.txt', mode='w', encoding='utf8') as temp_file:

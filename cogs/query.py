@@ -14,12 +14,11 @@ class Query(CogExtension):
     @query.command()
     @commands.has_any_role('總召', 'Administrator')
     async def quiz(self, ctx):
-
         quiz_ongoing_cursor = self_client["QuizOngoing"]
         data = quiz_ongoing_cursor.find({})
 
         if data.count() == 0:
-            return await ctx.send(':exclamation: There is no data!')
+            return await ctx.send(':x: 沒有任何正在進行中的講座資料！')
 
         status = str()
         for item in data:
@@ -55,10 +54,12 @@ class Query(CogExtension):
         }
         week_active_count = fluct_cursor.find(week_active_match).count()
         countable_member_count = fluct_cursor.find({"deep_freeze": {"$ne": 1}}).count()
+        activeness = round((week_active_count / countable_member_count) * 100, 4)
 
         await ctx.send(
-            f':scroll: Weekly activeness until now is {(week_active_count / countable_member_count) * 100} %\n'
-            f'Active: {week_active_count}, Total: {countable_member_count}'
+            f':scroll: 伺服器目前活躍度為 {activeness}%\n'
+            f'總人數：{countable_member_count}\n'
+            f'活躍中：{week_active_count}'
         )
 
 

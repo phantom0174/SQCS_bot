@@ -1,7 +1,8 @@
 from discord.ext import commands
 from core.cog_config import CogExtension
 from core.db import self_client, rsp, fluctlight_client
-from core.utils import DiscordExt
+from typing import Union
+import discord
 
 
 class KickMember(CogExtension):
@@ -13,13 +14,13 @@ class KickMember(CogExtension):
 
     @kick.command()
     async def list(self, ctx):
-        await ctx.send(':hourglass_flowing_sand: Finding...')
+        await ctx.send(content=':hourglass_flowing_sand: 尋找中...', delete_after=3.0)
 
         kick_cursor = self_client["ReadyToKick"]
         data = kick_cursor.find({})
 
         if data.count() == 0:
-            return await ctx.send(':exclamation: There are no member in the kick list!')
+            return await ctx.send(':x: 待踢除名單為空！')
 
         kick_member_list = str()
         for member in data:
@@ -39,53 +40,66 @@ class KickMember(CogExtension):
         if len(kick_member_list) > 0:
             await ctx.send(kick_member_list)
 
-        await ctx.send(':white_check_mark: Logging finished!')
+        await ctx.send(':white_check_mark: 記錄尋找完畢！')
 
     @kick.command(aliases=['insert'])
-    async def add(self, ctx, member_id: int):
+    async def add(self, ctx, target_member: Union[discord.Member, int]):
+        if isinstance(target_member, discord.Member):
+            member_id = target_member.id
+        else:
+            member_id = target_member
+
         fluctlight_cursor = fluctlight_client["MainFluctlights"]
         data = fluctlight_cursor.find_one({"_id": member_id})
 
         if not data:
-            return await ctx.send(f":exclamation: There's no data of member whose id is {member_id}")
+            return await ctx.send(f':x: 沒有成員 {target_member} 的搖光資料！')
 
-        member_name = await DiscordExt.get_member_nick_name(ctx.guild, member_id)
         member_info = {
             "_id": member_id,
-            "name": member_name,
+            "name": data["name"],
             "contrib": data["contrib"],
             "lvl_ind": data["lvl_ind"]
         }
-
         kick_cursor = self_client["ReadyToKick"]
         kick_cursor.insert_one(member_info)
 
-        await ctx.send(f':white_check_mark: Member {member_name}({member_id}) has been added to the kick list!')
+        await ctx.send(f':white_check_mark: 成員 {data["name"]} - {member_id} 已被加到待踢除名單！')
 
     @kick.command(aliases=['delete', 'del'])
-    async def remove(self, ctx, member_id: int):
+    async def remove(self, ctx, target_member: Union[discord.Member, int]):
+        if isinstance(target_member, discord.Member):
+            member_id = target_member.id
+        else:
+            member_id = target_member
+
         kick_cursor = self_client["ReadyToKick"]
         data = kick_cursor.find_one({"_id": member_id})
 
         if not data:
-            return await ctx.send(f":exclamation: Member {member_id} isn't in the kick list!")
+            return await ctx.send(f':x: 成員 {member_id} 不在待踢除名單中！')
 
         kick_cursor.delete_one({"_id": member_id})
 
-        await ctx.send(f':white_check_mark: Member {member_id} has been removed from the kick list!')
+        await ctx.send(f':white_check_mark: 已將成員 {data["name"]} - {member_id} 從待踢除名單中移除！')
 
     @kick.command(aliases=['single'])
-    async def kick_single(self, ctx, member_id: int, kick_reason: str):
+    async def kick_single(self, ctx, target_member: Union[discord.Member, int], kick_reason: str):
+        if isinstance(target_member, discord.Member):
+            member_id = target_member.id
+        else:
+            member_id = target_member
+
         kick_cursor = self_client["ReadyToKick"]
         data = kick_cursor.find_one({"_id": member_id})
 
         if not data:
-            return await ctx.send(f":exclamation: Member {member_id} isn't in the kick list!")
+            return await ctx.send(f':x: 成員 {member_id} 不在待踢除名單中！')
 
         kick_user = await ctx.guild.fetch_member(member_id)
 
         if kick_reason == 'default':
-            kick_reason = f':skull_crossbones: Levelling index reached {data["lvl_ind"]}.'
+            kick_reason = f':skull_crossbones: 違反指數達到了 {data["lvl_ind"]}'
 
         msg = '\n'.join(rsp["kick"]["kick_single"]) + '\n'
         msg += f'> {kick_reason}\n'
@@ -95,7 +109,7 @@ class KickMember(CogExtension):
         try:
             await kick_user.kick(reason=kick_reason)
         except Exception as e:
-            await ctx.send(f':x: Error when kicking member {data["name"]}({data["_id"]})!')
+            await ctx.send(f':x: 踢除 {data["name"]} - {data["_id"]} 時發生了錯誤！')
             await ctx.send(content=e, delete_after=5.0)
 
         # delete member fluctlight info in guild
@@ -109,11 +123,11 @@ class KickMember(CogExtension):
             try:
                 cursor.delete_one({"_id": member_id})
             except Exception as e:
-                await ctx.send(f':exclamation: Error when manipulating cursor {cursor}')
+                await ctx.send(f':x: 使用指標 {cursor} 時發生了錯誤！')
                 await ctx.send(content=e, delete_after=5.0)
 
         kick_cursor.delete_one({"_id": member_id})
-        await ctx.send(f':white_check_mark: Kicked member {data["name"]}({data["_id"]})!')
+        await ctx.send(f':white_check_mark: 成員 {data["name"]} - {data["_id"]} 已被踢除！')
 
     @kick.command(aliases=['all'])
     async def kick_all(self, ctx):
@@ -121,7 +135,7 @@ class KickMember(CogExtension):
         data = kick_cursor.find({})
 
         if data.count() == 0:
-            return await ctx.send(':exclamation: Kick member list is empty!')
+            return await ctx.send(':x: 待踢除名單為空！')
 
         cursors = [
             fluctlight_client["MainFluctlights"],
@@ -138,22 +152,20 @@ class KickMember(CogExtension):
             await kick_user.send(msg)
 
             try:
-                await kick_user.kick(reason=f'Levelling index reached {member["lvl_ind"]}.')
+                await kick_user.kick(reason=f'違反指數達到了 {member["lvl_ind"]}')
             except Exception as e:
-                await ctx.send(f':x: Error when kicking member {member["name"]}({member["_id"]})!')
+                await ctx.send(f':x: 踢除 {member["name"]} - {member["_id"]} 時發生了錯誤！')
                 await ctx.send(content=e, delete_after=5.0)
 
             for cursor in cursors:
                 try:
                     cursor.delete_one({"_id": member["_id"]})
                 except Exception as e:
-                    await ctx.send(
-                        f':exclamation: Error when deleting fluctlight data of member {member["_id"]}'
-                    )
+                    await ctx.send(f':x: 操作指標 {cursor} 時發生了錯誤！')
                     await ctx.send(content=e, delete_after=5.0)
 
         kick_cursor.delete_many({})
-        await ctx.send(':white_check_mark: All members in the kick list has been kicked!')
+        await ctx.send(':white_check_mark: 所有在待踢除名單中的成員已被踢除！')
 
 
 def setup(bot):

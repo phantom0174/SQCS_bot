@@ -103,7 +103,8 @@ class React(CogExtension):
 
         msg = '\n'.join(rsp["join"]["fl_create_finish"])
         await member.send(msg)
-        await member.send(f'順帶一提，我用了 {round(end_time - start_time, 2)} (sec) 建立你的檔案><!')
+        time_duration = round(end_time - start_time, 2)
+        await member.send(f'順帶一提，我用了 {time_duration} (sec) 建立你的檔案><!')
 
 
 def setup(bot):

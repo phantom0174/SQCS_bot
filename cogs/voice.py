@@ -11,8 +11,9 @@ class Voice(CogExtension):
     async def voice(self, ctx):
         pass
 
+    # remove member in voice channel
     @voice.command()
-    async def kick_timer(self, ctx, channel_id: int, countdown: int):  # remove member in voice channel
+    async def kick_timer(self, ctx, channel_id: int, countdown: int):
         countdown_duration = countdown
         voice_channel = self.bot.get_channel(channel_id)
 
@@ -41,16 +42,12 @@ class Voice(CogExtension):
     async def collect_on(self, ctx, channel_id: int):
         target_channel = ctx.guild.get_channel(channel_id)
         if target_channel is None:
-            return await ctx.send(
-                ':exclamation: There exists no such channel'
-            )
+            return await ctx.send(':x: 這個頻道不存在！')
 
         dyn_json = JsonApi().get('DynamicSetting')
 
         if channel_id in dyn_json["voice_in_protect"]:
-            return await ctx.send(
-                f':exclamation: {target_channel.name} is already in collect mode'
-            )
+            return await ctx.send(f':x: 頻道 {target_channel.name} 已在蒐集模式中！')
 
         dyn_json["voice_in_protect"].append(channel_id)
         JsonApi().put('DynamicSetting', dyn_json)
@@ -64,27 +61,23 @@ class Voice(CogExtension):
                 except:
                     pass
 
-        await ctx.send(':white_check_mark: Operation finished!')
+        await ctx.send(':white_check_mark: 指令執行完畢！')
 
     @voice.command()
     @commands.has_any_role('總召', 'Administrator')
     async def collect_off(self, ctx, channel_id: int):
         target_channel = ctx.guild.get_channel(channel_id)
         if target_channel is None:
-            return await ctx.send(
-                ':exclamation: There exists no such channel'
-            )
+            return await ctx.send(':x: 這個頻道不存在！')
 
         dyn_json = JsonApi().get('DynamicSetting')
 
         if channel_id not in dyn_json["voice_in_protect"]:
-            return await ctx.send(
-                f':exclamation: {target_channel.name} is already out of collect mode'
-            )
+            return await ctx.send(f':x: 頻道 {target_channel.name} 已解除蒐集模式！')
 
         dyn_json["voice_in_protect"].remove(channel_id)
         JsonApi().put('DynamicSetting', dyn_json)
-        await ctx.send(':white_check_mark: Operation finished!')
+        await ctx.send(':white_check_mark: 指令執行完畢！')
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
@@ -99,9 +92,7 @@ class Voice(CogExtension):
         terminal_channel = ctx.guild.get_channel(839170475309006979)
 
         if ctx.author.voice.channel != terminal_channel:
-            return await ctx.send(
-                ':exclamation: Please jump into 🔐團體語音終端機 to use this command'
-            )
+            return await ctx.send(f':x: 請先加入 {terminal_channel.name} 以使用這個指令！')
 
         make_channel = await ctx.guild.create_voice_channel(
             name=f"{members[0].display_name}'s party",
@@ -123,7 +114,7 @@ class Voice(CogExtension):
             await member.move_to(make_channel)
 
         await make_channel.set_permissions(ctx.guild.default_role, connect=False)
-        await ctx.send(f':white_check_mark: Created {make_channel.name}!')
+        await ctx.send(f':white_check_mark: 已創建頻道 {make_channel.name}！')
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
@@ -131,6 +122,9 @@ class Voice(CogExtension):
             return
 
         if before.channel.name == f"{member.display_name}'s party":
+            await before.channel.delete()
+
+        if not before.channel.members:
             await before.channel.delete()
 
 

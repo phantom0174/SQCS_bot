@@ -18,13 +18,13 @@ class Channel(CogExtension):
         if channel_id != -1:
             target_channel = ctx.guild.get_channel(channel_id)
             if target_channel is None:
-                return await ctx.send(f':exclamation: No such channel with id {channel_id} exists')
+                return await ctx.send(f':x: 沒有id為 {channel_id} 的頻道存在！')
 
             dyn_json['channel_in_protect'].append(channel_id)
-            await ctx.send(f':white_check_mark: {target_channel.name} is in protect mode!')
+            await ctx.send(f':white_check_mark: 頻道 {target_channel.name} 開啟了保護模式！')
         else:
             dyn_json['channel_in_protect'].append(ctx.channel.id)
-            await ctx.send(f':white_check_mark: {ctx.channel.name} is in protect mode!')
+            await ctx.send(f':white_check_mark: 頻道 {ctx.channel.name} 開啟了保護模式！')
 
         JsonApi().put('DynamicSetting', dyn_json)
 
@@ -35,13 +35,13 @@ class Channel(CogExtension):
         if channel_id != -1:
             target_channel = ctx.guild.get_channel(channel_id)
             if target_channel is None:
-                return await ctx.send(f':exclamation: No such channel with id {channel_id} exists')
+                return await ctx.send(f':x: 沒有id為 {channel_id} 的頻道存在！')
 
             dyn_json['channel_in_protect'].remove(channel_id)
-            await ctx.send(f':white_check_mark: {target_channel.name} is in disarm mode!')
+            await ctx.send(f':white_check_mark: 頻道 {target_channel.name} 已解除保護！')
         else:
             dyn_json['channel_in_protect'].remove(ctx.channel.id)
-            await ctx.send(f':white_check_mark: {ctx.channel.name} is in disarm mode!')
+            await ctx.send(f':white_check_mark: 頻道 {ctx.channel.name} 已解除保護！')
 
         JsonApi().put('DynamicSetting', dyn_json)
 
@@ -54,7 +54,7 @@ class Channel(CogExtension):
                 dyn_json['channel_in_protect'].append(channel.id)
 
         JsonApi().put('DynamicSetting', dyn_json)
-        await ctx.send(':white_check_mark: Operation finished!')
+        await ctx.send(':white_check_mark: 指令執行完畢！')
 
     @cha.command(aliases=['d_all'])
     async def disarm_all(self, ctx):
@@ -65,7 +65,7 @@ class Channel(CogExtension):
                 dyn_json['channel_in_protect'].remove(channel.id)
 
         JsonApi().put('DynamicSetting', dyn_json)
-        await ctx.send(':white_check_mark: Operation finished!')
+        await ctx.send(':white_check_mark: 指令執行完畢！')
 
     @cha.command(aliases=['cpl'])
     async def clear_protect_list(self, ctx):
@@ -73,7 +73,7 @@ class Channel(CogExtension):
         dyn_json['channel_in_protect'].clear()
 
         JsonApi().put('DynamicSetting', dyn_json)
-        await ctx.send(':white_check_mark: Operation finished!')
+        await ctx.send(':white_check_mark: 指令執行完畢！')
 
     @commands.Cog.listener()
     async def on_guild_channel_delete(self, channel):
@@ -100,10 +100,10 @@ class Channel(CogExtension):
                 **respawn_config,
                 **text_config
             )
-            await respawn_channel.send(':exclamation: The channel has been respawned')
+            await respawn_channel.send(':exclamation: 這個頻道被重新生成了')
             entry = await channel.guild.audit_logs(action=discord.AuditLogAction.channel_delete, limit=1).get()
             await respawn_channel.send(
-                f'Deleted by {entry.user.mention} at {delete_time}'
+                f'由 {entry.user.mention} 於 {delete_time}　刪除'
             )
         elif str(channel.type) == 'voice':
             voice_config = {

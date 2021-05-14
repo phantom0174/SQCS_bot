@@ -54,7 +54,7 @@ def find_cog(path: str, target_cog: str, mode: str) -> (bool, str):
                     f'{trans_path.get(path)}{item[:-3]}'
                 )
                 return True, f':white_check_mark: Extension {item} loaded!'
-            elif mode == 'unload':
+            if mode == 'unload':
                 bot.unload_extension(
                     f'{trans_path.get(path)}{item[:-3]}'
                 )
@@ -102,7 +102,7 @@ async def reload(ctx, target_package: str):
             ':x: `target_package` can only be `main` or `sqcs`!'
         )
 
-    if target_package == 'all':
+    if target_package == 'main':
         for reload_filename in os.listdir('./cogs'):
             if reload_filename.endswith('.py'):
                 bot.reload_extension(f'cogs.{reload_filename[:-3]}')

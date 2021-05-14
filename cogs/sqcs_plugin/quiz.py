@@ -24,7 +24,7 @@ class Quiz(CogExtension):
             }
         }
         quiz_set_cursor.update_one({"_id": 0}, execute)
-        await ctx.send(f':white_check_mark: The stand-by answer has been set as {alter_answer}!')
+        await ctx.send(f':white_check_mark: 預備答案被設定為 {alter_answer} 了！')
 
     @quiz.command()
     async def alter_formal_ans(self, ctx, alter_answer: str):
@@ -36,7 +36,7 @@ class Quiz(CogExtension):
             }
         }
         quiz_set_cursor.update_one({"_id": 0}, execute)
-        await ctx.send(f':white_check_mark: The stand-by answer has been set as {alter_answer}!')
+        await ctx.send(f':white_check_mark: 正式答案被設定為 {alter_answer} 了！')
 
     @quiz.command()
     async def set_qns_link(self, ctx, qns_link: str):
@@ -48,7 +48,7 @@ class Quiz(CogExtension):
             }
         }
         quiz_set_cursor.update_one({"_id": 0}, execute)
-        await ctx.send(f':white_check_mark: The question link has been set as {qns_link}!')
+        await ctx.send(f':white_check_mark: 問題連結被設定為 {qns_link} 了！')
 
     @quiz.command()
     async def set_ans_link(self, ctx, ans_link: str):
@@ -60,12 +60,12 @@ class Quiz(CogExtension):
             }
         }
         quiz_set_cursor.update_one({"_id": 0}, execute)
-        await ctx.send(f':white_check_mark: The question link has been set as {ans_link}!')
+        await ctx.send(f':white_check_mark: 答案連結被設定為 {ans_link} 了！')
 
     @quiz.command()
     async def alt_member_result(self, ctx, member_id: int, new_result: int):
         if new_result not in [0, 1]:
-            return await ctx.send(':exclamation: New result must be one of 0 or 1!')
+            return await ctx.send(':x: 答題正確狀態參數必須為 0 或 1！')
 
         quiz_set_cursor = self_client["QuizSetting"]
         execute = {
@@ -76,7 +76,7 @@ class Quiz(CogExtension):
         quiz_set_cursor.update_one({"_id": member_id}, execute)
 
         member_name = await DiscordExt.get_member_nick_name(ctx.guild, member_id)
-        await ctx.send(f"Member {member_name}'s correctness has been set as {new_result}!")
+        await ctx.send(f'成員 {member_name} 的答題正確狀態被設定為 {new_result} 了！')
 
     @quiz.command()
     async def repost_qns(self, ctx):
@@ -101,8 +101,11 @@ class Quiz(CogExtension):
     # event answer listen function
     @commands.Cog.listener()
     async def on_message(self, msg):
-        main_channel = discord.utils.get(self.bot.guilds[0].text_channels, name='💎懸賞區')
-        if msg.author == self.bot.user or msg.channel != main_channel:
+        quiz_channel = msg.guild.get_channel(746014424086610012)
+        if quiz_channel is None:
+            return
+
+        if msg.author == self.bot.user or msg.channel != quiz_channel:
             return
 
         if msg.content.startswith('~') or msg.content.startswith('+'):
@@ -119,10 +122,8 @@ class Quiz(CogExtension):
         await msg.delete()
 
         correct_answer = quiz_set_cursor.find_one({"_id": 0})["correct_answer"]
-
         quiz_score = score_set_cursor.find_one({"_id": 0})["quiz_point"]
         score_weight = score_set_cursor.find_one({"_id": 0})["score_weight"]
-
         quiz_cursor = self_client["QuizOngoing"]
 
         data = quiz_cursor.find_one({"_id": msg.author.id})
@@ -163,8 +164,8 @@ class Quiz(CogExtension):
 # auto start quiz event
 async def quiz_start(bot):
     guild = bot.guilds[0]
-    main_channel = discord.utils.get(guild.text_channels, name='💎懸賞區')
-    cmd_channel = discord.utils.get(guild.text_channels, name='總指令區')
+    main_channel = bot.get_channel(746014424086610012)
+    gm_channel = bot.get_channel(743677861000380527)
 
     quiz_set_cursor = self_client["QuizSetting"]
     quiz_data = quiz_set_cursor.find_one({"_id": 0})
@@ -184,7 +185,7 @@ async def quiz_start(bot):
     quiz_status = new_quiz_data["event_status"]
     correct_answer = new_quiz_data["correct_answer"]
 
-    await cmd_channel.send(
+    await gm_channel.send(
         f'Quiz Event status set to {quiz_status}, '
         f'correct answer set to {correct_answer}!'
     )
@@ -208,8 +209,8 @@ async def quiz_start(bot):
 # auto end quiz event
 async def quiz_end(bot):
     guild = bot.guilds[0]
-    main_channel = discord.utils.get(guild.text_channels, name='💎懸賞區')
-    cmd_channel = discord.utils.get(guild.text_channels, name='總指令區')
+    main_channel = bot.get_channel(746014424086610012)
+    gm_channel = bot.get_channel(743677861000380527)
 
     quiz_set_cursor = self_client["QuizSetting"]
     quiz_data = quiz_set_cursor.find_one({"_id": 0})
@@ -231,7 +232,7 @@ async def quiz_end(bot):
     quiz_status = new_quiz_dara["event_status"]
     correct_answer = new_quiz_dara["correct_answer"]
 
-    await cmd_channel.send(
+    await gm_channel.send(
         f'Quiz Event status set to {quiz_status}, '
         f'correct answer set to {correct_answer}!'
     )
@@ -269,7 +270,7 @@ async def quiz_end(bot):
         winner_name = await DiscordExt.get_member_nick_name(bot.gulids[0], winner["_id"])
         winners += f'{winner_name}\n'
 
-    if winners == '':
+    if not winners:
         winners = 'None'
 
     quiz_ongoing_cursor.delete_many({})
@@ -282,7 +283,6 @@ async def quiz_end(bot):
         [winners]
     ]
     await main_channel.send(embed=DiscordExt.create_embed(*embed_para))
-
     await guild_weekly_update(bot)
 
 

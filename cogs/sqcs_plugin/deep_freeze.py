@@ -13,9 +13,8 @@ class DeepFreeze(CogExtension):
 
     @df.command()
     async def mani(self, ctx, member_id: int, status: int):
-
         if status not in [0, 1]:
-            return await ctx.send(':exclamation: Status must be either 0 or 1')
+            return await ctx.send(':x: 狀態參數必須為 0 或 1！')
 
         fluct_cursor = fluctlight_client["MainFluctlights"]
         try:
@@ -28,19 +27,19 @@ class DeepFreeze(CogExtension):
             member = await ctx.guild.fetch_member(member_id)
 
             await member.send(f':exclamation: 你的 `deep freeze` 狀態被設定為 {bool(status)} 了！')
-            await ctx.send(':white_check_mark: Manipulation finished!')
+            await ctx.send(':white_check_mark: 指令執行完畢！')
         except Exception as e:
             return await ctx.send(content=e, delete_after=5.0)
 
     @df.command()
     async def list(self, ctx):
-        await ctx.send(':hourglass_flowing_sand: Finding...')
+        await ctx.send(':hourglass_flowing_sand: 尋找中...')
 
         fluct_cursor = fluctlight_client["MainFluctlights"]
         data = fluct_cursor.find({"deep_freeze": {"$eq": True}})
 
         if data.count() == 0:
-            return await ctx.send(':exclamation: There are no member in deep_freeze status!')
+            return await ctx.send(':x: 沒有成員在凍結狀態中！')
 
         member_list = str()
         for member in data:
@@ -55,7 +54,7 @@ class DeepFreeze(CogExtension):
         if len(member_list) > 0:
             await ctx.send(member_list)
 
-        await ctx.send(':white_check_mark: Logging finished!')
+        await ctx.send(':white_check_mark: 記錄尋找完畢！')
 
 
 def setup(bot):

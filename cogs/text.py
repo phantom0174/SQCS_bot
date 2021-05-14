@@ -18,10 +18,10 @@ class Text(CogExtension):
             for msg in msg_logs:
                 await msg.delete()
                 if msg.id == msg_id:
-                    find = bool(True)
+                    find = True
                     break
 
-    @text.command()
+    @text.command(aliases=['move'])
     async def trans(self, ctx, start_id: int, end_id: int, to_channel: discord.TextChannel):
         msg_logs = await ctx.channel.history(limit=500).flatten()
         msg_logs.reverse()
@@ -56,9 +56,7 @@ class Text(CogExtension):
         perms.embed_links = True
 
         await ctx.channel.set_permissions(member, overwrite=perms)
-        await ctx.send(
-            f':white_check_mark: Successfully added {member.display_name} to this channel!'
-        )
+        await ctx.send(f':white_check_mark: 已將 {member.display_name} 加進此頻道！')
 
     @text.command(aliases=['remove'])
     async def remove_member(self, ctx, member: discord.Member):
@@ -73,9 +71,7 @@ class Text(CogExtension):
         perms.embed_links = None
 
         await ctx.channel.set_permissions(member, overwrite=perms)
-        await ctx.send(
-            f':white_check_mark: Successfully removed {member.display_name} from this channel!'
-        )
+        await ctx.send(f':white_check_mark: 已將 {member.display_name} 移出此頻道！')
 
 
 def setup(bot):

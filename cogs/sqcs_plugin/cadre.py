@@ -14,54 +14,53 @@ class Cadre(CogExtension):
 
     @ca.command()
     async def apply(self, ctx, cadre: str):
-        appl = ctx.author  # applicant
-
         if ctx.channel.id != 774794670034124850:
             return
 
-        if cadre not in ['副召', '網管', '議程', '公關', '美宣', '學術']:
+        cadre_options = ['副召', '網管', '議程', '公關', '美宣', '學術']
+        if cadre not in cadre_options:
             return await ctx.send(
-                content=f':exclamation: {appl.mention}, 沒有名為 `{cadre}` 的職位！', delete_after=5.0
+                content=f':x: 職位選項必須要在 {cadre_options} 中！',
+                delete_after=5.0
             )
 
         cadre_cursor = self_client["Cadre"]
-        data = cadre_cursor.find_one({"_id": appl.id})
+        data = cadre_cursor.find_one({"_id": ctx.author.id})
 
         if data:
-            return await appl.send(
-                f':exclamation: {appl.mention} (id: {data["_id"]}),\n'
-                f'您已經於 {data["apply_time"]} 申請 `{data["apply_cadre"]}` 職位！\n'
-                f'請確認是否發生以下狀況 `重複申請` `同時申請兩職位` `申請錯誤`\n'
-                f'如有疑問請洽總召'
+            return await ctx.author.send(
+                f':x: {ctx.author.mention} (id: {data["_id"]})\n'
+                f':scroll: 你已經於 {data["apply_time"]} 申請 `{data["apply_cadre"]}` 職位\n'
+                f'> 請確認是否發生 `重複申請` `同時申請兩職位` `申請錯誤`\n'
+                f'> 如有疑問，請洽總召'
             )
 
         apply_time = Time.get_info('whole')
         apply_info = {
-            "_id": appl.id,
-            "name": appl.display_name,
+            "_id": ctx.author.id,
+            "name": ctx.author.display_name,
             "apply_cadre": cadre,
             "apply_time": apply_time
         }
 
         cadre_cursor.insert_one(apply_info)
 
-        await appl.send(
-            f':white_check_mark: 我收到你的申請了！請耐心等待\n'
-            f'申請人名字: `{appl.display_name}`,\n'
-            f'申請人id: `{appl.id}`,\n'
-            f'申請職位: `{cadre}`,\n'
-            f'申請時間: `{apply_time}`'
+        await ctx.author.send(
+            f':white_check_mark: 我收到你的申請了！請耐心等待審核\n'
+            f'申請人名字：{ctx.author.display_name},\n'
+            f'申請人id：{ctx.author.id},\n'
+            f'申請職位：{cadre},\n'
+            f'申請時間：{apply_time}'
         )
 
     @ca.command()
     @commands.has_any_role('總召', 'Administrator')
     async def list(self, ctx):
-
         cadre_cursor = self_client["Cadre"]
         data = cadre_cursor.find({})
 
         if data.count() == 0:
-            return await ctx.send(':exclamation: There is no data in the list!')
+            return await ctx.send(':x: 職位申請名單為空！')
 
         apply_info = str()
         for item in data:
@@ -81,22 +80,19 @@ class Cadre(CogExtension):
     @ca.command()
     @commands.has_any_role('總召', 'Administrator')
     async def permit(self, ctx, permit_id: int):
-
         cadre_cursor = self_client["Cadre"]
         data = cadre_cursor.find_one({"_id": permit_id})
 
         if not data:
-            return await ctx.send(
-                f':exclamation: There exists no applicant whose id is {permit_id}!'
-            )
+            return await ctx.send(f':x: 申請名單中沒有id為 {permit_id} 的申請！')
 
         await ctx.author.send(
-            f':white_check_mark: You\'ve permitted user {data["name"]} to join cadre {data["apply_cadre"]}!'
+            f':white_check_mark: 你已批准 {data["name"]} 對職位 {data["apply_cadre"]} 的申請！'
         )
 
         member = await ctx.guild.fetch_member(data["_id"])
         await member.send(
-            f':white_check_mark: 您於 {data["apply_time"]} 申請 {data["apply_cadre"]} 的程序已通過！\n'
+            f':white_check_mark: 你於 {data["apply_time"]} 申請 {data["apply_cadre"]} 的程序已通過！\n'
             f'此為幹部群的連結，請在加入之後使用指令領取屬於你的身分組\n'
             f'{os.environ.get("Working_link")}'
         )
@@ -106,12 +102,11 @@ class Cadre(CogExtension):
     @ca.command()
     @commands.has_any_role('總召', 'Administrator')
     async def search(self, ctx, search_id: int):
-
         cadre_cursor = self_client["Cadre"]
         data = cadre_cursor.find_one({"_id": search_id})
 
         if not data:
-            return await ctx.send(f':exclamation: There are no applicant whose Id is {search_id}!')
+            return await ctx.send(f':x: 申請名單中沒有id為 {search_id} 的申請！')
 
         await ctx.send(
             f'{data["name"]}({data["_id"]}): '
@@ -119,18 +114,17 @@ class Cadre(CogExtension):
             f'{data["apply_time"]}'
         )
 
-    @ca.command()
+    @ca.command(aliases=['delete'])
     @commands.has_any_role('總召', 'Administrator')
     async def remove(self, ctx, delete_id: int):
-
         cadre_cursor = self_client["Cadre"]
         data = cadre_cursor.find_one({"_id": delete_id})
 
         if not data:
-            await ctx.send(f':exclamation: There exists no applicant whose id is {delete_id}!')
+            return await ctx.send(f':x: 申請名單中沒有id為 {delete_id} 的申請！')
 
         cadre_cursor.delete_one({"_id": delete_id})
-        await ctx.send(f'Member {data["name"]}({delete_id})\'s application has been removed!')
+        await ctx.send(f':white_check_mark: 成員 {data["name"]}({delete_id}) 的申請已被刪除！')
 
 
 class GuildRole(CogExtension):
@@ -155,9 +149,7 @@ class GuildRole(CogExtension):
                 except:
                     pass
 
-        await ctx.send(
-            f':white_check_mark: Role operation finished!'
-        )
+        await ctx.send(f':white_check_mark: 指令執行完畢！')
 
     @role_level.command()
     async def init_single(self, ctx, member: discord.Member):
@@ -168,14 +160,12 @@ class GuildRole(CogExtension):
                 await member.remove_roles(role)
 
         await member.add_roles(default_role)
-        await ctx.send(':white_check_mark: Operation finished!')
+        await ctx.send(':white_check_mark: 指令執行完畢！')
 
     @role_level.command()
     async def advance(self, ctx, member: discord.Member):
         if member not in ctx.guild.members:
-            return await ctx.send(
-                f':x: {member.display_name} is a invalid user!'
-            )
+            return await ctx.send(f':x: 不存在成員 {member.display_name}！')
 
         sta_json = JsonApi().get('StaticSetting')
         name_to_index: dict = sta_json['level_role_id']
@@ -194,12 +184,12 @@ class GuildRole(CogExtension):
                 await member.add_roles(new_role)
                 break
 
+        await ctx.send(':white_check_mark: 指令執行完畢！')
+
     @role_level.command()
     async def retract(self, ctx, member: discord.Member):
         if member not in ctx.guild.members:
-            return await ctx.send(
-                f':x: {member.display_name} is a invalid user!'
-            )
+            return await ctx.send(f':x: 不存在成員 {member.display_name}！')
 
         sta_json = JsonApi().get('StaticSetting')
         name_to_index: dict = sta_json['level_role_id']
@@ -216,6 +206,8 @@ class GuildRole(CogExtension):
                 await member.remove_roles(role)
                 await member.add_roles(new_role)
                 break
+
+        await ctx.send(':white_check_mark: 指令執行完畢！')
 
 
 def setup(bot):

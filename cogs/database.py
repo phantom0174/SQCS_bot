@@ -24,12 +24,12 @@ class DataBase(CogExtension):
                 if datum["_id"] not in members_id:
                     cursor.delete_one({"_id": datum["_id"]})
 
-        await ctx.send(':white_check_mark: Operation finished!')
+        await ctx.send(':white_check_mark: 指令執行完畢！')
 
     @db.command()
     async def copy(self, ctx, ori_db_name: str, ori_coll_name: str, target_db_name: str, target_coll_name: str):
         if ori_db_name == '' or ori_coll_name == '' or target_db_name == '' or target_coll_name == '':
-            return await ctx.send(':exclamation: Four arguments must not be null string')
+            return await ctx.send(':x: 任何一個參數都不能為空字串！')
 
         # origin
         ori_db = MongoClient(link)[ori_db_name]
@@ -45,14 +45,14 @@ class DataBase(CogExtension):
                 datum_dict = dict(datum)
                 target_coll_cursor.insert_one(datum_dict)
             except:
-                await ctx.send(':exclamation: Error when operating')
+                await ctx.send(f':x: 在複製id為 {datum["_id"]} 的檔案時發生了錯誤！')
 
-        await ctx.send(':white_check_mark: Operation finished!')
+        await ctx.send(':white_check_mark: 指令執行完畢！')
 
     @db.command()
     async def move(self, ctx, ori_db_name: str, ori_coll_name: str, target_db_name: str, target_coll_name: str):
         if ori_db_name == '' or ori_coll_name == '' or target_db_name == '' or target_coll_name == '':
-            return await ctx.send(':exclamation: Four arguments must not be null string')
+            return await ctx.send(':x: 任何一個參數都不能為空字串！')
 
         # origin
         ori_db = MongoClient(link)[ori_db_name]
@@ -69,9 +69,9 @@ class DataBase(CogExtension):
                 target_coll_cursor.insert_one(datum_dict)
                 ori_coll_cursor.delete_one({"_id": datum["_id"]})
             except:
-                await ctx.send(':exclamation: Error when operating')
+                await ctx.send(f':x: 在轉移id為 {datum["_id"]} 的檔案時發生了錯誤！')
 
-        await ctx.send(':white_check_mark: Operation finished!')
+        await ctx.send(':white_check_mark: 指令執行完畢！')
 
 
 def setup(bot):

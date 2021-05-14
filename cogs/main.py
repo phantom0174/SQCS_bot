@@ -32,7 +32,7 @@ class Main(CogExtension):
                     except:
                         pass
                     break
-        await ctx.send(':white_check_mark: Role fixing finished!')
+        await ctx.send(':white_check_mark: 身分組維修完成！')
 
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')

@@ -13,28 +13,29 @@ class PersonalInfo(CogExtension):
 
     @fluct.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def remedy(self, ctx, member_id: int, delta_value: float):
+    async def remedy(self, ctx, members_id: commands.Greedy[int], delta_value: float):
         fl_cursor = fluctlight_client["MainFluctlights"]
         score_set_cursor = self_client["ScoreSetting"]
         score_weight = score_set_cursor.find_one({"_id": 0})["score_weight"]
 
-        try:
-            execute = {
-                "$inc": {
-                    "score": round(delta_value * score_weight, 2)
+        for member_id in members_id:
+            try:
+                execute = {
+                    "$inc": {
+                        "score": round(delta_value * score_weight, 2)
+                    }
                 }
-            }
-            fl_cursor.update_one({"_id": member_id}, execute)
-            Fluct().active_log_update(member_id)
+                fl_cursor.update_one({"_id": member_id}, execute)
+                Fluct().active_log_update(member_id)
 
-            member = await ctx.guild.fetch_member(member_id)
-            msg = f'耶！你被管理員加了 {delta_value} 分！' + '\n'
-            msg += rsp["main"]["mibu"]["pt_1"]
-            await member.send(msg)
-        except:
-            await ctx.send(f':exclamation: Error when remedying {member_id}, value: {delta_value}!')
+                member = await ctx.guild.fetch_member(member_id)
+                msg = f'耶！你被管理員加了 {delta_value} 分！' + '\n'
+                msg += rsp["main"]["mibu"]["pt_1"]
+                await member.send(msg)
+            except:
+                await ctx.send(f':x: 彌補 {member_id} 時發生了錯誤！彌補分數：{delta_value}')
 
-        await ctx.send(':white_check_mark: Operation finished!')
+        await ctx.send(':white_check_mark: 指令執行完畢！')
 
     @fluct.command()
     async def delete(self, ctx, member_id: int):
@@ -48,9 +49,9 @@ class PersonalInfo(CogExtension):
             try:
                 cursor.delete_one({"_id": member_id})
             except:
-                await ctx.send(f':exclamation: Error when manipulating cursor {cursor}')
+                await ctx.send(f':x: 操作指標 {cursor} 時發生了錯誤！')
 
-        await ctx.send(':white_check_mark: Operation finished!')
+        await ctx.send(':white_check_mark: 指令執行完畢！')
 
     @fluct.command()
     async def reset(self, ctx, member_id: int):
@@ -58,7 +59,7 @@ class PersonalInfo(CogExtension):
         Fluct().reset_vice(member_id)
         Fluct().reset_active(member_id)
 
-        await ctx.send(':white_check_mark: Operation finished!')
+        await ctx.send(':white_check_mark: 指令執行完畢！')
 
 
 def setup(bot):
