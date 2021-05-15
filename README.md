@@ -25,6 +25,6 @@
 
 ## 💖 Thanks
 - Thanks for `@esenciamorii`, who gave me the chance to learn Discord Bot.
-- Thanks for all contributers to this project.
+- Thanks for all contributors to this project.
 - Thanks for the lecture from `@Proladon`.
 - Thanks for the help from members in Shelter-Zone.
