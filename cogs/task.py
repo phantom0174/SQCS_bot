@@ -90,6 +90,26 @@ class Task(CogExtension):
         if self.activity_loop is not None:
             await self.bot.change_presence(activity=next(self.activity_loop))
 
+    @tasks.loop(hours=2)
+    async def role_check(self):
+        guild = self.bot.get_guild(743507979369709639)
+
+        auto_role = guild.get_role(823804080199565342)
+        neutral_role = guild.get_role(823803958052257813)
+        active_cursor = fluctlight_client['ActiveLogs']
+
+        for member in guild.members:
+            if neutral_role in member.roles:
+                member_active_data = active_cursor.find_one({"_id": member.id})
+
+                quiz_crt_count = member_active_data["quiz_correct_count"]
+                lect_attend_count = member_active_data["lect_attend_count"]
+
+                if quiz_crt_count >= 2 and lect_attend_count >= 4:
+                    await member.remove_roles(neutral_role)
+                    await member.add_roles(auto_role)
+                    await member.send(':partying_face: 恭喜！你已升級為自由量子！')
+
 
 def setup(bot):
     bot.add_cog(Task(bot))
