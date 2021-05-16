@@ -93,6 +93,8 @@ class Task(CogExtension):
 
     @tasks.loop(hours=2)
     async def role_check(self):
+        await self.bot.wait_until_ready()
+        
         guild = self.bot.get_guild(743507979369709639)
 
         auto_role = guild.get_role(823804080199565342)
