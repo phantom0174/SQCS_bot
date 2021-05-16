@@ -6,6 +6,7 @@ from discord.ext import tasks
 from core.cog_config import CogExtension
 from core.db import fluctlight_client, JsonApi
 from itertools import cycle
+from core.fluctlight_ext import Fluct
 
 
 class Task(CogExtension):
@@ -94,7 +95,7 @@ class Task(CogExtension):
     @tasks.loop(hours=2)
     async def role_check(self):
         await self.bot.wait_until_ready()
-        
+
         guild = self.bot.get_guild(743507979369709639)
 
         auto_role = guild.get_role(823804080199565342)
@@ -102,8 +103,15 @@ class Task(CogExtension):
         active_cursor = fluctlight_client['ActiveLogs']
 
         for member in guild.members:
+            if member.bot:
+                continue
+
             if neutral_role in member.roles:
                 member_active_data = active_cursor.find_one({"_id": member.id})
+
+                if not member_active_data:
+                    Fluct().reset_active(member.id)
+                    continue
 
                 quiz_crt_count = member_active_data["quiz_correct_count"]
                 lect_attend_count = member_active_data["lect_attend_count"]

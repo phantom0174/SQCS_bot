@@ -88,7 +88,10 @@ class React(CogExtension):
 
         default_act = {
             "_id": member.id,
-            "log": ''
+            "log": '',
+            "lect_attend_count": 0,
+            "quiz_submit_count": 0,
+            "quiz_correct_count": 0
         }
         try:
             act_cursor.insert_one(default_act)
