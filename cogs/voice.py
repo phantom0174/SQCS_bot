@@ -124,7 +124,7 @@ class Voice(CogExtension):
         if before.channel.name == f"{member.display_name}'s party":
             await before.channel.delete()
 
-        if not before.channel.members:
+        if before.channel.name.endswith('party') and not before.channel.members:
             await before.channel.delete()
 
 
