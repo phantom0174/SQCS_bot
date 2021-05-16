@@ -1,6 +1,5 @@
 from discord.ext import commands
-import discord
-from core.db import self_client, rsp, fluctlight_client
+from core.db import self_client, huma_get, fluctlight_client
 from core.utils import Time, DiscordExt
 from core.fluctlight_ext import guild_weekly_update, Fluct
 from core.cog_config import CogExtension
@@ -128,11 +127,11 @@ class Quiz(CogExtension):
 
         data = quiz_cursor.find_one({"_id": msg.author.id})
         if data:
-            message = ':no_entry_sign: ' + '\n'.join(rsp["quiz"]["repeat_answer"])
+            message = huma_get('quiz/repeat_answer')
             return await msg.author.send(message)
 
         if msg.content.startswith('||') and msg.content.endswith('||'):
-            message = ':white_check_mark: ' + '\n'.join(rsp["quiz"]["get_answer"])
+            message = huma_get('quiz/get_answer')
             await msg.author.send(message)
 
             answer_correctness = (msg.content[2:-2] == correct_answer)
@@ -155,9 +154,9 @@ class Quiz(CogExtension):
                 Fluct().quiz_correct_update(msg.author.id)
 
         else:
-            message = ':exclamation: ' + '\n'.join(rsp["quiz"]["invalid_syntax"]["pt_1"]) + '\n'
-            message += '\n'.join(rsp["quiz"]["answer_tut"]) + '\n'
-            message += '\n'.join(rsp["quiz"]["invalid_syntax"]["pt_2"])
+            message = huma_get('quiz/invalid_syntax/pt_1', '\n')
+            message += huma_get('quiz/answer_tut', '\n')
+            message += huma_get('quiz/invalid_syntax/pt_2')
             await msg.author.send(message)
 
 
@@ -190,9 +189,9 @@ async def quiz_start(bot):
         f'correct answer set to {correct_answer}!'
     )
 
-    msg = '\n'.join(rsp["quiz"]["start"]["pt_1"]) + '\n'
-    msg += '\n'.join(rsp["quiz"]["answer_tut"]) + '\n'
-    msg += '\n'.join(rsp["quiz"]["start"]["pt_2"])
+    msg = huma_get('quiz/start/pt_1', '\n')
+    msg += huma_get('quiz/answer_tut', '\n')
+    msg += huma_get('quiz/start/pt_2')
     await main_channel.send(msg)
     await main_channel.send(f'活動開始於 {Time.get_info("whole")}')
 
@@ -239,9 +238,9 @@ async def quiz_end(bot):
 
     quiz_ongoing_cursor = self_client["QuizOngoing"]
     fluctlight_cursor = fluctlight_client["light-cube-info"]
-    msg = '\n'.join(rsp["quiz"]["end"]["main"]["pt_1"]) + '\n'
+    msg = huma_get('quiz/end/main/pt_1', '\n')
     msg += f':white_check_mark: 這次的答案呢...是 `{old_correct_ans}`！\n'
-    msg += '\n'.join(rsp["quiz"]["end"]["main"]["pt_2"]) + '\n'
+    msg += huma_get('quiz/end/main/pt_2', '\n')
 
     attend_count = quiz_ongoing_cursor.find({}).count()
     countable_member_count = fluctlight_cursor.find({"deep_freeze": {"$eq": 0}}).count()
@@ -250,7 +249,7 @@ async def quiz_end(bot):
     quiz_attend_level = min(quiz_attend_level, 7)
 
     msg += f'我這次有 {round((attend_count / countable_member_count) * 100, 1)} 分飽！\n'
-    msg += rsp["quiz"]["end"]["reactions"][quiz_attend_level]
+    msg += huma_get(f'quiz/end/reactions/{quiz_attend_level}')
     await main_channel.send(msg)
     await main_channel.send(f':stopwatch: 活動結束於 {Time.get_info("whole")}')
 

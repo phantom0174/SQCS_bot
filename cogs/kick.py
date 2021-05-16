@@ -1,6 +1,6 @@
 from discord.ext import commands
 from core.cog_config import CogExtension
-from core.db import self_client, rsp, fluctlight_client
+from core.db import self_client, huma_get, fluctlight_client, JsonApi
 from typing import Union
 import discord
 
@@ -101,9 +101,9 @@ class KickMember(CogExtension):
         if kick_reason == 'default':
             kick_reason = f':skull_crossbones: 違反指數達到了 {data["lvl_ind"]}'
 
-        msg = '\n'.join(rsp["kick"]["kick_single"]) + '\n'
+        msg = huma_get('kick/kick_single', '\n')
         msg += f'> {kick_reason}\n'
-        msg += '\n'.join(rsp["kick"]["re_join"])
+        msg += huma_get('kick/re_join')
         await kick_user.send(msg)
 
         try:
@@ -146,9 +146,9 @@ class KickMember(CogExtension):
         for member in data:
             kick_user = await ctx.guild.fetch_member(member["_id"])
 
-            msg = '\n'.join(rsp["kick"]["kick_all"]) + '\n'
-            msg += f'> Levelling index reached {member["lvl_ind"]}.' + '\n'
-            msg += '\n'.join(rsp["kick"]["re_join"])
+            msg = huma_get('kick/kick_all', '\n')
+            msg += f'> Levelling index reached {member["lvl_ind"]}.\n'
+            msg += huma_get('kick/re_join')
             await kick_user.send(msg)
 
             try:
@@ -168,5 +168,29 @@ class KickMember(CogExtension):
         await ctx.send(':white_check_mark: 所有在待踢除名單中的成員已被踢除！')
 
 
+class NT(CogExtension):
+
+    @commands.group()
+    @commands.has_any_role('總召', 'Administrator')
+    async def nt(self, ctx):
+        pass
+
+    @commands.command()
+    async def list(self, ctx):
+        id_list = JsonApi().get('NT')["id_list"]
+        await ctx.send(id_list)
+
+    @commands.command(aliases=['push', 'insert'])
+    async def add(self, ctx, user_id: int = None):
+        nt_json = JsonApi().get('NT')
+        if user_id is None:
+            return
+
+        nt_json['id_list'].append(user_id)
+        JsonApi().put('NT', nt_json)
+        await ctx.send(':white_check_mark: 指令執行完畢！')
+
+
 def setup(bot):
     bot.add_cog(KickMember(bot))
+    bot.add_cog(NT(bot))

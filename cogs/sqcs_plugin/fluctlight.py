@@ -1,6 +1,6 @@
 from discord.ext import commands
 from core.cog_config import CogExtension
-from core.db import fluctlight_client, self_client, rsp
+from core.db import fluctlight_client, self_client, huma_get
 from core.fluctlight_ext import Fluct
 
 
@@ -30,7 +30,7 @@ class PersonalInfo(CogExtension):
 
                 member = await ctx.guild.fetch_member(member_id)
                 msg = f'耶！你被管理員加了 {delta_value} 分！' + '\n'
-                msg += rsp["main"]["mibu"]["pt_1"]
+                msg += huma_get('main/remedy/pt_1')
                 await member.send(msg)
             except:
                 await ctx.send(f':x: 彌補 {member_id} 時發生了錯誤！彌補分數：{delta_value}')

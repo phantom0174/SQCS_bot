@@ -1,7 +1,7 @@
 from discord.ext import commands
 import asyncio
 import time
-from core.db import rsp, fluctlight_client, JsonApi
+from core.db import huma_get, fluctlight_client, JsonApi
 from core.utils import Time
 from core.cog_config import CogExtension
 
@@ -11,7 +11,10 @@ class React(CogExtension):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         nts = JsonApi().get('NT')["id_list"]
-        if (member.id in nts) or member.bot or member.guild.id != 743507979369709639:
+        if member.id in nts:
+            return await member.ban()
+
+        if member.bot or member.guild.id != 743507979369709639:
             return
 
         default_role = member.guild.get_role(823803958052257813)
@@ -19,12 +22,12 @@ class React(CogExtension):
 
         time_status = Time.get_range(Time.get_info('hour'))
 
-        msg = '\n'.join(rsp["join"]["opening"][time_status]) + '\n'
-        msg += '\n'.join(rsp["join"]["opening"]["main"])
+        msg = huma_get(f'join/opening/{time_status}', '\n')
+        msg += huma_get('join/opening/main')
         await member.send(msg)
-        await asyncio.sleep(60)
+        await asyncio.sleep(30)
 
-        msg = '\n'.join(rsp["join"]["hackmd_read"])
+        msg = huma_get('join/hackmd_read')
         reaction_msg = await member.send(msg)
         await reaction_msg.add_reaction('⭕')
         await reaction_msg.add_reaction('❌')
@@ -37,22 +40,16 @@ class React(CogExtension):
             reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=60.0)
 
             if reaction.emoji == '⭕':
-                msg = '\n'.join(rsp["join"]["df_1"])
+                msg = huma_get('join/df_1', '\n')
                 deep_freeze_status = True
             elif reaction.emoji == '❌':
-                msg = '\n'.join(rsp["join"]["df_0"])
+                msg = huma_get('join/df_0', '\n')
                 deep_freeze_status = False
-
-            # remember to delete the invalid_syntax part of humanity ext.
-            # else:
-            #     msg = '\n'.join(rsp["join"]["invalid_syntax"])
-            #     deep_freeze_status = False
         except asyncio.TimeoutError:
-            msg = '\n'.join(rsp["join"]["time_out"])
+            msg = huma_get('join/time_out', '\n')
             deep_freeze_status = False
 
-        # another \n for last un-inserted \n
-        msg += '\n' + '\n'.join(rsp["join"]["contact_method"])
+        msg += huma_get('join/contact_method')
 
         await member.send(msg)
 
@@ -72,6 +69,11 @@ class React(CogExtension):
             "lvl_ind": 0,
             "deep_freeze": deep_freeze_status
         }
+        try:
+            main_fluct_cursor.insert_one(default_main_fluctlight)
+        except:
+            pass
+
         default_vice_fluctlight = {
             "_id": member.id,
             "du": 0,
@@ -79,21 +81,15 @@ class React(CogExtension):
             "oc_auth": 0,
             "sc_auth": 0,
         }
-        default_act = {
-            "_id": member.id,
-            "log": ''
-        }
-
-        try:
-            main_fluct_cursor.insert_one(default_main_fluctlight)
-        except:
-            pass
-
         try:
             vice_fluct_cursor.insert_one(default_vice_fluctlight)
         except:
             pass
 
+        default_act = {
+            "_id": member.id,
+            "log": ''
+        }
         try:
             act_cursor.insert_one(default_act)
         except:
@@ -101,7 +97,7 @@ class React(CogExtension):
 
         end_time = time.time()
 
-        msg = '\n'.join(rsp["join"]["fl_create_finish"])
+        msg = huma_get('join/fl_create_finish')
         await member.send(msg)
         time_duration = round(end_time - start_time, 2)
         await member.send(f'順帶一提，我用了 {time_duration} (sec) 建立你的檔案><!')

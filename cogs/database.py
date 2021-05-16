@@ -17,9 +17,9 @@ class DataBase(CogExtension):
             fluctlight_client["ViceFluctlights"],
             fluctlight_client["ActiveLogs"]
         ]
+        members_id = [member.id for member in ctx.guild.members]
         for cursor in cursors:
             data = cursor.find({})
-            members_id = [member.id for member in ctx.guild.members]
             for datum in data:
                 if datum["_id"] not in members_id:
                     cursor.delete_one({"_id": datum["_id"]})

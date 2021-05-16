@@ -2,8 +2,8 @@ from discord.ext import commands
 import asyncio
 import random
 import core.sqcs_module as sm
-from core.db import self_client, rsp, fluctlight_client
-from core.utils import Time, DiscordExt
+from core.db import self_client, huma_get, fluctlight_client
+from core.utils import DiscordExt
 from core.cog_config import CogExtension
 from core.fluctlight_ext import Fluct
 
@@ -97,9 +97,9 @@ class Lecture(CogExtension):
         if lect_config["status"]:
             return await ctx.send(':x: 講座已經開始了！')
 
-        msg = '\n'.join(rsp["lecture"]["start"]["pt_1"]) + '\n'
+        msg = huma_get('lecture/start/pt_1', '\n')
         msg += f'星期 `{week}` 的講座－`{lect_config["name"]}` 開始了呦 \\^~^\n'
-        msg += '\n'.join(rsp["lecture"]["start"]["pt_2"])
+        msg += huma_get('lecture/start/pt_2')
         await ctx.send(msg)
 
         execute = {
@@ -197,9 +197,9 @@ class Lecture(CogExtension):
         if not lect_set_cursor["status"]:
             return await ctx.send(':exclamation: 講座已經結束了！')
 
-        msg = '\n'.join(rsp["lecture"]["end"]["main"]) + '\n'
+        msg = huma_get('lecture/end/main', '\n')
         population_level = int(round(lect_config["population"] / 10))
-        msg += rsp["lecture"]["end"]["reactions"][population_level]
+        msg += huma_get(f'lecture/end/reactions/{population_level}')
         await ctx.send(msg)
         execute = {
             "$set": {

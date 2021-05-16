@@ -38,3 +38,16 @@ class JsonApi:
 
 # static json db
 rsp = JsonApi().get('HumanityExtension')
+
+
+def huma_get(directory: str, ending: str = '') -> Union[str, list]:
+    dir_split = directory.split('/')
+
+    data = rsp
+    for dirs in dir_split:
+        data = data.get(dirs)
+
+    if isinstance(data, str):
+        return data
+    if isinstance(data, list):
+        return '\n'.join(data) + ending
