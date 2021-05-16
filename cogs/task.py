@@ -20,6 +20,7 @@ class Task(CogExtension):
         self.quiz_auto.start()
         self.nt_auto.start()
         self.bot_activity.start()
+        self.role_check.start()
 
     @tasks.loop(minutes=10)
     async def parameters_set(self):
