@@ -28,3 +28,4 @@
 - Thanks for all contributors to this project.
 - Thanks for the lecture from `@Proladon`.
 - Thanks for the help from members in Shelter-Zone.
+- Thanks for the channel-protecting concept from `@BłÜɪᴄᴇ.#1015 (Discord Name)`'s discord bot - `PRØ-TECTER`
