@@ -104,7 +104,7 @@ class Channel(CogExtension):
             await respawn_channel.send(':exclamation: 這個頻道被重新生成了')
             entry = await channel.guild.audit_logs(action=discord.AuditLogAction.channel_delete, limit=1).get()
             await respawn_channel.send(
-                f'由 {entry.user.mention} 於 {delete_time}　刪除'
+                f'由 {entry.user.mention} 於 {delete_time} 刪除'
             )
         elif str(channel.type) == 'voice':
             voice_config = {
