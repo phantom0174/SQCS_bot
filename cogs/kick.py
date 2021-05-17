@@ -115,8 +115,7 @@ class KickMember(CogExtension):
         # delete member fluctlight info in guild
         cursors = [
             fluctlight_client["MainFluctlights"],
-            fluctlight_client["ViceFluctlights"],
-            fluctlight_client["ActiveLogs"]
+            fluctlight_client["ViceFluctlights"]
         ]
 
         for cursor in cursors:
@@ -139,8 +138,7 @@ class KickMember(CogExtension):
 
         cursors = [
             fluctlight_client["MainFluctlights"],
-            fluctlight_client["ViceFluctlights"],
-            fluctlight_client["ActiveLogs"]
+            fluctlight_client["ViceFluctlights"]
         ]
 
         for member in data:

@@ -13,7 +13,8 @@ async def report_lect_attend(bot, attendants: list, week: int) -> None:
     fluct_cursor = fluctlight_client["MainFluctlights"]
 
     report_json = JsonApi().get('LectureLogging')
-    report_channel = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-lecture-attend')
+    guild = bot.get_guild(784607509629239316)
+    report_channel = discord.utils.get(guild.text_channels, name='sqcs-lecture-attend')
 
     for member_id in attendants:
         delta_score = round(lect_attend_score * score_weight, 2)

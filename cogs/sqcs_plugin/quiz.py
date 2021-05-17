@@ -134,7 +134,7 @@ class Quiz(CogExtension):
             message = huma_get('quiz/get_answer')
             await msg.author.send(message)
 
-            answer_correctness = (msg.content[2:-2] == correct_answer)
+            answer_correctness = (msg.content[2:-2].lower() == correct_answer)
             member_quiz_result = {
                 "_id": msg.author.id,
                 "correct": answer_correctness
@@ -162,7 +162,7 @@ class Quiz(CogExtension):
 
 # auto start quiz event
 async def quiz_start(bot):
-    guild = bot.guilds[0]
+    guild = bot.get_guild(743507979369709639)
     main_channel = bot.get_channel(746014424086610012)
     gm_channel = bot.get_channel(743677861000380527)
 
@@ -177,7 +177,7 @@ async def quiz_start(bot):
             "stand_by_answer": 'N/A'
         }
     }
-    quiz_set_cursor.update({"_id": 0}, new_quiz_info)
+    quiz_set_cursor.update_one({"_id": 0}, new_quiz_info)
 
     # data re-check
     new_quiz_data = quiz_set_cursor.find_one({"_id": 0})
@@ -207,7 +207,7 @@ async def quiz_start(bot):
 
 # auto end quiz event
 async def quiz_end(bot):
-    guild = bot.guilds[0]
+    guild = bot.get_guild(743507979369709639)
     main_channel = bot.get_channel(746014424086610012)
     gm_channel = bot.get_channel(743677861000380527)
 
@@ -219,7 +219,7 @@ async def quiz_end(bot):
     execute = {
         "$set": {
             "correct_answer": 'N/A',
-            "event_status": 0,
+            "event_status": False,
             "qns_link": '',
             "ans_link": ''
         }
@@ -237,13 +237,13 @@ async def quiz_end(bot):
     )
 
     quiz_ongoing_cursor = self_client["QuizOngoing"]
-    fluctlight_cursor = fluctlight_client["light-cube-info"]
+    fluctlight_cursor = fluctlight_client["MainFluctlights"]
     msg = huma_get('quiz/end/main/pt_1', '\n')
     msg += f':white_check_mark: 這次的答案呢...是 `{old_correct_ans}`！\n'
     msg += huma_get('quiz/end/main/pt_2', '\n')
 
     attend_count = quiz_ongoing_cursor.find({}).count()
-    countable_member_count = fluctlight_cursor.find({"deep_freeze": {"$eq": 0}}).count()
+    countable_member_count = fluctlight_cursor.find({"deep_freeze": {"$eq": False}}).count()
     quiz_attend_level = int(attend_count / countable_member_count)
 
     quiz_attend_level = min(quiz_attend_level, 7)
@@ -266,7 +266,7 @@ async def quiz_end(bot):
 
     winners = str()
     for winner in data:
-        winner_name = await DiscordExt.get_member_nick_name(bot.gulids[0], winner["_id"])
+        winner_name = await DiscordExt.get_member_nick_name(guild, winner["_id"])
         winners += f'{winner_name}\n'
 
     if not winners:

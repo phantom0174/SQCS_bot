@@ -8,7 +8,6 @@ class Fluct:
     def __init__(self, member_id=None):
         self.main_fluct_cursor = fluctlight_client["MainFluctlights"]
         self.vice_fluct_cursor = fluctlight_client["ViceFluctlights"]
-        self.act_cursor = fluctlight_client["ActiveLogs"]
 
         if member_id is not None:
             self.member_fluctlight = self.main_fluct_cursor.find_one({"_id": member_id})
@@ -21,7 +20,11 @@ class Fluct:
             "week_active": False,
             "contrib": 0,
             "lvl_ind": 0,
-            "deep_freeze": False
+            "deep_freeze": False,
+            "log": '',
+            "lect_attend_count": 0,
+            "quiz_submit_count": 0,
+            "quiz_correct_count": 0
         }
         try:
             self.main_fluct_cursor.delete_one({"_id": member_id})
@@ -51,24 +54,6 @@ class Fluct:
         except:
             pass
 
-    def reset_active(self, member_id) -> None:
-        default_act = {
-            "_id": member_id,
-            "log": '',
-            "lect_attend_count": 0,
-            "quiz_submit_count": 0,
-            "quiz_correct_count": 0
-        }
-        try:
-            self.act_cursor.delete_one({"_id": member_id})
-        except:
-            pass
-
-        try:
-            self.act_cursor.insert_one(default_act)
-        except:
-            pass
-
     def active_log_update(self, member_id: int) -> None:
         active = self.main_fluct_cursor.find_one({"_id": member_id})["week_active"]
         if not active:
@@ -80,40 +65,28 @@ class Fluct:
             self.main_fluct_cursor.update_one({"_id": member_id}, execute)
 
     def lect_attend_update(self, member_id: int) -> None:
-        data = self.act_cursor.find_one({"_id": member_id})
-        if not data:
-            self.reset_active(member_id)
-
         execute = {
             "$inc": {
                 "lect_attend_count": 1
             }
         }
-        self.act_cursor.update_one({"_id": member_id}, execute)
+        self.main_fluct_cursor.update_one({"_id": member_id}, execute)
 
     def quiz_submit_update(self, member_id: int) -> None:
-        data = self.act_cursor.find_one({"_id": member_id})
-        if not data:
-            self.reset_active(member_id)
-
         execute = {
             "$inc": {
                 "quiz_submit_count": 1
             }
         }
-        self.act_cursor.update_one({"_id": member_id}, execute)
+        self.main_fluct_cursor.update_one({"_id": member_id}, execute)
 
     def quiz_correct_update(self, member_id: int) -> None:
-        data = self.act_cursor.find_one({"_id": member_id})
-        if not data:
-            self.reset_active(member_id)
-
         execute = {
             "$inc": {
                 "quiz_correct_count": 1
             }
         }
-        self.act_cursor.update_one({"_id": member_id}, execute)
+        self.main_fluct_cursor.update_one({"_id": member_id}, execute)
 
 
 # main function
@@ -126,7 +99,6 @@ async def guild_weekly_update(bot) -> None:
     # set-up self_client
     fluctlight_cursor = fluctlight_client["MainFluctlights"]
     score_set_cursor = self_client["ScoreSetting"]
-    active_logs_cursor = fluctlight_client["ActiveLogs"]
 
     # calculate total score, max, min score
     max_score = fluctlight_cursor.find_one({}, {"score": 1}, sort=[("score", -1)])["score"]
@@ -143,16 +115,16 @@ async def guild_weekly_update(bot) -> None:
 
     # update active logs
     # insert fluctlight_cursor, active_logs_cursor
-    await active_logs_update(fluctlight_cursor, active_logs_cursor)
+    await active_logs_update(fluctlight_cursor)
 
     # calculate test contribution, average test contribution
     # insert fluctlight_cursor
     # get avr_contrib
-    avr_contrib = await contribution_update(fluctlight_cursor, active_logs_cursor)
+    avr_contrib = await contribution_update(fluctlight_cursor)
 
     # calculate levelling index
     # insert score_set_cursor, fluctlight_cursor, active_logs_cursor
-    await lvl_ind_update(fluctlight_cursor, active_logs_cursor, avr_contrib)
+    await lvl_ind_update(fluctlight_cursor, avr_contrib)
 
     # detect member levelling index reached warning range
     # insert self.bot, fluctlight_cursor
@@ -170,44 +142,34 @@ async def guild_weekly_update(bot) -> None:
 
 
 # vice functions
-async def active_logs_update(fluctlight_cursor, active_logs_cursor) -> None:
+async def active_logs_update(fluctlight_cursor) -> None:
     data = fluctlight_cursor.find({})
 
     for member in data:
-        member_id = member["_id"]
         member_active = '1' if member["week_active"] else '0'
 
-        member_active_info = active_logs_cursor.find_one({"_id": member_id})
-
-        if not member_active_info:
-            if not member["deep_freeze"]:
-                active_logs_cursor.insert({"_id": member_id, "log": member_active})
-            elif member["deep_freeze"]:
-                active_logs_cursor.insert({"_id": member_id, "log": '1'})
-        else:
-            old_log = active_logs_cursor.find_one({"_id": member_id})["log"]
-
-            if not member["deep_freeze"]:
-                execute = {
-                    "$set": {
-                        "log": member_active + old_log
-                    }
+        old_log = fluctlight_cursor.find_one({"_id": member["_id"]})["log"]
+        if not member["deep_freeze"]:
+            execute = {
+                "$set": {
+                    "log": member_active + old_log
                 }
-                active_logs_cursor.update_one({"_id": member_id}, execute)
-            elif member["deep_freeze"]:
-                execute = {
-                    "$set": {
-                        "log": '1' + old_log
-                    }
+            }
+            fluctlight_cursor.update_one({"_id": member["_id"]}, execute)
+        elif member["deep_freeze"]:
+            execute = {
+                "$set": {
+                    "log": '1' + old_log
                 }
-                active_logs_cursor.update_one({"_id": member_id}, execute)
+            }
+            fluctlight_cursor.update_one({"_id": member["_id"]}, execute)
 
     fluctlight_cursor.update_many({}, {"$set": {"week_active": False}})
 
 
-async def contribution_update(fluctlight_cursor, active_logs_cursor) -> float:
+async def contribution_update(fluctlight_cursor) -> float:
     avr_contrib = float(0)
-    data = active_logs_cursor.find({})
+    data = fluctlight_cursor.find({})
 
     for member in data:
         member_frozen = fluctlight_cursor.find_one({"_id": member["_id"]})["deep_freeze"]
@@ -228,13 +190,10 @@ async def contribution_update(fluctlight_cursor, active_logs_cursor) -> float:
     return avr_contrib
 
 
-async def lvl_ind_update(fluctlight_cursor, active_logs_cursor, avr_contrib) -> None:
+async def lvl_ind_update(fluctlight_cursor, avr_contrib) -> None:
     data = fluctlight_cursor.find({"deep_freeze": {"$eq": False}})
     for member in data:
-        member_active_logs = active_logs_cursor.find_one({"_id": member["_id"]})
-
-        if not member_active_logs:
-            Fluct().reset_active(member["_id"])
+        member_active_logs = fluctlight_cursor.find_one({"_id": member["_id"]})
 
         member_week_count = len(member_active_logs["log"])
         active_logs = member_active_logs["log"]
@@ -244,7 +203,6 @@ async def lvl_ind_update(fluctlight_cursor, active_logs_cursor, avr_contrib) -> 
             member["contrib"],
             avr_contrib
         )
-
         fluctlight_cursor.update_one({"_id": member["_id"]}, {"$inc": {"lvl_ind": delta_lvl_ind}})
 
 
@@ -267,62 +225,3 @@ async def lvl_ind_detect(bot, fluctlight_cursor) -> None:
                 "lvl_ind": member["lvl_ind"]
             }
             kick_cursor.insert_one(member_info)
-
-"""
-async def hurt(member_id, delta_du):
-    fluct_cursor = fluctlight_client["light-cube-info"]
-    member_fluctlight = fluct_cursor.find_one({"_id": member_id})
-    current_du = member_fluctlight["du"]
-
-    if current_du <= delta_du:
-        return 'dead'
-    else:
-        execute = {
-            "$inc": {
-                "du": -delta_du
-            }
-        }
-        fluct_cursor.update_one({"_id": member_id}, execute)
-
-        regeneration_json = JsonApi().get('FluctlightEvent')
-        if member_id not in regeneration_json["regen_id_list"]:
-            regeneration_json["id_list"].append(member_id)
-            JsonApi().put('FluctlightEvent', regeneration_json)
-
-            regeneration_task = threading.Thread(target=regeneration, args=(member_id,))
-            regeneration_task.start()
-
-        return 'alive'
-
-
-# def respawn_cool_down(member_id):
-
-
-def regeneration(member_id):
-    fluct_cursor = fluctlight_client["light-cube-info"]
-
-    while True:
-        member_fluctlight = fluct_cursor.find_one({"_id": member_id})
-        current_du = member_fluctlight["du"]
-        mdu = member_fluctlight["mdu"]
-
-        regenerate_du = math.floor(mdu / 100)
-        if current_du + regenerate_du < mdu:
-            execute = {
-                "$inc": {
-                    "du": regenerate_du
-                }
-            }
-            fluct_cursor.update_one({"_id": member_id}, execute)
-        else:
-            execute = {
-                "$set": {
-                    "du": mdu
-                }
-            }
-            fluct_cursor.update_one({"_id": member_id}, execute)
-            break
-
-        # wait 1 tic
-        time.sleep(10)
-"""

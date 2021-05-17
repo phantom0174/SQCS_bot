@@ -14,8 +14,7 @@ class DataBase(CogExtension):
     async def refresh_db(self, ctx):
         cursors = [
             fluctlight_client["MainFluctlights"],
-            fluctlight_client["ViceFluctlights"],
-            fluctlight_client["ActiveLogs"]
+            fluctlight_client["ViceFluctlights"]
         ]
         members_id = [member.id for member in ctx.guild.members]
         for cursor in cursors:

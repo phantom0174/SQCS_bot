@@ -41,8 +41,7 @@ class PersonalInfo(CogExtension):
     async def delete(self, ctx, member_id: int):
         cursors = [
             fluctlight_client["MainFluctlights"],
-            fluctlight_client["ViceFluctlights"],
-            fluctlight_client["ActiveLogs"]
+            fluctlight_client["ViceFluctlights"]
         ]
 
         for cursor in cursors:
@@ -57,7 +56,6 @@ class PersonalInfo(CogExtension):
     async def reset(self, ctx, member_id: int):
         await Fluct().reset_main(member_id, ctx.guild)
         Fluct().reset_vice(member_id)
-        Fluct().reset_active(member_id)
 
         await ctx.send(':white_check_mark: 指令執行完畢！')
 

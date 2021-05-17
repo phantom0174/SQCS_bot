@@ -58,7 +58,6 @@ class React(CogExtension):
 
         main_fluct_cursor = fluctlight_client["MainFluctlights"]
         vice_fluct_cursor = fluctlight_client["ViceFluctlights"]
-        act_cursor = fluctlight_client["ActiveLogs"]
 
         default_main_fluctlight = {
             "_id": member.id,
@@ -67,7 +66,11 @@ class React(CogExtension):
             "week_active": False,
             "contrib": 0,
             "lvl_ind": 0,
-            "deep_freeze": deep_freeze_status
+            "deep_freeze": deep_freeze_status,
+            "log": '',
+            "lect_attend_count": 0,
+            "quiz_submit_count": 0,
+            "quiz_correct_count": 0
         }
         try:
             main_fluct_cursor.insert_one(default_main_fluctlight)
@@ -83,18 +86,6 @@ class React(CogExtension):
         }
         try:
             vice_fluct_cursor.insert_one(default_vice_fluctlight)
-        except:
-            pass
-
-        default_act = {
-            "_id": member.id,
-            "log": '',
-            "lect_attend_count": 0,
-            "quiz_submit_count": 0,
-            "quiz_correct_count": 0
-        }
-        try:
-            act_cursor.insert_one(default_act)
         except:
             pass
 

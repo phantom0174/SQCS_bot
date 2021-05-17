@@ -45,7 +45,10 @@ def huma_get(directory: str, ending: str = '') -> Union[str, list]:
 
     data = rsp
     for dirs in dir_split:
-        data = data.get(dirs)
+        if isinstance(data, dict):
+            data = data.get(dirs)
+        elif isinstance(data, list):
+            data = data[int(dirs)]
 
     if isinstance(data, str):
         return data
