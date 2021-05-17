@@ -52,7 +52,7 @@ class Time:
 
 class FluctMath:
     @staticmethod
-    def lvl_ind_calc(log, member_week_count, contrib, avr_contrib) -> float:
+    async def lvl_ind_calc(log, member_week_count, contrib, avr_contrib) -> float:
         theta1 = sgn(contrib - avr_contrib)
 
         active_days = sum(map(int, log))
@@ -77,7 +77,7 @@ class FluctMath:
 
 class DiscordExt:
     @staticmethod
-    def create_embed(title, thumbnail, color, fields_name, values) -> discord.Embed:
+    async def create_embed(title, thumbnail, color, fields_name, values) -> discord.Embed:
         if thumbnail == 'default':
             thumbnail = 'https://i.imgur.com/MbzRNTJ.png'
 

@@ -26,7 +26,7 @@ class PersonalInfo(CogExtension):
                     }
                 }
                 fl_cursor.update_one({"_id": member_id}, execute)
-                Fluct().active_log_update(member_id)
+                await Fluct().active_log_update(member_id)
 
                 member = await ctx.guild.fetch_member(member_id)
                 msg = f'耶！你被管理員加了 {delta_value} 分！' + '\n'
@@ -55,7 +55,7 @@ class PersonalInfo(CogExtension):
     @fluct.command()
     async def reset(self, ctx, member_id: int):
         await Fluct().reset_main(member_id, ctx.guild)
-        Fluct().reset_vice(member_id)
+        await Fluct().reset_vice(member_id)
 
         await ctx.send(':white_check_mark: 指令執行完畢！')
 

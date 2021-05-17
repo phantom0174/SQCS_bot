@@ -40,7 +40,7 @@ class JsonApi:
 rsp = JsonApi().get('HumanityExtension')
 
 
-def huma_get(directory: str, ending: str = '') -> Union[str, list]:
+async def huma_get(directory: str, ending: str = '') -> Union[str, list]:
     dir_split = directory.split('/')
 
     data = rsp

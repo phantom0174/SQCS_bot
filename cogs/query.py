@@ -76,7 +76,7 @@ async def personal_info(member_id):
             ['Error'],
             ['Logging error']
         ]
-        return DiscordExt.create_embed(*embed_para)
+        return await DiscordExt.create_embed(*embed_para)
 
     value_title = [
         'Member id',
@@ -107,7 +107,7 @@ async def personal_info(member_id):
         value_title,
         obj_info
     ]
-    return DiscordExt.create_embed(*embed_para)
+    return await DiscordExt.create_embed(*embed_para)
 
 
 def setup(bot):

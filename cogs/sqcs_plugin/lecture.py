@@ -182,7 +182,7 @@ class Lecture(CogExtension):
                 }
                 lect_ongoing_cursor.update_one({"_id": member_id}, execute)
 
-            Fluct().active_log_update(member_id)
+            await Fluct().active_log_update(member_id)
 
             if top_score > 1:
                 top_score -= 1
@@ -241,7 +241,7 @@ class Lecture(CogExtension):
                 }
             }
             fl_cursor.update_one({"_id": member["_id"]}, execute)
-            Fluct().active_log_update(member["_id"])
+            await Fluct().active_log_update(member["_id"])
 
         embed_para = [
             ':scroll: Lecture Event Result',
@@ -251,7 +251,7 @@ class Lecture(CogExtension):
             [member_rank_list]
         ]
 
-        await ctx.send(embed=DiscordExt.create_embed(*embed_para))
+        await ctx.send(embed=await DiscordExt.create_embed(*embed_para))
 
         lect_ongoing_cursor.delete_many({})
 

@@ -36,7 +36,7 @@ class Fluct:
         except:
             pass
 
-    def reset_vice(self, member_id) -> None:
+    async def reset_vice(self, member_id) -> None:
         default_vice_fluctlight = {
             "_id": member_id,
             "du": 0,
@@ -54,7 +54,7 @@ class Fluct:
         except:
             pass
 
-    def active_log_update(self, member_id: int) -> None:
+    async def active_log_update(self, member_id: int) -> None:
         active = self.main_fluct_cursor.find_one({"_id": member_id})["week_active"]
         if not active:
             execute = {
@@ -64,7 +64,7 @@ class Fluct:
             }
             self.main_fluct_cursor.update_one({"_id": member_id}, execute)
 
-    def lect_attend_update(self, member_id: int) -> None:
+    async def lect_attend_update(self, member_id: int) -> None:
         execute = {
             "$inc": {
                 "lect_attend_count": 1
@@ -72,7 +72,7 @@ class Fluct:
         }
         self.main_fluct_cursor.update_one({"_id": member_id}, execute)
 
-    def quiz_submit_update(self, member_id: int) -> None:
+    async def quiz_submit_update(self, member_id: int) -> None:
         execute = {
             "$inc": {
                 "quiz_submit_count": 1
@@ -80,7 +80,7 @@ class Fluct:
         }
         self.main_fluct_cursor.update_one({"_id": member_id}, execute)
 
-    def quiz_correct_update(self, member_id: int) -> None:
+    async def quiz_correct_update(self, member_id: int) -> None:
         execute = {
             "$inc": {
                 "quiz_correct_count": 1
@@ -197,7 +197,7 @@ async def lvl_ind_update(fluctlight_cursor, avr_contrib) -> None:
 
         member_week_count = len(member_active_logs["log"])
         active_logs = member_active_logs["log"]
-        delta_lvl_ind = FluctMath.lvl_ind_calc(
+        delta_lvl_ind = await FluctMath.lvl_ind_calc(
             active_logs,
             member_week_count,
             member["contrib"],
