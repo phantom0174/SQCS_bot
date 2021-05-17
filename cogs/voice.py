@@ -33,99 +33,100 @@ class Voice(CogExtension):
 
     @voice.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def norm(self, ctx, channel_id: int, mode: int):
+    async def set_default_connect(self, ctx, channel_id: int, mode: int):
         protect_target_channel = ctx.guild.get_channel(channel_id)
         await protect_target_channel.set_permissions(ctx.guild.default_role, connect=bool(mode))
 
-    @voice.command()
+        # dynamic creating personal voice channel
+        @voice.command(aliases=['make'])
+        async def make_channel_for(self, ctx, members: commands.Greedy[discord.Member]):
+            terminal_channel = ctx.guild.get_channel(839170475309006979)
+
+            if ctx.author.voice.channel != terminal_channel:
+                return await ctx.send(f':x: 請先加入 {terminal_channel.name} 以使用這個指令！')
+
+            make_channel = await ctx.guild.create_voice_channel(
+                name=f"{members[0].display_name}'s party",
+                category=terminal_channel.category
+            )
+
+            for member in members:
+                if member.voice.channel is None:
+                    continue
+
+                perms = {
+                    "connect": True,
+                    "request_to_speak": True,
+                    "speak": True,
+                    "stream": True,
+                    "use_voice_activation": True
+                }
+                await make_channel.set_permissions(member, **perms)
+                await member.move_to(make_channel)
+
+            await make_channel.set_permissions(ctx.guild.default_role, connect=False)
+            await ctx.send(f':white_check_mark: 已創建頻道 {make_channel.name}！')
+
+        @commands.Cog.listener()
+        async def on_voice_state_update(self, member, before, after):
+            if not before.channel.name.endswith('party'):
+                return
+
+            if before.channel is None or before.channel == after.channel:
+                return
+
+            if before.channel.name == f"{member.display_name}'s party":
+                await before.channel.delete()
+
+            if not before.channel.members:
+                await before.channel.delete()
+
+    # for meeting usage
+    @commands.group(aliases=['meeting'])
     @commands.has_any_role('總召', 'Administrator')
-    async def collect_on(self, ctx, channel_id: int):
+    async def voice_meeting(self, ctx):
+        pass
+
+    @voice_meeting.command()
+    async def on(self, ctx, channel_id: int):
         target_channel = ctx.guild.get_channel(channel_id)
         if target_channel is None:
-            return await ctx.send(':x: 這個頻道不存在！')
+            return await ctx.send(':x: 這是一個無效頻道！')
 
         dyn_json = JsonApi().get('DynamicSetting')
 
-        if channel_id in dyn_json["voice_in_protect"]:
-            return await ctx.send(f':x: 頻道 {target_channel.name} 已在蒐集模式中！')
+        if channel_id in dyn_json["voice_in_meeting"]:
+            return await ctx.send(f':x: 頻道 {target_channel.name} 已在開會模式中！')
 
-        dyn_json["voice_in_protect"].append(channel_id)
+        dyn_json["voice_in_meeting"].append(channel_id)
         JsonApi().put('DynamicSetting', dyn_json)
-        for member in ctx.guild.members:
-            if member.voice is None:
-                continue
 
-            if member.voice.channel != target_channel:
-                try:
-                    await member.move_to(target_channel)
-                except:
-                    pass
-
+        await target_channel.set_permissions(ctx.guild.default_role, connect=False)
         await ctx.send(':white_check_mark: 指令執行完畢！')
 
-    @voice.command()
-    @commands.has_any_role('總召', 'Administrator')
-    async def collect_off(self, ctx, channel_id: int):
+    @voice_meeting.command()
+    async def off(self, ctx, channel_id: int):
         target_channel = ctx.guild.get_channel(channel_id)
         if target_channel is None:
-            return await ctx.send(':x: 這個頻道不存在！')
+            return await ctx.send(':x: 這是一個無效頻道！')
 
         dyn_json = JsonApi().get('DynamicSetting')
 
-        if channel_id not in dyn_json["voice_in_protect"]:
-            return await ctx.send(f':x: 頻道 {target_channel.name} 已解除蒐集模式！')
+        if channel_id not in dyn_json["voice_in_meeting"]:
+            return await ctx.send(f':x: 頻道 {target_channel.name} 不在開會模式中！')
 
-        dyn_json["voice_in_protect"].remove(channel_id)
+        dyn_json["voice_in_meeting"].remove(channel_id)
         JsonApi().put('DynamicSetting', dyn_json)
+
+        await target_channel.set_permissions(ctx.guild.default_role, connect=True)
         await ctx.send(':white_check_mark: 指令執行完畢！')
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
-        voice_in_protect = JsonApi().get('DynamicSetting')["voice_in_protect"]
+        voice_in_protect = JsonApi().get('DynamicSetting')["voice_in_meeting"]
 
         if before.channel is not None and after.channel != before.channel and before.channel.id in voice_in_protect:
             await member.move_to(before.channel)
-
-    # dynamic creating personal voice channel
-    @voice.command(aliases=['make'])
-    async def make_channel_for(self, ctx, members: commands.Greedy[discord.Member]):
-        terminal_channel = ctx.guild.get_channel(839170475309006979)
-
-        if ctx.author.voice.channel != terminal_channel:
-            return await ctx.send(f':x: 請先加入 {terminal_channel.name} 以使用這個指令！')
-
-        make_channel = await ctx.guild.create_voice_channel(
-            name=f"{members[0].display_name}'s party",
-            category=terminal_channel.category
-        )
-
-        for member in members:
-            if member.voice.channel is None:
-                continue
-
-            perms = {
-                "connect": True,
-                "request_to_speak": True,
-                "speak": True,
-                "stream": True,
-                "use_voice_activation": True
-            }
-            await make_channel.set_permissions(member, **perms)
-            await member.move_to(make_channel)
-
-        await make_channel.set_permissions(ctx.guild.default_role, connect=False)
-        await ctx.send(f':white_check_mark: 已創建頻道 {make_channel.name}！')
-
-    @commands.Cog.listener()
-    async def on_voice_state_update(self, member, before, after):
-        if before.channel is None or before.channel == after.channel:
-            return
-
-        if before.channel.name == f"{member.display_name}'s party":
-            await before.channel.delete()
-
-        if before.channel.name.endswith('party') and not before.channel.members:
-            await before.channel.delete()
 
 
 def setup(bot):

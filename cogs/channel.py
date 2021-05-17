@@ -6,13 +6,13 @@ from core.db import JsonApi
 
 
 class Channel(CogExtension):
-    @commands.group()
+    @commands.group(aliases=['cha_p', 'protect'])
     @commands.has_any_role('總召', 'Administrator')
-    async def cha(self, ctx):
+    async def cha_protect(self, ctx):
         pass
 
-    @cha.command(aliases=['p'])
-    async def protect(self, ctx, channel_id: int = -1):
+    @cha_protect.command()
+    async def on(self, ctx, channel_id: int = -1):
         dyn_json = JsonApi().get('DynamicSetting')
 
         if channel_id != -1:
@@ -28,8 +28,8 @@ class Channel(CogExtension):
 
         JsonApi().put('DynamicSetting', dyn_json)
 
-    @cha.command(aliases=['d'])
-    async def disarm(self, ctx, channel_id: int = -1):
+    @cha_protect.command()
+    async def off(self, ctx, channel_id: int = -1):
         dyn_json = JsonApi().get('DynamicSetting')
 
         if channel_id != -1:
@@ -45,8 +45,8 @@ class Channel(CogExtension):
 
         JsonApi().put('DynamicSetting', dyn_json)
 
-    @cha.command(aliases=['p_all'])
-    async def protect_all(self, ctx):
+    @cha_protect.command()
+    async def all_on(self, ctx):
         dyn_json = JsonApi().get('DynamicSetting')
 
         for channel in ctx.guild.channels:
@@ -56,8 +56,8 @@ class Channel(CogExtension):
         JsonApi().put('DynamicSetting', dyn_json)
         await ctx.send(':white_check_mark: 指令執行完畢！')
 
-    @cha.command(aliases=['d_all'])
-    async def disarm_all(self, ctx):
+    @cha_protect.command()
+    async def all_off(self, ctx):
         dyn_json = JsonApi().get('DynamicSetting')
 
         for channel in ctx.guild.channels:
@@ -67,8 +67,8 @@ class Channel(CogExtension):
         JsonApi().put('DynamicSetting', dyn_json)
         await ctx.send(':white_check_mark: 指令執行完畢！')
 
-    @cha.command(aliases=['cpl'])
-    async def clear_protect_list(self, ctx):
+    @cha_protect.command(aliases=['cpl'])
+    async def clear_list(self, ctx):
         dyn_json = JsonApi().get('DynamicSetting')
         dyn_json['channel_in_protect'].clear()
 
@@ -133,6 +133,46 @@ class Channel(CogExtension):
         dyn_json['channel_in_protect'].remove(channel.id)
         dyn_json['channel_in_protect'].append(respawn_channel.id)
         JsonApi().put('DynamicSetting', dyn_json)
+
+    @commands.group()
+    async def cha_bind(self, ctx):
+        pass
+
+    @cha_bind.command(aliases=['create', 'insert'])
+    async def add(self, ctx, text_cha_id: int, voice_cha_id: int):
+        text_channel = ctx.guild.get_channel(text_cha_id)
+        voice_channel = ctx.guild.get_channel(voice_cha_id)
+
+        if text_channel is None or voice_channel is None:
+            return await ctx.send(
+                ':x: 其中有一個無效頻道！'
+            )
+
+        binding_info = {
+            "text_channel": text_cha_id,
+            "voice_channel": voice_cha_id
+        }
+
+        dyn_json = JsonApi().get('DynamicSetting')
+        dyn_json['text_voice_channel_in_binding'].append(binding_info)
+        JsonApi().put('DynamicSetting', dyn_json)
+        await ctx.send(':white_check_mark: 指令執行完畢！')
+
+    @cha_bind.command(aliases=['remove'])
+    async def delete(self, ctx, text_cha_id: int):
+        text_channel = ctx.guild.get_channel(text_cha_id)
+
+        if text_channel is None:
+            return await ctx.send(':x: 此為無效頻道！')
+
+        dyn_json = JsonApi().get('DynamicSetting')
+        for index, item in enumerate(dyn_json['text_voice_channel_in_binding']):
+            if item['text_channel'] == text_channel:
+                del dyn_json['text_voice_channel_in_binding'][index]
+                break
+
+        JsonApi().put('DynamicSetting', dyn_json)
+        await ctx.send(':white_check_mark: 指令執行完畢！')
 
 
 def setup(bot):
