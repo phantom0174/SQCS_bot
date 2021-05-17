@@ -3,6 +3,7 @@ from core.cog_config import CogExtension
 import discord
 from core.utils import Time
 from core.db import JsonApi
+import asyncio
 
 
 class Channel(CogExtension):
@@ -173,6 +174,114 @@ class Channel(CogExtension):
 
         JsonApi().put('DynamicSetting', dyn_json)
         await ctx.send(':white_check_mark: 指令執行完畢！')
+
+    # for text and voice meeting usage
+    @commands.group()
+    async def meeting(self, ctx):
+        pass
+
+    # for text meeting usage
+    @meeting.command()
+    async def join(self, ctx):
+        if ctx.author.voice.channel is None:
+            return await ctx.send(
+                content=':x: 請先加入與此頻道連結的語音頻道！',
+                delete_after=5
+            )
+
+        dyn_json = JsonApi().get('DynamicSetting')
+
+        find = bool(False)
+        bind_voice_channel = None
+        for item in dyn_json['text_voice_channel_in_binding']:
+            if item['text_channel'] == ctx.channel.id:
+                find = True
+                bind_voice_channel = ctx.guild.get_channel(item['voice_channel'])
+                break
+
+        if not find:
+            return await ctx.send(content=':x: 此頻道尚未與語音頻道連結！', delete_after=5)
+
+        permit_msg = await ctx.send(content=f':question: 請問管理者是否接受申請？（剩餘 30 秒）')
+        await permit_msg.add_reaction('⭕')
+        await permit_msg.add_reaction('❌')
+
+        def is_admin(member: discord.Member):
+            member_roles_name = [role.name for role in member.roles]
+            if '總召' in member_roles_name or 'Administrator' in member_roles_name:
+                return True
+            return False
+
+        def check(check_reaction, check_user):
+            return check_reaction.message.id == permit_msg.id and is_admin(check_user)
+
+        try:
+            asyncio.ensure_future(permit_countdown(permit_msg, 30))
+            reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=30.0)
+
+            if reaction.emoji == '⭕':
+                await ctx.author.move_to(bind_voice_channel)
+            elif reaction.emoji == '❌':
+                await ctx.author.move_to(None)
+
+            return await permit_msg.delete()
+        except asyncio.TimeoutError:
+            return await permit_msg.delete()
+
+    # for voice meeting usage
+    @meeting.command()
+    async def on(self, ctx, channel_id: int):
+        target_channel = ctx.guild.get_channel(channel_id)
+        if target_channel is None:
+            return await ctx.send(':x: 這是一個無效頻道！')
+
+        dyn_json = JsonApi().get('DynamicSetting')
+
+        if channel_id in dyn_json["voice_in_meeting"]:
+            return await ctx.send(f':x: 頻道 {target_channel.name} 已在開會模式中！')
+
+        dyn_json["voice_in_meeting"].append(channel_id)
+        JsonApi().put('DynamicSetting', dyn_json)
+
+        await target_channel.set_permissions(ctx.guild.default_role, connect=False)
+        await ctx.send(':white_check_mark: 指令執行完畢！')
+
+    @meeting.command()
+    async def off(self, ctx, channel_id: int):
+        target_channel = ctx.guild.get_channel(channel_id)
+        if target_channel is None:
+            return await ctx.send(':x: 這是一個無效頻道！')
+
+        dyn_json = JsonApi().get('DynamicSetting')
+
+        if channel_id not in dyn_json["voice_in_meeting"]:
+            return await ctx.send(f':x: 頻道 {target_channel.name} 不在開會模式中！')
+
+        dyn_json["voice_in_meeting"].remove(channel_id)
+        JsonApi().put('DynamicSetting', dyn_json)
+
+        await target_channel.set_permissions(ctx.guild.default_role, connect=True)
+        await ctx.send(':white_check_mark: 指令執行完畢！')
+
+    @commands.Cog.listener()
+    async def on_voice_state_update(self, member, before, after):
+        voice_in_protect = JsonApi().get('DynamicSetting')["voice_in_meeting"]
+
+        if before.channel is not None and after.channel != before.channel and before.channel.id in voice_in_protect:
+            await member.move_to(before.channel)
+
+
+async def permit_countdown(target_msg, sec):
+    def content(s):
+        return f':question: 請問管理者是否接受申請？（剩餘 {s} 秒）'
+
+    while sec:
+        try:
+            await target_msg.edit(content=content(sec))
+            await asyncio.sleep(1)
+            sec -= 1
+        except:
+            break
 
 
 def setup(bot):
