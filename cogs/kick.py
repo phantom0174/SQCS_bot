@@ -101,9 +101,9 @@ class KickMember(CogExtension):
         if kick_reason == 'default':
             kick_reason = f':skull_crossbones: 違反指數達到了 {data["lvl_ind"]}'
 
-        msg = huma_get('kick/kick_single', '\n')
+        msg = await huma_get('kick/kick_single', '\n')
         msg += f'> {kick_reason}\n'
-        msg += huma_get('kick/re_join')
+        msg += await huma_get('kick/re_join')
         await kick_user.send(msg)
 
         try:
@@ -144,9 +144,9 @@ class KickMember(CogExtension):
         for member in data:
             kick_user = await ctx.guild.fetch_member(member["_id"])
 
-            msg = huma_get('kick/kick_all', '\n')
+            msg = await huma_get('kick/kick_all', '\n')
             msg += f'> Levelling index reached {member["lvl_ind"]}.\n'
-            msg += huma_get('kick/re_join')
+            msg += await huma_get('kick/re_join')
             await kick_user.send(msg)
 
             try:
