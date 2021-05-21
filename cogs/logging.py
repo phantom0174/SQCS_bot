@@ -32,7 +32,7 @@ class Log(CogExtension):
         if title not in logging_channel.keys():
             return await ctx.send(f':x: 參數必須在 {logging_channel.keys()} 中！')
 
-        buffer_channel = self.bot.fetch_channel(logging_channel.get(title))
+        buffer_channel = await self.bot.fetch_channel(logging_channel.get(title))
         logs_json = JsonApi().get(title)
 
         if not logs_json["logs"]:
