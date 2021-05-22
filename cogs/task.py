@@ -1,11 +1,9 @@
-from core.db import self_client
+from core.db import self_client, fluctlight_client
 from core.utils import Time
 from cogs.sqcs_plugin.quiz import quiz_start, quiz_end
 import discord
 from discord.ext import tasks
 from core.cog_config import CogExtension
-from core.db import fluctlight_client
-from itertools import cycle
 from core.fluctlight_ext import Fluct
 
 
@@ -15,51 +13,10 @@ class Task(CogExtension):
 
         self.quiz_set_cursor = self_client["QuizSetting"]
 
-        self.activity_loop = None
-
-        self.parameters_set.start()
         self.quiz_auto.start()
-        self.bot_activity.start()
         self.role_check.start()
 
-    @tasks.loop(minutes=10)
-    async def parameters_set(self):
-        await self.bot.wait_until_ready()
-
-        # fetching current non-bot member count
-        fluctlight_cursor = fluctlight_client["MainFluctlights"]
-        member_count = fluctlight_cursor.find({}).count()
-
-        # fetching current guild activity percentage
-        fluct_cursor = fluctlight_client["MainFluctlights"]
-        week_active_match = {
-            "deep_freeze": {
-                "$ne": True
-            },
-            "week_active": {
-                "$ne": False
-            }
-        }
-        week_active_count = fluct_cursor.find(week_active_match).count()
-        countable_member_count = fluct_cursor.find({"deep_freeze": {"$ne": 1}}).count()
-        activity_percentage = round((week_active_count / countable_member_count) * 100, 4)
-
-        self.activity_loop = cycle([
-            discord.Activity(
-                type=discord.ActivityType.watching,
-                name=f'{member_count} 個活生生的搖光'
-            ),
-            discord.Activity(
-                type=discord.ActivityType.listening,
-                name=f'+help'
-            ),
-            discord.Activity(
-                type=discord.ActivityType.watching,
-                name=f'{activity_percentage}% 的活躍度...'
-            )
-        ])
-
-    @tasks.loop(minutes=10)
+    @tasks.loop(minutes=50)
     async def quiz_auto(self):
         await self.bot.wait_until_ready()
 
@@ -72,7 +29,7 @@ class Task(CogExtension):
             return Time.get_info('date') == 1 and Time.get_info('hour') >= 6 and not quiz_status
 
         def quiz_ready_to_end():
-            return Time.get_info('date') == 7 and Time.get_info('hour') >= 23 and quiz_status
+            return Time.get_info('date') == 7 and Time.get_info('hour') >= 22 and quiz_status
 
         if quiz_ready_to_start():
             await quiz_start(self.bot)
@@ -80,13 +37,6 @@ class Task(CogExtension):
         elif quiz_ready_to_end():
             await quiz_end(self.bot)
             await report_channel.send(f'[AUTO QUIZ END][{Time.get_info("whole")}]')
-
-    @tasks.loop(seconds=10)
-    async def bot_activity(self):
-        await self.bot.wait_until_ready()
-
-        if self.activity_loop is not None:
-            await self.bot.change_presence(activity=next(self.activity_loop))
 
     @tasks.loop(hours=2)
     async def role_check(self):

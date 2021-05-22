@@ -18,7 +18,13 @@ bot = commands.Bot(
 
 @bot.event
 async def on_ready():
-    print(">> Bot is online <<")
+    print(">--->> Bot is online <<---<")
+    await bot.change_presence(
+        activity=discord.Activity(
+            type=discord.ActivityType.listening,
+            name=f'+help'
+        )
+    )
 
 
 @bot.command()
