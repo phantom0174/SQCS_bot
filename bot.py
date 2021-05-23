@@ -8,7 +8,11 @@ import core.utils as utl
 import logging
 
 
-Format = '%(asctime)s %(levelname)s: %(message)s, via line: %(lineno)d , in func: %(funcName)s, of file: %(pathname)s\n'
+Format = '%(asctime)s %(levelname)s: %(message)s, ' \
+         'via line: %(lineno)d, ' \
+         'in func: %(funcName)s, ' \
+         'of file: %(pathname)s\n'
+
 logging.basicConfig(
     filename='bot.log',
     level=logging.WARNING,
@@ -57,7 +61,7 @@ async def info(ctx):
     await ctx.send(embed=embed)
 
 
-# a short function for load and unload cogs
+# function for cogs management
 def find_cog(path: str, target_cog: str, mode: str) -> (bool, str):
     trans_path = {
         "./cogs": "cogs.",
@@ -75,6 +79,11 @@ def find_cog(path: str, target_cog: str, mode: str) -> (bool, str):
                     f'{trans_path.get(path)}{item[:-3]}'
                 )
                 return True, f':white_check_mark: Extension {item} unloaded!'
+            if mode == 'reload':
+                bot.reload_extension(
+                    f'{trans_path.get(path)}{item[:-3]}'
+                )
+                return True, f':white_check_mark: Extension {item} reloaded!'
     return False, ''
 
 
@@ -113,16 +122,24 @@ async def unload(ctx, target_cog: str):
 @bot.command()
 @commands.has_any_role('總召', 'Administrator')
 async def reload(ctx, target_package: str):
-    if target_package not in ['main', 'sqcs']:
+    if target_package not in ['MAIN', 'SQCS']:
+        find, msg = find_cog('./cogs', target_package, 'reload')
+        if find:
+            return await ctx.send(msg)
+
+        find, msg = find_cog('./cogs/sqcs_plugin', target_package, 'reload')
+        if find:
+            return await ctx.send(msg)
+
         return await ctx.send(
-            ':x: `target_package` can only be `main` or `sqcs`!'
+            f':exclamation: There are no extension called {target_package}!'
         )
 
-    if target_package == 'main':
+    if target_package == 'MAIN':
         for reload_filename in os.listdir('./cogs'):
             if reload_filename.endswith('.py'):
                 bot.reload_extension(f'cogs.{reload_filename[:-3]}')
-    elif target_package == 'sqcs':
+    elif target_package == 'SQCS':
         for reload_filename in os.listdir('./cogs/sqcs_plugin'):
             if reload_filename.endswith('.py'):
                 bot.reload_extension(f'cogs/sqcs_plugin.{reload_filename[:-3]}')
