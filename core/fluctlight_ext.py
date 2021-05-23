@@ -208,14 +208,15 @@ async def lvl_ind_update(fluctlight_cursor, avr_contrib) -> None:
 
 async def lvl_ind_detect(bot, fluctlight_cursor) -> None:
     kick_cursor = self_client["ReadyToKick"]
+    guild = bot.get_guild(743507979369709639)
 
     data = fluctlight_cursor.find({})
     for member in data:
         if 1 <= member["lvl_ind"] < 1.5:
-            user = await bot.guilds[0].fetch_member(member["_id"])
+            user = guild.get_member(member["_id"])
             await user.send(f'Your levelling index has reached warning range!({member["lvl_ind"]});')
         elif member["lvl_ind"] >= 1.5:
-            user = await bot.guilds[0].fetch_member(member["_id"])
+            user = guild.get_member(member["_id"])
             await user.send(f'Your levelling index has reached danger range!({member["lvl_ind"]});')
 
             member_info = {

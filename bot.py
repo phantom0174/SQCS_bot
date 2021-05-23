@@ -5,6 +5,16 @@ import os
 import keep_alive
 import asyncio
 import core.utils as utl
+import logging
+
+
+Format = '%(asctime)s %(levelname)s: %(message)s, via line: %(lineno)d , in func: %(funcName)s, of file: %(pathname)s\n'
+logging.basicConfig(
+    filename='bot.log',
+    level=logging.WARNING,
+    format=Format
+)
+logging.captureWarnings(True)
 
 
 intents = discord.Intents.all()
@@ -131,7 +141,7 @@ async def shut_down(ctx):
 
 @bot.event
 async def on_disconnect():
-    report_channel = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-report')
+    report_channel = bot.get_channel(785146879004508171)
     await report_channel.send(f':exclamation: Bot disconnected! {utl.Time.get_info("whole")}')
 
 

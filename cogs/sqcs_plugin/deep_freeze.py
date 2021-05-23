@@ -24,7 +24,7 @@ class DeepFreeze(CogExtension):
                 }
             }
             fluct_cursor.update_one({"_id": member_id}, execute)
-            member = await ctx.guild.fetch_member(member_id)
+            member = ctx.guild.get_member(member_id)
 
             await member.send(f':exclamation: 你的 `deep freeze` 狀態被設定為 {bool(status)} 了！')
             await ctx.send(':white_check_mark: 指令執行完畢！')

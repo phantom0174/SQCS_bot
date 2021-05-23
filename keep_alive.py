@@ -1,7 +1,11 @@
 from flask import Flask
 from threading import Thread
+import logging
 
-app = Flask('')
+app = Flask(__name__)
+
+log = logging.getLogger('werkzeug')
+log.disabled = True
 
 
 @app.route('/')

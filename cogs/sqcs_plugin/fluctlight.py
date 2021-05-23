@@ -28,7 +28,7 @@ class PersonalInfo(CogExtension):
                 fl_cursor.update_one({"_id": member_id}, execute)
                 await Fluct().active_log_update(member_id)
 
-                member = await ctx.guild.fetch_member(member_id)
+                member = ctx.guild.get_member(member_id)
                 msg = f'耶！你被管理員加了 {delta_value} 分！' + '\n'
                 msg += await huma_get('main/remedy/pt_1')
                 await member.send(msg)

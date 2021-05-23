@@ -95,9 +95,9 @@ class DiscordExt:
 
     @staticmethod
     async def get_member_nick_name(guild, member_id) -> str:
-        member_name = (await guild.fetch_member(member_id)).nick
+        member_name = guild.get_member(member_id).nick
         if member_name is None:
-            member_name = (await guild.fetch_member(member_id)).name
+            member_name = guild.get_member(member_id).name
 
         return member_name
 

@@ -96,7 +96,7 @@ class KickMember(CogExtension):
         if not data:
             return await ctx.send(f':x: 成員 {member_id} 不在待踢除名單中！')
 
-        kick_user = await ctx.guild.fetch_member(member_id)
+        kick_user = ctx.guild.get_member(member_id)
 
         if kick_reason == 'default':
             kick_reason = f':skull_crossbones: 違反指數達到了 {data["lvl_ind"]}'
@@ -142,7 +142,7 @@ class KickMember(CogExtension):
         ]
 
         for member in data:
-            kick_user = await ctx.guild.fetch_member(member["_id"])
+            kick_user = ctx.guild.get_member(member["_id"])
 
             msg = await huma_get('kick/kick_all', '\n')
             msg += f'> Levelling index reached {member["lvl_ind"]}.\n'
