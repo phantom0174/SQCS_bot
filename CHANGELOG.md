@@ -1,8 +1,11 @@
 # 📜 ChangeLog
 
-`version 1.25.5.14`
+`version 1.26.5.23`
 
 ```markdown
+- 2021/05/23: Better logging system, fix api usage
+  > Fix warning logging, and code which may cause rate limit
+
 - 2021/05/14: 漢化
   > Better for reading
 
