@@ -65,7 +65,7 @@ async def info(ctx):
 def find_cog(path: str, target_cog: str, mode: str) -> (bool, str):
     trans_path = {
         "./cogs": "cogs.",
-        "./cogs/sqcs_plugin": "cogs/sqcs."
+        "./cogs/sqcs_plugin": "cogs.sqcs_plugin."
     }
     for item in os.listdir(path):
         if item.startswith(target_cog) and item.endswith('.py'):

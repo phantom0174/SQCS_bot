@@ -100,7 +100,7 @@ class Quiz(CogExtension):
     # event answer listen function
     @commands.Cog.listener()
     async def on_message(self, msg):
-        quiz_channel = msg.guild.get_channel(746014424086610012)
+        quiz_channel = self.bot.get_channel(746014424086610012)
         if quiz_channel is None:
             return
 

@@ -6,7 +6,7 @@ from core.db import JsonApi
 import asyncio
 
 
-class Channel(CogExtension):
+class Protect(CogExtension):
     @commands.group(aliases=['cha_p', 'protect'])
     @commands.has_any_role('總召', 'Administrator')
     async def cha_protect(self, ctx):
@@ -135,7 +135,10 @@ class Channel(CogExtension):
         dyn_json['channel_in_protect'].append(respawn_channel.id)
         JsonApi().put('DynamicSetting', dyn_json)
 
+
+class Meeting(CogExtension):
     @commands.group()
+    @commands.has_any_role('總召', 'Administrator')
     async def cha_bind(self, ctx):
         pass
 
@@ -230,6 +233,7 @@ class Channel(CogExtension):
 
     # for voice meeting usage
     @meeting.command()
+    @commands.has_any_role('總召', 'Administrator')
     async def on(self, ctx, channel_id: int):
         target_channel = ctx.guild.get_channel(channel_id)
         if target_channel is None:
@@ -247,6 +251,7 @@ class Channel(CogExtension):
         await ctx.send(':white_check_mark: 指令執行完畢！')
 
     @meeting.command()
+    @commands.has_any_role('總召', 'Administrator')
     async def off(self, ctx, channel_id: int):
         target_channel = ctx.guild.get_channel(channel_id)
         if target_channel is None:
@@ -285,4 +290,5 @@ async def permit_countdown(target_msg, sec):
 
 
 def setup(bot):
-    bot.add_cog(Channel(bot))
+    bot.add_cog(Protect(bot))
+    bot.add_cog(Meeting(bot))
