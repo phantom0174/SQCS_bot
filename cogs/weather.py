@@ -24,12 +24,6 @@ data_suffix = {
   "4": "%"
 }
 
-time_range_title = {
-  "0": "時段一",
-  "1": "時段二",
-  "2": "時段三"
-}
-
 
 class WeatherQuery(CogExtension):
     @commands.group()
@@ -61,8 +55,11 @@ class WeatherQuery(CogExtension):
                 county_weather_info += item["locationName"] + '\n'
 
                 for time_range in range(3):
+                    start_time_str = loc_json[0]["time"][time_range]["startTime"]
+                    end_time_str = loc_json[0]["time"][time_range]["endTime"]
                     county_weather_info += (
-                        f'{time_range_title[str(time_range)]}::\n'
+                        f'{start_time_str.split("T")[0]} {start_time_str.split("T")[1].split("+")[0]}~'
+                        f'{end_time_str.split("T")[0]} {end_time_str.split("T")[1].split("+")[0]}::\n'
                     )
                     for (index, info) in enumerate(loc_json):
                         county_weather_info += (
