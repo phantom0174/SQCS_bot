@@ -4,7 +4,7 @@ import os
 from core.cog_config import CogExtension
 
 """
-The extension is for school h.w. of phantom1074
+The extension is for school h.w. of phantom0174
 """
 
 
