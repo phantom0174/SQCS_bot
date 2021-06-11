@@ -58,7 +58,7 @@ class WeatherQuery(CogExtension):
                     start_time_str = loc_json[0]["time"][time_range]["startTime"]
                     end_time_str = loc_json[0]["time"][time_range]["endTime"]
                     county_weather_info += (
-                        f'{start_time_str.split("T")[0]} {start_time_str.split("T")[1].split("+")[0]}~'
+                        f'{start_time_str.split("T")[0]} {start_time_str.split("T")[1].split("+")[0]} ～ '
                         f'{end_time_str.split("T")[0]} {end_time_str.split("T")[1].split("+")[0]}::\n'
                     )
                     for (index, info) in enumerate(loc_json):
