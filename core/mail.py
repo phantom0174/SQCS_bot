@@ -17,7 +17,6 @@ smtpserver.login(Account, Password)
 
 
 async def send_email(to_account, subject, content):
-    # 開始組合信件內容
     mail = MIMEMultipart()
     mail['From'] = Account
     mail['To'] = to_account
