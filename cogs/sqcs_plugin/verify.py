@@ -26,8 +26,8 @@ class Verify(CogExtension):
             return f'{prefix}{suffix}'
 
         # encryption (?
-        token = [generate(name) for name in accounts.copy().split('@')]
-        for (account, token) in zip(accounts, token):
+        tokens = [generate(name) for name in accounts.copy().split('@')]
+        for (account, token) in zip(accounts, tokens):
             try:
                 await send_email(
                     to_account=account,
