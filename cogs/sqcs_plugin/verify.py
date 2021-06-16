@@ -2,6 +2,7 @@ from discord.ext import commands
 from core.cog_config import CogExtension
 from random import randint
 from core.mail import send_email
+from core.db import self_client
 
 
 """
@@ -13,6 +14,8 @@ class Verify(CogExtension):
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
     async def lect_generate_token(self, ctx, *, accounts):
+        verify_cursor = self_client['Verification']
+
         accounts = accounts.split('\n')
         while ' ' in accounts:
             accounts.remove(' ')
@@ -25,10 +28,16 @@ class Verify(CogExtension):
             ))
             return f'{prefix}{suffix}'
 
-        # encryption (?
+        # token generation
         tokens = [generate(name) for name in accounts.copy().split('@')]
         for (account, token) in zip(accounts, tokens):
             try:
+                token_data = {
+                    "TOKEN": str(token),
+                    "reason": 'lect'
+                }
+                verify_cursor.insert_one(token_data)
+
                 await send_email(
                     to_account=account,
                     subject='SQCS 講座加分神奇密碼',
@@ -37,7 +46,7 @@ class Verify(CogExtension):
                             f'之後也要來聽講座呦！\\^~^'
                 )
             except:
-                return ctx.send(f":x: Error when sending {account}'s token email")
+                return await ctx.send(f":x: Error when sending {account}'s token email")
 
         await ctx.send(':white_check_mark: Token emails send!')
 

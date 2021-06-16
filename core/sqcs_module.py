@@ -6,8 +6,9 @@ import core.fluctlight_ext as fluct_ext
 
 async def report_lect_attend(bot, attendants: list, week: int) -> None:
     score_set_cursor = self_client["ScoreSetting"]
-    score_weight = score_set_cursor.find_one({"_id": 0})["score_weight"]
-    lect_attend_score = score_set_cursor.find_one({"_id": 0})["lecture_attend_point"]
+    score_data = score_set_cursor.find_one({"_id": 0})
+    score_weight = score_data["score_weight"]
+    lect_attend_score = score_data["lecture_attend_point"]
 
     # add score to the attendances
     fluct_cursor = fluctlight_client["MainFluctlights"]

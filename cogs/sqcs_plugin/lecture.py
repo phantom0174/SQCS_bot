@@ -6,6 +6,7 @@ from core.db import self_client, huma_get, fluctlight_client
 from core.utils import DiscordExt
 from core.cog_config import CogExtension
 from core.fluctlight_ext import Fluct
+import discord
 
 
 class Lecture(CogExtension):
@@ -272,6 +273,68 @@ class Lecture(CogExtension):
 
         for member in voice_channel.members:
             await member.move_to(None)
+
+    @lect.command()
+    @commands.has_any_role('總召', 'Administrator')
+    async def set_verify_channel(self, ctx, set_channel_id: int):
+        verify_cursor = self_client['VerificationSetting']
+        data = verify_cursor.find_one({"_id": 0})
+
+        if set_channel_id in data['channel_id']:
+            return await ctx.send(':x: This is already a verification channel!')
+
+        execute = {
+            "$push": {
+                "channel_id": set_channel_id
+            }
+        }
+        verify_cursor.update_one({"_id": 0}, execute)
+        await ctx.send(f':white_check_mark: Operation finished!')
+
+    @lect.command()
+    @commands.dm_only()
+    @commands.cooldown(1, 15, commands.BucketType.user)
+    async def verify(self, ctx, token: str):
+        verify_cursor = self_client['Verify']
+        data = verify_cursor.find_one({"TOKEN": token, "reason": "lect"})
+
+        if not data:
+            return await ctx.send(
+                f':x: 講座資料庫中不存在這個token\n'
+                f'請在15秒後重試或聯絡總召'
+            )
+
+        # fetching score parameters
+        fluct_cursor = fluctlight_client["MainFluctlights"]
+
+        score_set_cursor = self_client["ScoreSetting"]
+        score_data = score_set_cursor.find_one({"_id": 0})
+
+        score_weight = score_data["score_weight"]
+        lect_attend_score = score_data["lecture_attend_point"]
+
+        delta_score = round(lect_attend_score * score_weight, 2)
+        try:
+            execute = {
+                "$inc": {
+                    "score": delta_score
+                }
+            }
+            fluct_cursor.update_one({"_id": ctx.author.id}, execute)
+            await Fluct().active_log_update(ctx.author.id)
+            await Fluct().lect_attend_update(ctx.author.id)
+
+            verify_cursor.delete_one({"TOKEN": token})
+            await ctx.send(':white_check_mark: 操作成功！')
+        except:
+            guild = self.bot.get_guild(784607509629239316)
+            report_channel = discord.utils.get(guild.text_channels, name='sqcs-lecture-attend')
+
+            await report_channel.send(
+                f'[DB MANI ERROR][to: {ctx.author.id}]'
+                f'[inc_score: {delta_score}]'
+            )
+            await ctx.send(':x: 操作失敗，請聯繫總召><')
 
 
 def setup(bot):
