@@ -324,7 +324,7 @@ class Lecture(CogExtension):
             await Fluct().active_log_update(ctx.author.id)
             await Fluct().lect_attend_update(ctx.author.id)
 
-            verify_cursor.delete_one({"TOKEN": token})
+            verify_cursor.delete_one({"TOKEN": token, "reason": "lect"})
             await ctx.send(':white_check_mark: 操作成功！')
         except:
             guild = self.bot.get_guild(784607509629239316)
