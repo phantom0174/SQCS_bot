@@ -337,5 +337,36 @@ class Lecture(CogExtension):
             await ctx.send(':x: 操作失敗，請聯繫總召><')
 
 
+class LectureAuto(CogExtension):
+    @commands.Cog.listener()
+    async def on_guild_channel_delete(self, channel):
+        lect_set_cursor = self_client["LectureSetting"]
+
+        # text and voice channel id redirecting
+        channel_type_list = ['text_channels', 'voice_channels']
+        channel_id_type_list = ['text_id', 'voice_id']
+
+        for (channel_type, channel_id) in zip(channel_type_list, channel_id_type_list):
+            lect_config = lect_set_cursor.find_one({channel_id: channel.id})
+
+            if not lect_config:
+                continue
+
+            # waiting for channel to be respawned
+            await asyncio.sleep(5)
+
+            new_channel = discord.utils.get(getattr(channel.guild, channel_type), name=lect_config['name'])
+            if new_channel is None:
+                continue
+
+            execute = {
+                "$set": {
+                    channel_id: new_channel.id
+                }
+            }
+            lect_set_cursor.update_one({channel_id: channel.id}, execute)
+
+
 def setup(bot):
     bot.add_cog(Lecture(bot))
+    bot.add_cog(LectureAuto(bot))

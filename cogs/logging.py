@@ -1,7 +1,8 @@
-from discord.ext import commands
+from discord.ext import commands, tasks
 from core.cog_config import CogExtension
 import discord
 from core.db import JsonApi
+from core.utils import Time
 
 
 class Log(CogExtension):
@@ -33,25 +34,46 @@ class Log(CogExtension):
             return await ctx.send(f':x: 參數必須在 {logging_channel.keys()} 中！')
 
         buffer_channel = self.bot.get_channel(logging_channel.get(title))
-        logs_json = JsonApi().get(title)
+        await release_log(title, buffer_channel, ctx.channel)
 
-        if not logs_json["logs"]:
-            return
 
-        logs = '\n'.join(logs_json["logs"])
+class CmdLogAuto(CogExtension):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-        with open('./txts/report_buffer.txt', mode='w', encoding='utf8') as temp_file:
-            temp_file.write(logs)
+        self.auto_release.start()
 
-        await buffer_channel.send(file=discord.File('./txts/report_buffer.txt'))
-        await ctx.send(f':white_check_mark: 記錄檔 {title} 已釋出！')
+    @tasks.loop(hours=1)
+    async def auto_release(self):
+        logs_json = JsonApi().get('CmdLogging')
 
-        # clear buffer content
-        with open('./txts/report_buffer.txt', mode='w', encoding='utf8') as temp_file:
-            temp_file.write('')
+        if Time.get_info('hour') >= 18 and logs_json['daily_release'] is False:
+            dev_guild = self.bot.get_guild(790978307235512360)
+            auto_logging_channel = dev_guild.get_channel(855702933299658765)
+            await release_log('CmdLogging', auto_logging_channel)
 
-        logs_json["logs"].clear()
-        JsonApi().put(title, logs_json)
+            logs_json['daily_release'] = True
+            JsonApi().put('CmdLogging', logs_json)
+
+
+async def release_log(title, target_channel: discord.TextChannel, report_channel: discord.TextChannel = None):
+    logs_json = JsonApi().get(title)
+    logs = '\n'.join(logs_json["logs"])
+
+    with open('./txts/report_buffer.txt', mode='w', encoding='utf8') as temp_file:
+        temp_file.write(logs)
+
+    await target_channel.send(file=discord.File('./txts/report_buffer.txt'))
+
+    if report_channel is not None:
+        await report_channel.send(f':white_check_mark: 記錄檔 {title} 已釋出！')
+
+    # clear buffer content
+    with open('./txts/report_buffer.txt', mode='w', encoding='utf8') as temp_file:
+        temp_file.write('')
+
+    logs_json["logs"].clear()
+    JsonApi().put(title, logs_json)
 
 
 def setup(bot):
