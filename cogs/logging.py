@@ -45,6 +45,8 @@ class CmdLogAuto(CogExtension):
 
     @tasks.loop(hours=1)
     async def auto_release(self):
+        await self.bot.wait_until_ready()
+
         logs_json = JsonApi().get('CmdLogging')
 
         if Time.get_info('hour') >= 18 and logs_json['daily_release'] is False:
@@ -78,3 +80,4 @@ async def release_log(title, target_channel: discord.TextChannel, report_channel
 
 def setup(bot):
     bot.add_cog(Log(bot))
+    bot.add_cog(CmdLogAuto(bot))
