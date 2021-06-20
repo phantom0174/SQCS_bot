@@ -1,8 +1,9 @@
-from discord.ext import commands
+from discord.ext import commands, tasks
 from core.db import self_client, huma_get, fluctlight_client
 from core.utils import Time, DiscordExt
 from core.fluctlight_ext import guild_weekly_update, Fluct
 from core.cog_config import CogExtension
+import discord
 
 
 class Quiz(CogExtension):
@@ -158,6 +159,37 @@ class Quiz(CogExtension):
             message += await huma_get('quiz/answer_tut', '\n')
             message += await huma_get('quiz/invalid_syntax/pt_2')
             await msg.author.send(message)
+
+
+class QuizAuto(CogExtension):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.quiz_set_cursor = self_client["QuizSetting"]
+
+        self.quiz_auto.start()
+
+    @tasks.loop(minutes=50)
+    async def quiz_auto(self):
+        await self.bot.wait_until_ready()
+
+        guild = self.bot.get_guild(784607509629239316)
+        report_channel = discord.utils.get(guild.text_channels, name='sqcs-report')
+
+        quiz_status = self.quiz_set_cursor.find_one({"_id": 0})["event_status"]
+
+        def quiz_ready_to_start():
+            return Time.get_info('date') == 1 and Time.get_info('hour') >= 6 and not quiz_status
+
+        def quiz_ready_to_end():
+            return Time.get_info('date') == 7 and Time.get_info('hour') >= 22 and quiz_status
+
+        if quiz_ready_to_start():
+            await quiz_start(self.bot)
+            await report_channel.send(f'[AUTO QUIZ START][{Time.get_info("whole")}]')
+        elif quiz_ready_to_end():
+            await quiz_end(self.bot)
+            await report_channel.send(f'[AUTO QUIZ END][{Time.get_info("whole")}]')
 
 
 # auto start quiz event

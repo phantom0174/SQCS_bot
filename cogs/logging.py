@@ -56,6 +56,37 @@ class CmdLogAuto(CogExtension):
 
             logs_json['daily_release'] = True
             JsonApi().put('CmdLogging', logs_json)
+        elif 0 <= Time.get_info('hour') <= 12 and logs_json['daily_release'] is True:
+            logs_json['daily_release'] = False
+            JsonApi().put('CmdLogging', logs_json)
+
+
+class LocalLogAuto(CmdLogAuto):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.local_log_upload.start()
+
+    @tasks.loop(minutes=30)
+    async def local_log_upload(self):
+        with open('./bot.log', mode='r', encoding='utf8') as temp_file:
+            local_logs = temp_file.read().split('\n')
+
+        if local_logs is None:
+            return
+
+        while str('') in local_logs:
+            local_logs.remove('')
+
+        # upload logs
+        log_json = JsonApi().get('CmdLogging')
+        for log in local_logs:
+            log_json['logs'].append(log)
+        JsonApi().put('CmdLogging', log_json)
+
+        # flush local logs
+        with open('./bot.log', mode='w', encoding='utf8') as temp_file:
+            temp_file.write('')
 
 
 async def release_log(title, target_channel: discord.TextChannel, report_channel: discord.TextChannel = None):
