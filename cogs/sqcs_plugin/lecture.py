@@ -110,6 +110,16 @@ class Lecture(CogExtension):
         }
         lect_set_cursor.update({"week": week}, execute)
 
+        # join the voice channel to speak
+        voice_channel = ctx.guild.get_channel(lect_config['voice_id'])
+        voice_client = await voice_channel.connect()
+        audio_source = discord.FFmpegPCMAudio('./assets/audio/lecture_starts.mp3')
+        voice_client.play(audio_source)
+        while voice_client.is_playing():
+            await asyncio.sleep(1)
+        voice_client.stop()
+        await voice_client.disconnect()
+
         # delete previous special message
         text_channel = self.bot.get_channel(lect_config["text_id"])
         msg_logs = await text_channel.history(limit=200).flatten()
@@ -208,6 +218,16 @@ class Lecture(CogExtension):
             }
         }
         lect_set_cursor.update_one({"week": week}, execute)
+
+        # join the voice channel to speak
+        voice_channel = ctx.guild.get_channel(lect_config['voice_id'])
+        voice_client = await voice_channel.connect()
+        audio_source = discord.FFmpegPCMAudio('./assets/audio/lecture_ends.mp3')
+        voice_client.play(audio_source)
+        while voice_client.is_playing():
+            await asyncio.sleep(1)
+        voice_client.stop()
+        await voice_client.disconnect()
 
         # adding scores and show lecture final data
         fl_cursor = fluctlight_client["MainFluctlights"]

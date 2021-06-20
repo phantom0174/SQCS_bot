@@ -68,10 +68,10 @@ class Voice(CogExtension):
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
-        if not before.channel.name.endswith('party'):
+        if before.channel is None or before.channel == after.channel:
             return
 
-        if before.channel is None or before.channel == after.channel:
+        if not before.channel.name.endswith('party'):
             return
 
         if before.channel.name == f"{member.display_name}'s party":
