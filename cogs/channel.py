@@ -6,7 +6,7 @@ from core.db import JsonApi
 
 
 class Protect(CogExtension):
-    @commands.group(aliases=['protect', 'p'])
+    @commands.group(aliases=['p'])
     @commands.has_any_role('總召', 'Administrator')
     async def protect(self, ctx):
         pass
@@ -138,12 +138,12 @@ class Protect(CogExtension):
 class Meeting(CogExtension):
     # for text and voice meeting usage
     @commands.group()
+    @commands.has_any_role('總召', 'Administrator')
     async def meeting(self, ctx):
         pass
 
     # for voice meeting usage
     @meeting.command()
-    @commands.has_any_role('總召', 'Administrator')
     async def on(self, ctx, channel_id: int):
         target_channel = ctx.guild.get_channel(channel_id)
         if target_channel is None:
@@ -161,7 +161,6 @@ class Meeting(CogExtension):
         await ctx.send(':white_check_mark: 指令執行完畢！')
 
     @meeting.command()
-    @commands.has_any_role('總召', 'Administrator')
     async def off(self, ctx, channel_id: int):
         target_channel = ctx.guild.get_channel(channel_id)
         if target_channel is None:
