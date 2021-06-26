@@ -18,7 +18,7 @@ class Fluct:
 
             score_set_cursor = self_client["ScoreSetting"]
             score_setting = score_set_cursor.find_one({"_id": 0})
-            self.score_weight = ["score_weight"]
+            self.score_weight = score_setting["score_weight"]
 
             if score_mode != 'custom':
                 score_modes = {
