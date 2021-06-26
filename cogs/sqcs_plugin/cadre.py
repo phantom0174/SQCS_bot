@@ -94,7 +94,7 @@ class Cadre(CogExtension):
         await member.send(
             f':white_check_mark: 你於 {data["apply_time"]} 申請 {data["apply_cadre"]} 的程序已通過！\n'
             f'此為幹部群的連結，請在加入之後使用指令領取屬於你的身分組\n'
-            f'{os.environ.get("Working_link")}'
+            f'{os.environ.get("WORKING_DC_GUILD_LINK")}'
         )
 
         cadre_cursor.delete_one({"_id": data["_id"]})

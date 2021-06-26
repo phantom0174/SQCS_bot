@@ -3,10 +3,9 @@ import os
 import requests
 from typing import Union
 
-
 # database
-password = os.environ.get("PW")
-account = os.environ.get("ACCOUNT")
+account = os.environ.get("MONGODB_ACCOUNT")
+password = os.environ.get("MONGODB_PASSWORD")
 link = f"mongodb+srv://{account}:{password}@light-cube-cluster.5wswq.mongodb.net/sqcs?retryWrites=true&w=majority"
 
 # set client
@@ -19,8 +18,8 @@ class JsonApi:
         self.link_header = 'https://api.jsonstorage.net/v1/json/'
 
         # json link switcher
-        self.json_links = str(os.environ.get("JsonApiLinks"))
-        self.link_dict = requests.get(self.link_header + self.json_links).json()["links"]
+        self.json_links = str(os.environ.get("JSON_API_ADAPTER_LINK"))
+        self.link_dict = requests.get(self.link_header + self.json_links).json()['links']
 
     def get(self, name) -> Union[dict, None]:
         if name not in self.link_dict.keys():

@@ -19,6 +19,7 @@ class Task(CogExtension):
         neutral_role = guild.get_role(823803958052257813)
         fluctlight_cursor = fluctlight_client["MainFluctlights"]
 
+        fluct_ext = Fluct()
         for member in guild.members:
             if member.bot:
                 continue
@@ -26,7 +27,7 @@ class Task(CogExtension):
             if neutral_role in member.roles:
                 member_active_data = fluctlight_cursor.find_one({"_id": member.id})
                 if member_active_data is None:
-                    await Fluct().reset_main(member.id, guild)
+                    await fluct_ext.create_main(guild, False, member.id)
                     continue
 
                 quiz_crt_count = member_active_data["quiz_correct_count"]

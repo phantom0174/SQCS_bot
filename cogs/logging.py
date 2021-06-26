@@ -54,6 +54,8 @@ class CmdLogAuto(CogExtension):
             auto_logging_channel = dev_guild.get_channel(855702933299658765)
             await release_log('CmdLogging', auto_logging_channel)
 
+            # need to refresh because the data has been changed in the function
+            logs_json = JsonApi().get('CmdLogging')
             logs_json['daily_release'] = True
             JsonApi().put('CmdLogging', logs_json)
         elif 0 <= Time.get_info('hour') <= 12 and logs_json['daily_release'] is True:
@@ -69,14 +71,13 @@ class LocalLogAuto(CmdLogAuto):
 
     @tasks.loop(minutes=30)
     async def local_log_upload(self):
-        with open('./bot.log', mode='r', encoding='utf8') as temp_file:
+        with open('./buffer/bot.log', mode='r', encoding='utf8') as temp_file:
             local_logs = temp_file.read().split('\n')
 
         if local_logs is None:
             return
 
-        while str('') in local_logs:
-            local_logs.remove('')
+        local_logs = list(filter(lambda item: item.strip(), local_logs))
 
         # upload logs
         log_json = JsonApi().get('CmdLogging')
@@ -85,7 +86,7 @@ class LocalLogAuto(CmdLogAuto):
         JsonApi().put('CmdLogging', log_json)
 
         # flush local logs
-        with open('./bot.log', mode='w', encoding='utf8') as temp_file:
+        with open('./buffer/bot.log', mode='w', encoding='utf8') as temp_file:
             temp_file.write('')
 
 
@@ -93,16 +94,19 @@ async def release_log(title, target_channel: discord.TextChannel, report_channel
     logs_json = JsonApi().get(title)
     logs = '\n'.join(logs_json["logs"])
 
-    with open('./txts/report_buffer.txt', mode='w', encoding='utf8') as temp_file:
+    with open('./buffer/report.txt', mode='w', encoding='utf8') as temp_file:
         temp_file.write(logs)
 
-    await target_channel.send(file=discord.File('./txts/report_buffer.txt'))
+    if logs == '':
+        return
+
+    await target_channel.send(file=discord.File('./buffer/report.txt'))
 
     if report_channel is not None:
         await report_channel.send(f':white_check_mark: 記錄檔 {title} 已釋出！')
 
     # clear buffer content
-    with open('./txts/report_buffer.txt', mode='w', encoding='utf8') as temp_file:
+    with open('./buffer/report.txt', mode='w', encoding='utf8') as temp_file:
         temp_file.write('')
 
     logs_json["logs"].clear()

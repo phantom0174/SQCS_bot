@@ -1,8 +1,8 @@
 # Sensitive information
 .env
 
-# Buffer
-txts
+# vscode
+.vscode
 
 # every casual documents
 devdata

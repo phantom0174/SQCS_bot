@@ -17,8 +17,7 @@ class Verify(CogExtension):
         verify_cursor = self_client['Verification']
 
         accounts = accounts.split('\n')
-        while ' ' in accounts:
-            accounts.remove(' ')
+        accounts = list(filter(lambda item: item.strip(), accounts))
 
         def generate(name):
             prefix = name[0]
@@ -29,7 +28,7 @@ class Verify(CogExtension):
             return f'{prefix}{suffix}'
 
         # token generation
-        tokens = [generate(name) for name in accounts.copy().split('@')]
+        tokens = [generate(name.split('@')) for name in accounts.copy()]
         for (account, token) in zip(accounts, tokens):
             try:
                 token_data = {
@@ -41,8 +40,8 @@ class Verify(CogExtension):
                 await send_email(
                     to_account=account,
                     subject='SQCS 講座加分神奇密碼',
-                    content=f'請在 #講座加分 頻道中輸入以下指令，就可以獲得今天的講座分數！'
-                            f'+lect verify {token}'
+                    content=f'請在 #講座加分 頻道中輸入以下指令，就可以獲得今天的講座分數！\n'
+                            f'+lect_verify attend {token}\n'
                             f'之後也要來聽講座呦！\\^~^'
                 )
             except:

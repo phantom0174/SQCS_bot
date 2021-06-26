@@ -1,10 +1,10 @@
-from discord.ext import commands
+from discord.ext import commands, tasks
 from core.cog_config import CogExtension
-from core.db import fluctlight_client, self_client, huma_get
+from core.db import fluctlight_client, huma_get
 from core.fluctlight_ext import Fluct
 
 
-class PersonalInfo(CogExtension):
+class Fluctlight(CogExtension):
 
     @commands.group()
     @commands.has_any_role('總召', 'Administrator')
@@ -13,23 +13,15 @@ class PersonalInfo(CogExtension):
 
     @fluct.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def remedy(self, ctx, members_id: commands.Greedy[int], delta_value: float):
-        fl_cursor = fluctlight_client["MainFluctlights"]
-        score_set_cursor = self_client["ScoreSetting"]
-        score_weight = score_set_cursor.find_one({"_id": 0})["score_weight"]
-
+    async def remedy(self, ctx, delta_value: float, members_id: commands.Greedy[int]):
+        fluct_ext = Fluct(score_mode='custom')
         for member_id in members_id:
             try:
-                execute = {
-                    "$inc": {
-                        "score": round(delta_value * score_weight, 2)
-                    }
-                }
-                fl_cursor.update_one({"_id": member_id}, execute)
-                await Fluct().active_log_update(member_id)
+                await fluct_ext.add_score(member_id, delta_value)
+                await fluct_ext.active_log_update(member_id)
 
                 member = ctx.guild.get_member(member_id)
-                msg = f'耶！你被管理員加了 {delta_value} 分！' + '\n'
+                msg = f'耶！你被加了 {delta_value} 分！' + '\n'
                 msg += await huma_get('main/remedy/pt_1')
                 await member.send(msg)
             except:
@@ -38,27 +30,84 @@ class PersonalInfo(CogExtension):
         await ctx.send(':white_check_mark: 指令執行完畢！')
 
     @fluct.command()
-    async def delete(self, ctx, member_id: int):
-        cursors = [
-            fluctlight_client["MainFluctlights"],
-            fluctlight_client["ViceFluctlights"]
-        ]
+    async def create(self, ctx, member_id: int):
+        fluct_ext = Fluct()
+        await fluct_ext.create_main(ctx.guild, False, member_id)
+        await fluct_ext.create_vice(member_id)
 
-        for cursor in cursors:
-            try:
-                cursor.delete_one({"_id": member_id})
-            except:
-                await ctx.send(f':x: 操作指標 {cursor} 時發生了錯誤！')
+        await ctx.send(':white_check_mark: 指令執行完畢！')
+
+    @fluct.command()
+    async def delete(self, ctx, member_id: int):
+        fluct_ext = Fluct()
+        await fluct_ext.delete_main(member_id)
+        await fluct_ext.delete_vice(member_id)
 
         await ctx.send(':white_check_mark: 指令執行完畢！')
 
     @fluct.command()
     async def reset(self, ctx, member_id: int):
-        await Fluct().reset_main(member_id, ctx.guild)
-        await Fluct().reset_vice(member_id)
+        fluct_ext = Fluct()
+        await fluct_ext.reset_main(ctx.guild, False, member_id)
+        await fluct_ext.reset_vice(member_id)
 
         await ctx.send(':white_check_mark: 指令執行完畢！')
 
 
+class FluctlightAuto(CogExtension):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.create_missing_member_fluctlight.start()
+        self.delete_unused_fluctlight.start()
+
+    @tasks.loop(hours=3)
+    async def create_missing_member_fluctlight(self):
+        main_cursor = fluctlight_client['MainFluctlights']
+        vice_cursor = fluctlight_client['ViceFluctlights']
+
+        await self.bot.wait_until_ready()
+        guild = self.bot.get_guild(743507979369709639)
+
+        fluct_ext = Fluct()
+        for member in guild.members:
+            if member.bot:
+                continue
+
+            member_main_fluct = main_cursor.find_one({"_id": member.id})
+            member_vice_fluct = vice_cursor.find_one({"_id": member.id})
+
+            if not member_main_fluct:
+                await fluct_ext.create_main(guild, False, member.id)
+
+            if not member_vice_fluct:
+                await fluct_ext.create_vice(member.id)
+
+    @tasks.loop(hours=12)
+    async def delete_unused_fluctlight(self):
+        main_cursor = fluctlight_client['MainFluctlights']
+        vice_cursor = fluctlight_client['ViceFluctlights']
+
+        main_data = main_cursor.find({})
+        vice_data = vice_cursor.find({})
+
+        await self.bot.wait_until_ready()
+        guild = self.bot.get_guild(743507979369709639)
+
+        fluct_ext = Fluct()
+        for member_data in main_data:
+            member = guild.get_member(member_data['_id'])
+
+            if member.bot or member is None:
+                await fluct_ext.delete_main(member_data['_id'])
+
+        for member_data in vice_data:
+            member = guild.get_member(member_data['_id'])
+
+            if member.bot or member is None:
+                await fluct_ext.delete_vice(member_data['_id'])
+
+
 def setup(bot):
-    bot.add_cog(PersonalInfo(bot))
+    bot.add_cog(Fluctlight(bot))
+    bot.add_cog(FluctlightAuto(bot))

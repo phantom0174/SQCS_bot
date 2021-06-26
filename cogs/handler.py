@@ -5,22 +5,22 @@ from core.db import JsonApi
 import traceback
 
 
-class Event(CogExtension):
-
+class ErrorHandler(CogExtension):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         log_channel = self.bot.get_channel(785146879004508171)
-        await ctx.send(content=f'`{error}`', delete_after=5.0)
+        await ctx.send(content=f'`{error}`', delete_after=8.0)
 
         # search for real traceback breakpoint
         error_message = traceback.format_exception(type(error), error, error.__traceback__)
         until_index = None
+
         for index, msg in enumerate(error_message):
             if msg.find('The above exception') != -1:
                 until_index = int(index)
                 break
         if until_index is None:
-            until_index = int(0)
+            until_index = len(error_message) - 1
 
         msg = '\n'.join(error_message[:until_index])
         await log_channel.send(
@@ -61,4 +61,4 @@ class Event(CogExtension):
 
 
 def setup(bot):
-    bot.add_cog(Event(bot))
+    bot.add_cog(ErrorHandler(bot))

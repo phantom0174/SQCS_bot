@@ -1,29 +1,16 @@
-import smtplib
 import os
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.header import Header
+import yagmail
 
-Account = os.environ.get("GmailAccount")
-Password = os.environ.get("GmailPassword")
 
-# server setup
-smtpserver = smtplib.SMTP_SSL("smtp.gmail.com", 465)
-smtpserver.ehlo()
-smtpserver.login(Account, Password)
+Account = os.environ.get("GMAIL_ACCOUNT")
+Password = os.environ.get("GMAIL_PASSWORD")
 
-# only used for shutting down
-# smtpserver.quit()
+yag = yagmail.SMTP(Account, Password)
 
 
 async def send_email(to_account, subject, content):
-    mail = MIMEMultipart()
-    mail['From'] = Account
-    mail['To'] = to_account
-    mail['Subject'] = Header(subject, 'utf-8')
-
-    # content encoding
-    content = MIMEText(content, "plain", "utf-8")
-    mail.attach(content)
-
-    smtpserver.sendmail(Account, to_account, mail.as_string())
+    yag.send(
+        to=to_account,
+        subject=subject,
+        contents=content
+    )

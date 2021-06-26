@@ -1,38 +1,23 @@
-from core.db import self_client, fluctlight_client, JsonApi
+from core.db import JsonApi
 import discord
 from core.utils import Time
-import core.fluctlight_ext as fluct_ext
+from core.fluctlight_ext import Fluct
 
 
 async def report_lect_attend(bot, attendants: list, week: int) -> None:
-    score_set_cursor = self_client["ScoreSetting"]
-    score_data = score_set_cursor.find_one({"_id": 0})
-    score_weight = score_data["score_weight"]
-    lect_attend_score = score_data["lecture_attend_point"]
-
-    # add score to the attendances
-    fluct_cursor = fluctlight_client["MainFluctlights"]
-
     report_json = JsonApi().get('LectureLogging')
     guild = bot.get_guild(784607509629239316)
     report_channel = discord.utils.get(guild.text_channels, name='sqcs-lecture-attend')
 
+    fluct_ext = Fluct(score_mode='lect_attend')
     for member_id in attendants:
-        delta_score = round(lect_attend_score * score_weight, 2)
         try:
-            execute = {
-                "$inc": {
-                    "score": delta_score
-                }
-            }
-            fluct_cursor.update_one({"_id": member_id}, execute)
-            await fluct_ext.Fluct().active_log_update(member_id)
-            await fluct_ext.Fluct().lect_attend_update(member_id)
+            await fluct_ext.add_score(member_id)
+            await fluct_ext.active_log_update(member_id)
+            await fluct_ext.lect_attend_update(member_id)
         except:
             await report_channel.send(
-                f'[DB MANI ERROR][to: {member_id}]'
-                f'[inc_score: {delta_score}]'
-            )
+                f'[DB MANI ERROR][to: {member_id}][score_mode: lect_attend]')
 
     report_json["logs"].append(
         f'[LECT ATTEND][week: {week}][attendants:\n'

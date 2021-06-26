@@ -112,8 +112,6 @@ class Quiz(CogExtension):
             return
 
         quiz_set_cursor = self_client["QuizSetting"]
-        score_set_cursor = self_client["ScoreSetting"]
-        fl_cursor = fluctlight_client["MainFluctlights"]
 
         quiz_status = quiz_set_cursor.find_one({"_id": 0})["event_status"]
         if not quiz_status:
@@ -121,19 +119,19 @@ class Quiz(CogExtension):
 
         await msg.delete()
 
-        correct_answer = quiz_set_cursor.find_one({"_id": 0})["correct_answer"]
-        quiz_score = score_set_cursor.find_one({"_id": 0})["quiz_point"]
-        score_weight = score_set_cursor.find_one({"_id": 0})["score_weight"]
         quiz_cursor = self_client["QuizOngoing"]
 
+        # whether the member had submit answer
         data = quiz_cursor.find_one({"_id": msg.author.id})
         if data:
             message = await huma_get('quiz/repeat_answer')
             return await msg.author.send(message)
 
+        # if answer fit standard format
         if msg.content.startswith('||') and msg.content.endswith('||'):
-            message = await huma_get('quiz/get_answer')
-            await msg.author.send(message)
+            correct_answer = quiz_set_cursor.find_one({"_id": 0})["correct_answer"]
+
+            fluct_ext = Fluct(member_id=msg.author.id, score_mode='quiz')
 
             answer_correctness = (msg.content[2:-2].lower() == correct_answer)
             member_quiz_result = {
@@ -141,19 +139,16 @@ class Quiz(CogExtension):
                 "correct": answer_correctness
             }
             quiz_cursor.insert_one(member_quiz_result)
-            await Fluct().active_log_update(msg.author.id)
-            await Fluct().quiz_submit_update(msg.author.id)
+            await fluct_ext.active_log_update()
+            await fluct_ext.quiz_submit_update()
 
-            # add score to member fluctlight
+            message = await huma_get('quiz/get_answer')
+            await msg.author.send(message)
+
+            # add score to member fluctlight if answer is correct
             if answer_correctness:
-                execute = {
-                    "$inc": {
-                        "score": round(quiz_score * score_weight, 2)
-                    }
-                }
-                fl_cursor.update_one({"_id": msg.author.id}, execute)
-                await Fluct().quiz_correct_update(msg.author.id)
-
+                await fluct_ext.add_score()
+                await fluct_ext.quiz_correct_update()
         else:
             message = await huma_get('quiz/invalid_syntax/pt_1', '\n')
             message += await huma_get('quiz/answer_tut', '\n')

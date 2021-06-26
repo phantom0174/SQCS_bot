@@ -12,7 +12,7 @@ class Voice(CogExtension):
 
     # remove member in voice channel
     @voice.command()
-    async def kick_timer(self, ctx, channel_id: int, countdown: int):
+    async def timer(self, ctx, channel_id: int, countdown: int):
         countdown_duration = countdown
         voice_channel = self.bot.get_channel(channel_id)
 
@@ -32,13 +32,19 @@ class Voice(CogExtension):
 
     @voice.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def set_default_connect(self, ctx, channel_id: int, mode: int):
+    async def default_role_connect(self, ctx, channel_id: int, mode: int):
         protect_target_channel = ctx.guild.get_channel(channel_id)
         await protect_target_channel.set_permissions(ctx.guild.default_role, connect=bool(mode))
 
+
+class GroupVCChannel(CogExtension):
     # dynamic creating personal voice channel
-    @voice.command(aliases=['make'])
-    async def make_channel_for(self, ctx, members: commands.Greedy[discord.Member]):
+    @commands.group()
+    async def personal(self, ctx):
+        pass
+
+    @personal.command(aliases=['make'])
+    async def make_channel(self, ctx, members: commands.Greedy[discord.Member]):
         terminal_channel = ctx.guild.get_channel(839170475309006979)
 
         if ctx.author.voice.channel != terminal_channel:

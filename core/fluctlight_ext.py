@@ -2,95 +2,161 @@ import statistics
 import discord
 from core.db import self_client, fluctlight_client
 from core.utils import Time, FluctMath, DiscordExt
+from typing import NoReturn
 
 
 class Fluct:
-    def __init__(self, member_id=None):
+    def __init__(self, member_id=None, score_mode=None):
+        # fluctlight cursor
         self.main_fluct_cursor = fluctlight_client["MainFluctlights"]
         self.vice_fluct_cursor = fluctlight_client["ViceFluctlights"]
 
-        if member_id is not None:
-            self.member_fluctlight = self.main_fluct_cursor.find_one({"_id": member_id})
+        # score setting cursor
+        self.delta_score = None
+        if score_mode is not None:
+            self.score_mode = score_mode
 
-    async def reset_main(self, member_id, guild) -> None:
+            score_set_cursor = self_client["ScoreSetting"]
+            score_setting = score_set_cursor.find_one({"_id": 0})
+            self.score_weight = ["score_weight"]
+
+            if score_mode != 'custom':
+                score_modes = {
+                    "lect_attend": "lecture_attend_point",
+                    "quiz": "quiz_point"
+                }
+                if score_mode not in score_modes.keys():
+                    raise BaseException('ARGUMENT ERROR: score_mode', score_mode)
+
+                self.delta_score = self.score_weight * score_setting[score_modes.get(score_mode)]
+                self.delta_score = round(self.delta_score, 2)
+
+        self.member_id = None
+        if member_id is not None:
+            self.member_id = member_id
+
+    async def get_final_id(self, input_member_id):
+        if self.member_id is not None:
+            return self.member_id
+        else:
+            return input_member_id
+
+    async def create_main(self, guild, deep_freeze_status: bool, member_id: int = -1) -> None:
+        member_final_id = await self.get_final_id(member_id)
+
         default_main_fluctlight = {
-            "_id": member_id,
-            "name": await DiscordExt.get_member_nick_name(guild, member_id),
+            "_id": member_final_id,
+            "name": await DiscordExt.get_member_nick_name(guild, member_final_id),
             "score": 0,
             "week_active": False,
             "contrib": 0,
             "lvl_ind": 0,
-            "deep_freeze": False,
+            "deep_freeze": deep_freeze_status,
             "log": '',
             "lect_attend_count": 0,
             "quiz_submit_count": 0,
             "quiz_correct_count": 0
         }
         try:
-            self.main_fluct_cursor.delete_one({"_id": member_id})
-        except:
-            pass
-
-        try:
             self.main_fluct_cursor.insert_one(default_main_fluctlight)
         except:
             pass
 
-    async def reset_vice(self, member_id) -> None:
+    async def delete_main(self, member_id: int = -1) -> NoReturn:
+        member_final_id = await self.get_final_id(member_id)
+        try:
+            self.main_fluct_cursor.delete_one({"_id": member_final_id})
+        except:
+            pass
+
+    async def reset_main(self, guild, deep_freeze_status: bool, member_id: int = -1) -> NoReturn:
+        member_final_id = await self.get_final_id(member_id)
+        await self.delete_main(member_final_id)
+        await self.create_main(guild, deep_freeze_status, member_final_id)
+
+    async def create_vice(self, member_id: int = -1) -> NoReturn:
+        member_final_id = await self.get_final_id(member_id)
         default_vice_fluctlight = {
-            "_id": member_id,
+            "_id": member_final_id,
             "du": 0,
             "mdu": 0,
             "oc_auth": 0,
             "sc_auth": 0,
         }
         try:
-            self.vice_fluct_cursor.delete_one({"_id": member_id})
-        except:
-            pass
-
-        try:
             self.vice_fluct_cursor.insert_one(default_vice_fluctlight)
         except:
             pass
 
-    async def active_log_update(self, member_id: int) -> None:
-        active = self.main_fluct_cursor.find_one({"_id": member_id})["week_active"]
+    async def delete_vice(self, member_id: int = -1) -> NoReturn:
+        member_final_id = await self.get_final_id(member_id)
+        try:
+            self.vice_fluct_cursor.delete_one({"_id": member_final_id})
+        except:
+            pass
+
+    async def reset_vice(self, member_id: int = -1) -> NoReturn:
+        member_final_id = await self.get_final_id(member_id)
+        await self.delete_vice(member_final_id)
+        await self.create_vice(member_final_id)
+
+    async def add_score(self, member_id: int = -1, delta_value: float = -1) -> NoReturn:
+        member_final_id = await self.get_final_id(member_id)
+        if self.score_mode == 'custom':
+            final_delta_score = delta_value
+        else:
+            final_delta_score = self.delta_score
+
+        final_delta_score = round(final_delta_score, 2)
+
+        execute = {
+            "$inc": {
+                "score": final_delta_score
+            }
+        }
+        self.main_fluct_cursor.update_one({"_id": member_final_id}, execute)
+
+    async def active_log_update(self, member_id: int = -1) -> NoReturn:
+        member_final_id = await self.get_final_id(member_id)
+        active = self.main_fluct_cursor.find_one({"_id": member_final_id})["week_active"]
         if not active:
             execute = {
                 "$set": {
                     "week_active": True
                 }
             }
-            self.main_fluct_cursor.update_one({"_id": member_id}, execute)
+            self.main_fluct_cursor.update_one({"_id": member_final_id}, execute)
 
-    async def lect_attend_update(self, member_id: int) -> None:
+    async def lect_attend_update(self, member_id: int = -1) -> NoReturn:
+        member_final_id = await self.get_final_id(member_id)
         execute = {
             "$inc": {
                 "lect_attend_count": 1
             }
         }
-        self.main_fluct_cursor.update_one({"_id": member_id}, execute)
+        self.main_fluct_cursor.update_one({"_id": member_final_id}, execute)
 
-    async def quiz_submit_update(self, member_id: int) -> None:
+    async def quiz_submit_update(self, member_id: int = -1) -> NoReturn:
+        member_final_id = await self.get_final_id(member_id)
         execute = {
             "$inc": {
                 "quiz_submit_count": 1
             }
         }
-        self.main_fluct_cursor.update_one({"_id": member_id}, execute)
+        self.main_fluct_cursor.update_one({"_id": member_final_id}, execute)
 
-    async def quiz_correct_update(self, member_id: int) -> None:
+    async def quiz_correct_update(self, member_id: int = -1) -> NoReturn:
+        member_final_id = await self.get_final_id(member_id)
         execute = {
             "$inc": {
                 "quiz_correct_count": 1
             }
         }
-        self.main_fluct_cursor.update_one({"_id": member_id}, execute)
+        self.main_fluct_cursor.update_one({"_id": member_final_id}, execute)
 
 
 # main function
-async def guild_weekly_update(bot) -> None:
+async def guild_weekly_update(bot) -> NoReturn:
 
     # ------------------------------
     # Very important update function

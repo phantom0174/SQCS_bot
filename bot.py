@@ -2,10 +2,15 @@ from discord.ext import commands
 import discord
 import sys
 import os
-import keep_alive
+from core import keep_alive
 import asyncio
 import core.utils as utl
 import logging
+from typing import Tuple
+from dotenv import load_dotenv
+
+# load token from .env
+load_dotenv()
 
 
 Format = '%(asctime)s %(levelname)s: %(message)s, ' \
@@ -14,7 +19,7 @@ Format = '%(asctime)s %(levelname)s: %(message)s, ' \
          'of file: %(pathname)s\n'
 
 logging.basicConfig(
-    filename='bot.log',
+    filename='./buffer/bot.log',
     level=logging.WARNING,
     format=Format
 )
@@ -62,39 +67,34 @@ async def info(ctx):
 
 
 # function for cogs management
-def find_cog(path: str, target_cog: str, mode: str) -> (bool, str):
-    trans_path = {
-        "./cogs": "cogs.",
-        "./cogs/sqcs_plugin": "cogs.sqcs_plugin."
-    }
-    for item in os.listdir(path):
-        if item.startswith(target_cog) and item.endswith('.py'):
-            if mode == 'load':
-                bot.load_extension(
-                    f'{trans_path.get(path)}{item[:-3]}'
-                )
-                return True, f':white_check_mark: Extension {item} loaded!'
-            if mode == 'unload':
-                bot.unload_extension(
-                    f'{trans_path.get(path)}{item[:-3]}'
-                )
-                return True, f':white_check_mark: Extension {item} unloaded!'
-            if mode == 'reload':
-                bot.reload_extension(
-                    f'{trans_path.get(path)}{item[:-3]}'
-                )
-                return True, f':white_check_mark: Extension {item} reloaded!'
+def find_cog(target_cog: str, mode: str) -> Tuple[bool, str]:
+    def load_ext(full_path: str):
+        if mode == 'load':
+            bot.load_extension(full_path)
+        if mode == 'unload':
+            bot.unload_extension(full_path)
+        if mode == 'reload':
+            bot.reload_extension(full_path)
+
+    for find_filename in os.listdir('./cogs'):
+        # normal cog file
+        if find_filename.find('.') != -1:
+            if find_filename.startswith(target_cog) and find_filename.endswith('.py'):
+                load_ext(f'cogs.{find_filename[:-3]}')
+                return True, f':white_check_mark: Extension {find_filename} {mode}ed!'
+        # plugin folders
+        else:
+            for find_sub_filename in os.listdir(f'./cogs/{filename}'):
+                if filename.endswith('.py'):
+                    load_ext(f'cogs.{find_filename[:-3]}')
+                    return True, f':white_check_mark: Extension {find_filename} {mode}ed!'
     return False, ''
 
 
 @bot.command()
 @commands.has_any_role('總召', 'Administrator')
 async def load(ctx, target_cog: str):
-    find, msg = find_cog('./cogs', target_cog, 'load')
-    if find:
-        return await ctx.send(msg)
-
-    find, msg = find_cog('./cogs/sqcs_plugin', target_cog, 'load')
+    find, msg = find_cog(target_cog, 'load')
     if find:
         return await ctx.send(msg)
 
@@ -106,11 +106,7 @@ async def load(ctx, target_cog: str):
 @bot.command()
 @commands.has_any_role('總召', 'Administrator')
 async def unload(ctx, target_cog: str):
-    find, msg = find_cog('./cogs', target_cog, 'unload')
-    if find:
-        return await ctx.send(msg)
-
-    find, msg = find_cog('./cogs/sqcs_plugin', target_cog, 'unload')
+    find, msg = find_cog(target_cog, 'unload')
     if find:
         return await ctx.send(msg)
 
@@ -121,30 +117,14 @@ async def unload(ctx, target_cog: str):
 
 @bot.command()
 @commands.has_any_role('總召', 'Administrator')
-async def reload(ctx, target_package: str):
-    if target_package not in ['MAIN', 'SQCS']:
-        find, msg = find_cog('./cogs', target_package, 'reload')
-        if find:
-            return await ctx.send(msg)
+async def reload(ctx, target_cog: str):
+    find, msg = find_cog(target_cog, 'reload')
+    if find:
+        return await ctx.send(msg)
 
-        find, msg = find_cog('./cogs/sqcs_plugin', target_package, 'reload')
-        if find:
-            return await ctx.send(msg)
-
-        return await ctx.send(
-            f':exclamation: There are no extension called {target_package}!'
-        )
-
-    if target_package == 'MAIN':
-        for reload_filename in os.listdir('./cogs'):
-            if reload_filename.endswith('.py'):
-                bot.reload_extension(f'cogs.{reload_filename[:-3]}')
-    elif target_package == 'SQCS':
-        for reload_filename in os.listdir('./cogs/sqcs_plugin'):
-            if reload_filename.endswith('.py'):
-                bot.reload_extension(f'cogs/sqcs_plugin.{reload_filename[:-3]}')
-
-    await ctx.send(':white_check_mark: Reload finished!')
+    return await ctx.send(
+        f':exclamation: There are no extension called {target_cog}!'
+    )
 
 
 @bot.command(aliases=['logout', 'shutdown'])
@@ -163,14 +143,17 @@ async def on_disconnect():
 
 
 for filename in os.listdir('./cogs'):
-    if filename.endswith('.py'):
-        bot.load_extension(f'cogs.{filename[:-3]}')
-for filename in os.listdir('./cogs/sqcs_plugin'):
-    if filename.endswith('.py'):
-        bot.load_extension(f'cogs.sqcs_plugin.{filename[:-3]}')
-
+    # normal cog file
+    if filename.find('.') != -1:
+        if filename.endswith('.py'):
+            bot.load_extension(f'cogs.{filename[:-3]}')
+    # plugin folders
+    else:
+        for sub_filename in os.listdir(f'./cogs/{filename}'):
+            if filename.endswith('.py'):
+                bot.load_extension(f'cogs.{filename}.{sub_filename[:-3]}')
 
 keep_alive.keep_alive()
 
 if __name__ == "__main__":
-    bot.run(os.environ.get("TOKEN"))
+    bot.run(os.environ.get("BOT_TOKEN"))

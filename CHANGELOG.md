@@ -1,8 +1,15 @@
 # 📜 ChangeLog
 
-`version 1.27.6.16`
+`version 1.28.6.26`
 
 ```markdown
+- 2021/06/26: Mega update
+  - Project structure re-design.
+  - Delete unused feature.
+  - Enhance feature.
+  - Fix bugs.
+  - Mail feature stabilize.
+
 - 2021/06/16: TOKEN Verification system
   > For external lecturing use.
 

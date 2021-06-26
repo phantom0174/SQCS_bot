@@ -26,19 +26,22 @@ data_suffix = {
 
 
 class WeatherQuery(CogExtension):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.weather_api_link_header: str = (
+            'https://opendata.cwb.gov.tw/fileapi/v1/opendataapi/F-C0032-001?Authorization='
+        )
+
     @commands.group()
     async def wea(self, ctx):
         pass
 
     @wea.command()
     async def query(self, ctx, target_county: str = ''):
-
-        weather_api_link_header: str = (
-            'https://opendata.cwb.gov.tw/fileapi/v1/opendataapi/F-C0032-001?Authorization='
-        )
         response = requests.get(
-            f'{weather_api_link_header}'
-            f'{str(os.environ.get("PhantomTWWeatherApiKey"))}&format=json'
+            f'{self.weather_api_link_header}'
+            f'{str(os.environ.get("PHANTOM_TW_WEATHER_TOKEN"))}&format=json'
         )
 
         location_weather_data = response.json()["cwbopendata"]["dataset"]["location"]

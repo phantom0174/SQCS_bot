@@ -1,9 +1,10 @@
 from discord.ext import commands
 import asyncio
 import time
-from core.db import huma_get, fluctlight_client, JsonApi
+from core.db import huma_get, JsonApi
 from core.utils import Time
 from core.cog_config import CogExtension
+from core.fluctlight_ext import Fluct
 
 
 class React(CogExtension):
@@ -55,40 +56,9 @@ class React(CogExtension):
 
         # create personal fluctlight data
         start_time = time.time()
-
-        main_fluct_cursor = fluctlight_client["MainFluctlights"]
-        vice_fluct_cursor = fluctlight_client["ViceFluctlights"]
-
-        default_main_fluctlight = {
-            "_id": member.id,
-            "name": member.display_name,
-            "score": 0,
-            "week_active": False,
-            "contrib": 0,
-            "lvl_ind": 0,
-            "deep_freeze": deep_freeze_status,
-            "log": '',
-            "lect_attend_count": 0,
-            "quiz_submit_count": 0,
-            "quiz_correct_count": 0
-        }
-        try:
-            main_fluct_cursor.insert_one(default_main_fluctlight)
-        except:
-            pass
-
-        default_vice_fluctlight = {
-            "_id": member.id,
-            "du": 0,
-            "mdu": 0,
-            "oc_auth": 0,
-            "sc_auth": 0,
-        }
-        try:
-            vice_fluct_cursor.insert_one(default_vice_fluctlight)
-        except:
-            pass
-
+        fluct_ext = Fluct()
+        await fluct_ext.create_main(member.guild, deep_freeze_status, member.id)
+        await fluct_ext.create_vice(member.id)
         end_time = time.time()
 
         msg = await huma_get('join/fl_create_finish')

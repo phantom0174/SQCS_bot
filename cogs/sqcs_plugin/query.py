@@ -3,6 +3,7 @@ import random
 from core.utils import DiscordExt
 from core.db import self_client, fluctlight_client, JsonApi
 from core.cog_config import CogExtension
+import discord
 
 
 class Query(CogExtension):
@@ -33,12 +34,12 @@ class Query(CogExtension):
 
     @query.command()
     async def my_data(self, ctx):
-        await ctx.author.send(embed=(await personal_info(ctx.author.id)))
+        await ctx.author.send(embed=(await create_fluct_data_embed(ctx.author.id)))
 
     @query.command()
     @commands.has_any_role('總召', 'Administrator')
     async def member_data(self, ctx, target_id: int):
-        await ctx.author.send(embed=(await personal_info(target_id)))
+        await ctx.author.send(embed=(await create_fluct_data_embed(target_id)))
 
     # guild active percentage
     @query.command()
@@ -63,7 +64,7 @@ class Query(CogExtension):
         )
 
 
-async def personal_info(member_id):
+async def create_fluct_data_embed(member_id) -> discord.Embed:
     fluct_cursor = fluctlight_client["MainFluctlights"]
     data = fluct_cursor.find_one({"_id": member_id})
 
