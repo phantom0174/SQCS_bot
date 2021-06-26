@@ -82,12 +82,11 @@ def find_cog(target_cog: str, mode: str) -> Tuple[bool, str]:
             if find_filename.startswith(target_cog) and find_filename.endswith('.py'):
                 load_ext(f'cogs.{find_filename[:-3]}')
                 return True, f':white_check_mark: Extension {find_filename} {mode}ed!'
-        # plugin folders
         else:
-            for find_sub_filename in os.listdir(f'./cogs/{filename}'):
-                if filename.endswith('.py'):
-                    load_ext(f'cogs.{find_filename[:-3]}')
-                    return True, f':white_check_mark: Extension {find_filename} {mode}ed!'
+            for find_sub_filename in os.listdir(f'./cogs/{find_filename}'):
+                if find_sub_filename.startswith(target_cog) and find_sub_filename.endswith('.py'):
+                    load_ext(f'cogs.{find_filename}.{find_sub_filename[:-3]}')
+                    return True, f':white_check_mark: Extension {find_sub_filename} {mode}ed!'
     return False, ''
 
 
@@ -147,10 +146,9 @@ for filename in os.listdir('./cogs'):
     if filename.find('.') != -1:
         if filename.endswith('.py'):
             bot.load_extension(f'cogs.{filename[:-3]}')
-    # plugin folders
-    else:
+    elif filename.find('.') == -1:
         for sub_filename in os.listdir(f'./cogs/{filename}'):
-            if filename.endswith('.py'):
+            if sub_filename.endswith('.py'):
                 bot.load_extension(f'cogs.{filename}.{sub_filename[:-3]}')
 
 keep_alive.keep_alive()

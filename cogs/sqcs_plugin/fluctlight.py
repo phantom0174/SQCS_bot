@@ -17,11 +17,11 @@ class Fluctlight(CogExtension):
         fluct_ext = Fluct(score_mode='custom')
         for member_id in members_id:
             try:
-                await fluct_ext.add_score(member_id, delta_value)
+                final_delta_score = await fluct_ext.add_score(member_id, delta_value)
                 await fluct_ext.active_log_update(member_id)
 
                 member = ctx.guild.get_member(member_id)
-                msg = f'耶！你被加了 {delta_value} 分！' + '\n'
+                msg = f'耶！你被加了 {final_delta_score} 分！' + '\n'
                 msg += await huma_get('main/remedy/pt_1')
                 await member.send(msg)
             except:
@@ -98,13 +98,13 @@ class FluctlightAuto(CogExtension):
         for member_data in main_data:
             member = guild.get_member(member_data['_id'])
 
-            if member.bot or member is None:
+            if member is None or member.bot:
                 await fluct_ext.delete_main(member_data['_id'])
 
         for member_data in vice_data:
             member = guild.get_member(member_data['_id'])
 
-            if member.bot or member is None:
+            if member is None or member.bot:
                 await fluct_ext.delete_vice(member_data['_id'])
 
 

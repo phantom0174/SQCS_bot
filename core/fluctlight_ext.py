@@ -28,8 +28,7 @@ class Fluct:
                 if score_mode not in score_modes.keys():
                     raise BaseException('ARGUMENT ERROR: score_mode', score_mode)
 
-                self.delta_score = self.score_weight * score_setting[score_modes.get(score_mode)]
-                self.delta_score = round(self.delta_score, 2)
+                self.delta_score = score_setting[score_modes.get(score_mode)]
 
         self.member_id = None
         if member_id is not None:
@@ -100,14 +99,14 @@ class Fluct:
         await self.delete_vice(member_final_id)
         await self.create_vice(member_final_id)
 
-    async def add_score(self, member_id: int = -1, delta_value: float = -1) -> NoReturn:
+    async def add_score(self, member_id: int = -1, delta_value: float = -1) -> float:
         member_final_id = await self.get_final_id(member_id)
         if self.score_mode == 'custom':
             final_delta_score = delta_value
         else:
             final_delta_score = self.delta_score
 
-        final_delta_score = round(final_delta_score, 2)
+        final_delta_score = round(self.score_weight * final_delta_score, 2)
 
         execute = {
             "$inc": {
@@ -115,6 +114,7 @@ class Fluct:
             }
         }
         self.main_fluct_cursor.update_one({"_id": member_final_id}, execute)
+        return final_delta_score
 
     async def active_log_update(self, member_id: int = -1) -> NoReturn:
         member_final_id = await self.get_final_id(member_id)
