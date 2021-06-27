@@ -21,6 +21,8 @@ class Time:
 
         if mode == 'whole':
             return str(dt2.strftime("%Y-%m-%d %H:%M:%S"))
+        if mode == 'partial':
+            return str(dt2.strftime("%Y-%m-%d"))
         if mode == 'hour':
             return int(dt2.strftime("%H"))
         if mode == 'date':

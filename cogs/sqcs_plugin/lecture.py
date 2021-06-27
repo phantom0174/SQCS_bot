@@ -2,7 +2,7 @@ from discord.ext import commands
 import asyncio
 import random
 import core.sqcs_module as sm
-from core.db import self_client, huma_get, fluctlight_client
+from core.db import self_client, huma_get
 from core.utils import Time, DiscordExt
 from core.cog_config import CogExtension
 from core.fluctlight_ext import Fluct
@@ -283,29 +283,10 @@ class LectureAttendVerify(CogExtension):
         pass
 
     @lect_verify.command()
-    @commands.has_any_role('總召', 'Administrator')
-    async def set_verify_channel(self, ctx, set_channel_id: int):
-        channel = ctx.guild.get_channel(set_channel_id)
-
-        verify_cursor = self_client['VerificationSetting']
-        data = verify_cursor.find_one({"_id": 0})
-
-        if set_channel_id in data['channel_id']:
-            return await ctx.send(f':x: {channel.name} is already a verification channel!')
-
-        execute = {
-            "$push": {
-                "channel_id": set_channel_id
-            }
-        }
-        verify_cursor.update_one({"_id": 0}, execute)
-        await ctx.send(f':white_check_mark: {channel.name} has been set as verification channel!')
-
-    @lect_verify.command()
     @commands.dm_only()
     @commands.cooldown(1, 15, commands.BucketType.user)
     async def attend(self, ctx, token: str):
-        verify_cursor = self_client['Verify']
+        verify_cursor = self_client['Verification']
         data = verify_cursor.find_one({"TOKEN": token, "reason": "lect"})
 
         if not data:
@@ -315,25 +296,11 @@ class LectureAttendVerify(CogExtension):
             )
 
         # fetching score parameters
-        fluct_cursor = fluctlight_client["MainFluctlights"]
-
-        score_set_cursor = self_client["ScoreSetting"]
-        score_data = score_set_cursor.find_one({"_id": 0})
-
-        score_weight = score_data["score_weight"]
-        lect_attend_score = score_data["lecture_attend_point"]
-
-        delta_score = round(lect_attend_score * score_weight, 2)
+        fluct_ext = Fluct(member_id=ctx.author.id, score_mode='lect_attend')
         try:
-            execute = {
-                "$inc": {
-                    "score": delta_score
-                }
-            }
-            fluct_cursor.update_one({"_id": ctx.author.id}, execute)
-            fluct_ext = Fluct()
-            await fluct_ext.active_log_update(ctx.author.id)
-            await fluct_ext.lect_attend_update(ctx.author.id)
+            await fluct_ext.add_score()
+            await fluct_ext.active_log_update()
+            await fluct_ext.lect_attend_update()
 
             verify_cursor.delete_one({"TOKEN": token, "reason": "lect"})
             await ctx.send(':white_check_mark: 操作成功！')
@@ -342,11 +309,11 @@ class LectureAttendVerify(CogExtension):
             report_channel = discord.utils.get(guild.text_channels, name='sqcs-lecture-attend')
 
             await report_channel.send(
-                f'[DB MANI ERROR][to: {ctx.author.id}]'
-                f'[inc_score: {delta_score}]'
+                f'[DB MANI ERROR][to: {ctx.author.id}][inc_score_mode: lecture_attend]'
             )
             await ctx.send(':x: 操作失敗，請聯繫總召><')
 
 
 def setup(bot):
     bot.add_cog(Lecture(bot))
+    bot.add_cog(LectureAttendVerify(bot))

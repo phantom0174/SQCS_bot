@@ -3,6 +3,7 @@ from core.utils import Time
 from core.cog_config import CogExtension
 from core.db import JsonApi
 import traceback
+import discord
 
 
 class ErrorHandler(CogExtension):
@@ -38,7 +39,11 @@ class ErrorHandler(CogExtension):
     async def on_command(self, ctx):
         cmd_name = ctx.command.name
         cmd_parents = ctx.command.full_parent_name
-        channel_name = ctx.channel.name
+
+        if isinstance(ctx.channel, discord.DMChannel):
+            channel_name = f'user dm_channel'
+        else:
+            channel_name = ctx.channel.name
         user_name = ctx.author.name
         user_id = ctx.author.id
         message = ctx.message.content
