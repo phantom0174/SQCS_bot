@@ -174,10 +174,10 @@ class QuizAuto(CogExtension):
         quiz_status = self.quiz_set_cursor.find_one({"_id": 0})["event_status"]
 
         def quiz_ready_to_start():
-            return Time.get_info('date') == 1 and Time.get_info('hour') >= 6 and not quiz_status
+            return Time.get_info('week_day') == 1 and Time.get_info('hour') >= 6 and not quiz_status
 
         def quiz_ready_to_end():
-            return Time.get_info('date') == 7 and Time.get_info('hour') >= 22 and quiz_status
+            return Time.get_info('week_day') == 7 and Time.get_info('hour') >= 22 and quiz_status
 
         if quiz_ready_to_start():
             await quiz_start(self.bot)
@@ -314,3 +314,4 @@ async def quiz_end(bot):
 
 def setup(bot):
     bot.add_cog(Quiz(bot))
+    bot.add_cog(QuizAuto(bot))

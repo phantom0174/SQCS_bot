@@ -3,6 +3,7 @@ from core.cog_config import CogExtension
 from core.db import self_client, huma_get, fluctlight_client, JsonApi
 from typing import Union
 import discord
+from core.fluctlight_ext import Fluct
 
 
 class KickMember(CogExtension):
@@ -108,25 +109,16 @@ class KickMember(CogExtension):
 
         try:
             await kick_user.kick(reason=kick_reason)
+
+            fluct_ext = Fluct(member_id=member_id)
+            await fluct_ext.delete_main()
+            await fluct_ext.delete_vice()
+
+            kick_cursor.delete_one({"_id": member_id})
+            await ctx.send(f':white_check_mark: 成員 {data["name"]} - {data["_id"]} 已被踢除！')
         except Exception as e:
             await ctx.send(f':x: 踢除 {data["name"]} - {data["_id"]} 時發生了錯誤！')
             await ctx.send(content=e, delete_after=5.0)
-
-        # delete member fluctlight info in guild
-        cursors = [
-            fluctlight_client["MainFluctlights"],
-            fluctlight_client["ViceFluctlights"]
-        ]
-
-        for cursor in cursors:
-            try:
-                cursor.delete_one({"_id": member_id})
-            except Exception as e:
-                await ctx.send(f':x: 使用指標 {cursor} 時發生了錯誤！')
-                await ctx.send(content=e, delete_after=5.0)
-
-        kick_cursor.delete_one({"_id": member_id})
-        await ctx.send(f':white_check_mark: 成員 {data["name"]} - {data["_id"]} 已被踢除！')
 
     @kick.command(aliases=['all'])
     async def kick_all(self, ctx):
@@ -136,11 +128,7 @@ class KickMember(CogExtension):
         if data.count() == 0:
             return await ctx.send(':x: 待踢除名單為空！')
 
-        cursors = [
-            fluctlight_client["MainFluctlights"],
-            fluctlight_client["ViceFluctlights"]
-        ]
-
+        fluct_ext = Fluct()
         for member in data:
             kick_user = ctx.guild.get_member(member["_id"])
 
@@ -151,16 +139,12 @@ class KickMember(CogExtension):
 
             try:
                 await kick_user.kick(reason=f'違反指數達到了 {member["lvl_ind"]}')
+
+                await fluct_ext.delete_main(member["_id"])
+                await fluct_ext.delete_vice(member["_id"])
             except Exception as e:
                 await ctx.send(f':x: 踢除 {member["name"]} - {member["_id"]} 時發生了錯誤！')
                 await ctx.send(content=e, delete_after=5.0)
-
-            for cursor in cursors:
-                try:
-                    cursor.delete_one({"_id": member["_id"]})
-                except Exception as e:
-                    await ctx.send(f':x: 操作指標 {cursor} 時發生了錯誤！')
-                    await ctx.send(content=e, delete_after=5.0)
 
         kick_cursor.delete_many({})
         await ctx.send(':white_check_mark: 所有在待踢除名單中的成員已被踢除！')

@@ -14,14 +14,17 @@ class Cadre(CogExtension):
 
     @ca.command()
     async def apply(self, ctx, cadre: str):
-        if ctx.channel.id != 774794670034124850:
+        cadre_set_cursor = self_client['CadreSetting']
+        cadre_setting = cadre_set_cursor.find_one({"_id": 0})
+
+        if ctx.channel.id != cadre_setting['apply_channel']:
             return
 
-        cadre_options = ['副召', '網管', '議程', '公關', '美宣', '學術']
+        cadre_options = cadre_setting['apply_options']
         if cadre not in cadre_options:
             return await ctx.send(
                 content=f':x: 職位選項必須要在 {cadre_options} 中！',
-                delete_after=5.0
+                delete_after=8
             )
 
         cadre_cursor = self_client["Cadre"]

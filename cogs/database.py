@@ -17,11 +17,14 @@ class DataBase(CogExtension):
             fluctlight_client["ViceFluctlights"]
         ]
         members_id = [member.id for member in ctx.guild.members]
+
+        condition = {
+            "_id": {
+                "$nin": members_id
+            }
+        }
         for cursor in cursors:
-            data = cursor.find({})
-            for datum in data:
-                if datum["_id"] not in members_id:
-                    cursor.delete_one({"_id": datum["_id"]})
+            cursor.delete_many(condition)
 
         await ctx.send(':white_check_mark: 指令執行完畢！')
 

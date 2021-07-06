@@ -118,14 +118,12 @@ class Fluct:
 
     async def active_log_update(self, member_id: int = -1) -> NoReturn:
         member_final_id = await self.get_final_id(member_id)
-        active = self.main_fluct_cursor.find_one({"_id": member_final_id})["week_active"]
-        if not active:
-            execute = {
-                "$set": {
-                    "week_active": True
-                }
+        execute = {
+            "$set": {
+                "week_active": True
             }
-            self.main_fluct_cursor.update_one({"_id": member_final_id}, execute)
+        }
+        self.main_fluct_cursor.update_one({"_id": member_final_id}, execute)
 
     async def lect_attend_update(self, member_id: int = -1) -> NoReturn:
         member_final_id = await self.get_final_id(member_id)
@@ -167,8 +165,8 @@ async def guild_weekly_update(bot) -> NoReturn:
     score_set_cursor = self_client["ScoreSetting"]
 
     # calculate total score, max, min score
-    max_score = fluctlight_cursor.find_one({}, {"score": 1}, sort=[("score", -1)])["score"]
-    min_score = fluctlight_cursor.find_one({}, {"score": 1}, sort=[("score", 1)])["score"]
+    max_score = fluctlight_cursor.find({}, {"score": 1}).sort("score", -1)[0]["score"]
+    min_score = fluctlight_cursor.find({}, {"score": 1}).sort("score", 1)[0]["score"]
     score_set_cursor.update({"_id": 0}, {"$set": {"maximum_score": max_score}})
     score_set_cursor.update({"_id": 0}, {"$set": {"minimum_score": min_score}})
 

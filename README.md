@@ -1,5 +1,7 @@
 # SQCS Bot
 
+[![wakatime](https://wakatime.com/badge/github/phantom0174/SQCS_bot.svg)](https://wakatime.com/badge/github/phantom0174/SQCS_bot)
+
 [![forthebadge](https://forthebadge.com/images/badges/made-with-python.svg)](https://forthebadge.com)
 
 [![CodeFactor](https://www.codefactor.io/repository/github/phantom0174/sqcs_bot/badge)](https://www.codefactor.io/repository/github/phantom0174/sqcs_bot)

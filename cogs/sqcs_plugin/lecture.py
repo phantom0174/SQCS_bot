@@ -1,4 +1,4 @@
-from discord.ext import commands
+from discord.ext import commands, tasks
 import asyncio
 import random
 import core.sqcs_module as sm
@@ -150,18 +150,6 @@ class Lecture(CogExtension):
         await sm.report_lect_attend(self.bot, attendants, week)
 
         # continue fetching population statistics, waiting for display using dash and flask integration
-        while True:
-            lecture_status = lect_set_cursor.find_one({"week": week})['status']
-            if not lecture_status:
-                break
-
-            execute = {
-                "$push": {
-                    "population": len(voice_channel.members)
-                }
-            }
-            lect_set_cursor.update_one({"week": week}, execute)
-            await asyncio.sleep(600)
 
     # origin: lecture ans check
     @lect.command()
@@ -170,21 +158,21 @@ class Lecture(CogExtension):
 
         fluct_ext = Fluct(score_mode='custom')
         for member_id in members_id:
-            await fluct_ext.add_score(member_id, delta_value)
+            final_delta_score = await fluct_ext.add_score(member_id, delta_value)
             await fluct_ext.active_log_update(member_id)
 
             member_lecture_statistics = lect_ongoing_cursor.find_one({"_id": member_id})
             if not member_lecture_statistics:
                 member_info = {
                     "_id": member_id,
-                    "score": fluct_ext.score_weight * delta_value,
+                    "score": final_delta_score,
                     "count": 1
                 }
                 lect_ongoing_cursor.insert_one(member_info)
             else:
                 execute = {
                     "$inc": {
-                        "score": fluct_ext.score_weight * delta_value,
+                        "score": final_delta_score,
                         "count": 1
                     }
                 }
@@ -205,7 +193,9 @@ class Lecture(CogExtension):
 
         msg = await huma_get('lecture/end/main', '\n')
 
-        average_population = statistics.mean(lect_config["population"])
+        population_list = [pop['count'] for pop in lect_config["population"]]
+        average_population = statistics.mean(population_list)
+
         population_level = int(round(average_population / 10))
         msg += await huma_get(f'lecture/end/reactions/{population_level}')
         await text_channel.send(msg)
@@ -314,6 +304,38 @@ class LectureAttendVerify(CogExtension):
             await ctx.send(':x: 操作失敗，請聯繫總召><')
 
 
+class LectureAuto(CogExtension):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.lect_set_cursor = self_client['LectureSetting']
+        self.lect_population_log = False
+
+    @tasks.loop()
+    async def lect_population_log(self):
+        await self.bot.wait_until_ready()
+
+        ongoing_lect = self.lect_set_cursor.find_one({"status": True})
+        if not ongoing_lect:
+            return
+
+        guild = self.bot.get_guild(743507979369709639)
+        voice_channel = discord.utils.get(guild.voice_channels, name=ongoing_lect['name'])
+
+        population = len(voice_channel.members)
+        if population:
+            execute = {
+                "$push": {
+                    "population": {
+                        "count": population,
+                        "time_stamp": Time.get_info('custom', "%Y-%m-%d %H:%M")
+                    }
+                }
+            }
+            self.lect_set_cursor.update_one({"week": ongoing_lect['week']}, execute)
+
+
 def setup(bot):
+    bot.add_cog(LectureConfig(bot))
     bot.add_cog(Lecture(bot))
     bot.add_cog(LectureAttendVerify(bot))
