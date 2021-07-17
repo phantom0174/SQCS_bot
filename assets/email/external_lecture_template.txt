@@ -1,16 +1,26 @@
-<!-- #######  YAY, I AM THE SOURCE EDITOR! #########-->
-<h1 style="color: #5e9ca0; text-align: center;">
-    <img src="https://i.imgur.com/5oCzkRe.png" alt="" width="36" height="28" /> 感謝你參加 SQCS {time_stamp} 的講座<br />
-    - {lect_name}
-</h1>
-<h4 style="text-align: center;">
-    <span style="color: #000000;">只要前往 Discord 中，將以下指令傳送給機器人&nbsp;<strong>Q ちゃん，</strong></span><span style="color: #000000;">便可獲得參加獎座的分數！</span>
-</h4>
-<p style="text-align: center;"><span style="color: #000000;">+lect_verify attend {lect_token}</span></p>
-<h4 style="text-align: center;"><span style="color: #000000;">以後也要多多來參加講座喔！</span></h4>
-<hr />
-<p style="font-size: 5px; text-align: center;">&nbsp;</p>
-<p style="font-size: 5px; text-align: center;"><span style="color: #000000;">安全保證：傳送此指令並不會造成任何資安疑慮</span></p>
-<p style="font-size: 5px; text-align: center;"><span style="color: #000000;">Auto - generated email from SQCS Bot,</span></p>
-<p style="font-size: 5px; text-align: center;"><span style="color: #000000;">managed by SQCS Discord Bot Dev. Team</span></p>
-<p style="font-size: 5px;"><img style="display: block; margin-left: auto; margin-right: auto;" src="https://i.imgur.com/MbzRNTJ.png" alt="" width="50" height="50" /></p>
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SQCS 講座加分神奇密碼</title>
+        <meta charset="utf-8">
+    </head>
+    <body style="background-color:white;">
+        <h1 style="text-align: center; color: #5e9ca0;">
+            <img src="https://i.imgur.com/5oCzkRe.png" alt="" width="36" height="28" />
+            感謝你參加 SQCS {time_stamp} 的講座 - {lect_name}
+        </h1>
+        <div id="context" style="text-align: center; color: #000000;">
+            <h4>只要前往 Discord 中，將以下指令傳送給機器人 <strong>Q ちゃん</strong>，</h4>
+            <h4>便可獲得參加獎座的分數！</h4>
+            <p>+lect_verify attend {lect_token}</p>
+            <h4>以後也要多多來參加講座喔！</h4>
+        </div>
+        <hr>
+        <div id="footer" style="font-size: 5px; text-align: center; color: #000000;">
+            <p>安全保證：傳送此指令並不會造成任何資安疑慮</p>
+            <p>Auto - generated email from SQCS Bot,</p>
+            <p>managed by SQCS Discord Bot Dev. Team</p>
+        </div>
+        <img style="display: block; margin-left: auto; margin-right: auto;" src="https://i.imgur.com/MbzRNTJ.png" alt="logo" width="40" height="40" />
+    </body>
+</html>

@@ -6,6 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/jsons" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/cogs" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/wrapper" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/local_module" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/devdata" />
     </content>
     <orderEntry type="inheritedJdk" />
