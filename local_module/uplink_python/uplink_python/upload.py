@@ -1,5 +1,9 @@
 """Module with Upload class and upload methods to work with object upload"""
 # pylint: disable=line-too-long
+
+# This file has been modified by phantom0174 at 2021/7/17, SQCS_bot version 1.29.7.17
+# modified content: change absolute import to relative import
+
 import ctypes
 import os
 

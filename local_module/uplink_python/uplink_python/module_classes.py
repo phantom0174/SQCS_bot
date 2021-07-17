@@ -1,5 +1,9 @@
 """Classes for input and output interface of parameters and returns from uplink."""
 # pylint: disable=too-few-public-methods, too-many-arguments
+
+# This file has been modified by phantom0174 at 2021/7/17, SQCS_bot version 1.29.7.17
+# modified content: change absolute import to relative import
+
 import ctypes
 
 from .module_def import _ConfigStruct, _PermissionStruct, _SharePrefixStruct,\

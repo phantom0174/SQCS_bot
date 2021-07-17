@@ -1,4 +1,8 @@
 """Module with Access class and access methods to get access grant to access project"""
+
+# This file has been modified by phantom0174 at 2021/7/17, SQCS_bot version 1.29.7.17
+# modified content: change absolute import to relative import
+
 import ctypes
 import hashlib
 

@@ -1,4 +1,8 @@
 """Module with Project class and project methods to work with buckets and objects"""
+
+# This file has been modified by phantom0174 at 2021/7/17, SQCS_bot version 1.29.7.17
+# modified content: change absolute import to relative import
+
 import ctypes
 
 from .module_classes import ListBucketsOptions, ListObjectsOptions,\
