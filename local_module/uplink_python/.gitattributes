@@ -1,4 +1,0 @@
-# Documentation files and directories are excluded from language
-# statistics.
-
-docs/* linguist-documentation=true
