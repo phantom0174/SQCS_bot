@@ -2,7 +2,7 @@
 """Python Binding's Uplink Module for Storj (V3)"""
 
 # This file has been modified by phantom0174 at 2021/7/17, SQCS_bot version 1.29.7.17
-# modified content: change absolute import to relative import
+# modified content: change absolute import to relative import, and change .so to .dll for windows
 
 import ctypes
 import os
@@ -24,7 +24,7 @@ class Uplink:
     Attributes
     ----------
     m_libuplink : CDLL
-        Instance to the libuplinkc.so.
+        Instance to the libuplinkc.dll.
 
     Methods
     -------
@@ -41,12 +41,12 @@ class Uplink:
         # private members of PyStorj class with reference objects
         # include the golang exported libuplink library functions
         if Uplink.__instance is None:
-            so_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'libuplinkc.so')
+            so_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'libuplinkc.dll')
             if os.path.exists(so_path):
                 self.m_libuplink = ctypes.CDLL(so_path)
             else:
                 new_path = os.path.join(sysconfig.get_paths()['purelib'], "uplink_python",
-                                        'libuplinkc.so')
+                                        'libuplinkc.dll')
                 if os.path.exists(new_path):
                     self.m_libuplink = ctypes.CDLL(so_path)
                 else:

@@ -64,16 +64,16 @@ async def huma_get(directory: str, ending: str = '') -> Union[str, list]:
 
 
 # Storj database
-MY_API_KEY = os.environ.get('MY_API_KEY')
-MY_SATELLITE = os.environ.get('MY_SATELLITE')
-MY_ENCRYPTION_PASSPHRASE = os.environ.get('MY_ENCRYPTION_PASSPHRASE')
+STORJ_API_KEY = os.environ.get('STORJ_API_KEY')
+STORJ_SATELLITE = os.environ.get('STORJ_SATELLITE')
+STORJ_ENCRYPTION_PASSPHRASE = os.environ.get('STORJ_ENCRYPTION_PASSPHRASE')
 
 uplink = Uplink()
 
 access = uplink.request_access_with_passphrase(
-    satellite=MY_SATELLITE,
-    api_key=MY_API_KEY,
-    passphrase=MY_ENCRYPTION_PASSPHRASE
+    satellite=STORJ_SATELLITE,
+    api_key=STORJ_API_KEY,
+    passphrase=STORJ_ENCRYPTION_PASSPHRASE
 )
 
 project = access.open_project()

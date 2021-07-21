@@ -18,6 +18,9 @@ Format = '%(asctime)s %(levelname)s: %(message)s, ' \
          'in func: %(funcName)s, ' \
          'of file: %(pathname)s\n'
 
+with open('./buffer/report.txt', 'ab') as w:
+    w.write(b'sdfsfd')
+
 logging.basicConfig(
     filename='./buffer/bot.log',
     level=logging.WARNING,
@@ -145,11 +148,18 @@ for filename in os.listdir('./cogs'):
     # normal cog file
     if filename.find('.') != -1:
         if filename.endswith('.py'):
-            bot.load_extension(f'cogs.{filename[:-3]}')
+            # soft handling
+            try:
+                bot.load_extension(f'cogs.{filename[:-3]}')
+            except:
+                print(f'Error loading cogs.{filename[:-3]}')
     elif filename.find('.') == -1:
         for sub_filename in os.listdir(f'./cogs/{filename}'):
             if sub_filename.endswith('.py'):
-                bot.load_extension(f'cogs.{filename}.{sub_filename[:-3]}')
+                try:
+                    bot.load_extension(f'cogs.{filename}.{sub_filename[:-3]}')
+                except:
+                    print(f'Error loading cogs.{filename}.{sub_filename[:-3]}')
 
 keep_alive.keep_alive()
 
