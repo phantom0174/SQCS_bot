@@ -1,6 +1,5 @@
 import os
 import logging
-from typing import ClassVar
 from local_module.uplink_python.uplink_python.uplink import Uplink
 from local_module.uplink_python.uplink_python.errors import BucketNotEmptyError, BucketNotFoundError
 from local_module.uplink_python.uplink_python.module_classes import ListObjectsOptions
