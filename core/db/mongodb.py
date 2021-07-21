@@ -27,9 +27,6 @@ class Mongo:
                     collection
                 )
 
-        cursors = list()
-        for collection in collections:
-            cursor = client[collection]
-            cursors.append(cursor)
+        cursors = [client[collection] for collection in collections]
         
         return tuple(cursors)
