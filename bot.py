@@ -18,9 +18,6 @@ Format = '%(asctime)s %(levelname)s: %(message)s, ' \
          'in func: %(funcName)s, ' \
          'of file: %(pathname)s\n'
 
-with open('./buffer/report.txt', 'ab') as w:
-    w.write(b'sdfsfd')
-
 logging.basicConfig(
     filename='./buffer/bot.log',
     level=logging.WARNING,
