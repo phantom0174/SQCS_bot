@@ -33,7 +33,7 @@ class JsonApi:
 
     # humanity extension parser
     @staticmethod
-    async def get_humanity(directory: str, ending: str = '') -> Union[str, list]:
+    async def get_humanity(directory: str, ending: str = '') -> str:
         rsp = JsonApi.get('HumanityExtension')
 
         dir_split = directory.split('/')

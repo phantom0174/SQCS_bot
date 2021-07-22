@@ -170,7 +170,7 @@ class GuildRole(CogExtension):
         if member not in ctx.guild.members:
             return await ctx.send(f':x: 不存在成員 {member.display_name}！')
 
-        sta_json = JsonApi().get('StaticSetting')
+        sta_json = JsonApi.get('StaticSetting')
         name_to_index: dict = sta_json['level_role_id']
 
         current_roles = member.roles
@@ -194,7 +194,7 @@ class GuildRole(CogExtension):
         if member not in ctx.guild.members:
             return await ctx.send(f':x: 不存在成員 {member.display_name}！')
 
-        sta_json = JsonApi().get('StaticSetting')
+        sta_json = JsonApi.get('StaticSetting')
         name_to_index: dict = sta_json['level_role_id']
 
         current_roles = member.roles

@@ -11,7 +11,7 @@ class React(CogExtension):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        nts = JsonApi().get('NT')["id_list"]
+        nts = JsonApi.get('NT')["id_list"]
         if member.id in nts:
             return await member.ban()
 

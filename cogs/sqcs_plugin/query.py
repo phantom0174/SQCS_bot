@@ -98,7 +98,7 @@ async def create_fluct_data_embed(member_id) -> discord.Embed:
         data["deep_freeze"]
     ]
 
-    icon_json = JsonApi().get('StaticSetting')
+    icon_json = JsonApi.get('StaticSetting')
     rand_icon = random.choice(icon_json['fluctlight_query_gifs'])
 
     embed_para = [
