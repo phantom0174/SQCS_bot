@@ -1,7 +1,7 @@
 from discord.ext import commands
 import asyncio
 import time
-from core.db import huma_get, JsonApi
+from core.db.jsonstorage import JsonApi
 from core.utils import Time
 from core.cog_config import CogExtension
 from core.fluctlight_ext import Fluct
@@ -23,12 +23,12 @@ class React(CogExtension):
 
         time_status = Time.get_range(Time.get_info('hour'))
 
-        msg = await huma_get(f'join/opening/{time_status}', '\n')
-        msg += await huma_get('join/opening/main')
+        msg = await JsonApi.get_humanity(f'join/opening/{time_status}', '\n')
+        msg += await JsonApi.get_humanity('join/opening/main')
         await member.send(msg)
         await asyncio.sleep(30)
 
-        msg = await huma_get('join/hackmd_read')
+        msg = await JsonApi.get_humanity('join/hackmd_read')
         reaction_msg = await member.send(msg)
         await reaction_msg.add_reaction('⭕')
         await reaction_msg.add_reaction('❌')
@@ -41,16 +41,16 @@ class React(CogExtension):
             reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=60.0)
 
             if reaction.emoji == '⭕':
-                msg = await huma_get('join/df_1', '\n')
+                msg = await JsonApi.get_humanity('join/df_1', '\n')
                 deep_freeze_status = True
             elif reaction.emoji == '❌':
-                msg = await huma_get('join/df_0', '\n')
+                msg = await JsonApi.get_humanity('join/df_0', '\n')
                 deep_freeze_status = False
         except asyncio.TimeoutError:
-            msg = await huma_get('join/time_out', '\n')
+            msg = await JsonApi.get_humanity('join/time_out', '\n')
             deep_freeze_status = False
 
-        msg += await huma_get('join/contact_method')
+        msg += await JsonApi.get_humanity('join/contact_method')
 
         await member.send(msg)
 
@@ -61,7 +61,7 @@ class React(CogExtension):
         await fluct_ext.create_vice(member.id)
         end_time = time.time()
 
-        msg = await huma_get('join/fl_create_finish')
+        msg = await JsonApi.get_humanity('join/fl_create_finish')
         await member.send(msg)
         time_duration = round(end_time - start_time, 2)
         await member.send(f'順帶一提，我用了 {time_duration} (sec) 建立你的檔案><!')

@@ -1,6 +1,6 @@
 from discord.ext import commands
 from core.cog_config import CogExtension
-from core.db import fluctlight_client
+import core.db.mongodb as mongo
 from core.utils import DiscordExt
 
 
@@ -16,7 +16,7 @@ class DeepFreeze(CogExtension):
         if status not in [0, 1]:
             return await ctx.send(':x: 狀態參數必須為 0 或 1！')
 
-        fluct_cursor = fluctlight_client["MainFluctlights"]
+        fluct_cursor, = await mongo.get_cursors('LightCube', ['MainFluctlights'])
         try:
             execute = {
                 "$set": {
@@ -35,7 +35,7 @@ class DeepFreeze(CogExtension):
     async def list(self, ctx):
         await ctx.send(':hourglass_flowing_sand: 尋找中...')
 
-        fluct_cursor = fluctlight_client["MainFluctlights"]
+        fluct_cursor, = await mongo.get_cursors('LightCube', ['MainFluctlights'])
         data = fluct_cursor.find({"deep_freeze": {"$eq": True}})
 
         if data.count() == 0:
