@@ -1,6 +1,7 @@
 from discord.ext import commands
 from core.cog_config import CogExtension
-from core.db import self_client, huma_get, fluctlight_client, JsonApi
+from core.db.jsonstorage import JsonApi
+import core.db.mongodb as mongo
 from typing import Union
 import discord
 from core.fluctlight_ext import Fluct
@@ -17,7 +18,7 @@ class KickMember(CogExtension):
     async def list(self, ctx):
         await ctx.send(content=':hourglass_flowing_sand: 尋找中...', delete_after=3.0)
 
-        kick_cursor = self_client["ReadyToKick"]
+        kick_cursor, = await mongo.get_cursors('sqcs-bot', ['ReadyToKick'])
         data = kick_cursor.find({})
 
         if data.count() == 0:
@@ -50,7 +51,7 @@ class KickMember(CogExtension):
         else:
             member_id = target_member
 
-        fluctlight_cursor = fluctlight_client["MainFluctlights"]
+        fluctlight_cursor, = await mongo.get_cursors('LightCube', ['MainFluctlights'])
         data = fluctlight_cursor.find_one({"_id": member_id})
 
         if not data:
@@ -62,7 +63,7 @@ class KickMember(CogExtension):
             "contrib": data["contrib"],
             "lvl_ind": data["lvl_ind"]
         }
-        kick_cursor = self_client["ReadyToKick"]
+        kick_cursor, = await mongo.get_cursors('sqcs-bot', ['ReadyToKick'])
         kick_cursor.insert_one(member_info)
 
         await ctx.send(f':white_check_mark: 成員 {data["name"]} - {member_id} 已被加到待踢除名單！')
@@ -74,7 +75,7 @@ class KickMember(CogExtension):
         else:
             member_id = target_member
 
-        kick_cursor = self_client["ReadyToKick"]
+        kick_cursor, = await mongo.get_cursors('sqcs-bot', ['ReadyToKick'])
         data = kick_cursor.find_one({"_id": member_id})
 
         if not data:
@@ -91,7 +92,7 @@ class KickMember(CogExtension):
         else:
             member_id = target_member
 
-        kick_cursor = self_client["ReadyToKick"]
+        kick_cursor, = await mongo.get_cursors('sqcs-bot', ['ReadyToKick'])
         data = kick_cursor.find_one({"_id": member_id})
 
         if not data:
@@ -102,9 +103,9 @@ class KickMember(CogExtension):
         if kick_reason == 'default':
             kick_reason = f':skull_crossbones: 違反指數達到了 {data["lvl_ind"]}'
 
-        msg = await huma_get('kick/kick_single', '\n')
+        msg = await JsonApi.get_humanity('kick/kick_single', '\n')
         msg += f'> {kick_reason}\n'
-        msg += await huma_get('kick/re_join')
+        msg += await JsonApi.get_humanity('kick/re_join')
         await kick_user.send(msg)
 
         try:
@@ -122,7 +123,7 @@ class KickMember(CogExtension):
 
     @kick.command(aliases=['all'])
     async def kick_all(self, ctx):
-        kick_cursor = self_client["ReadyToKick"]
+        kick_cursor, = await mongo.get_cursors('sqcs-bot', ['ReadyToKick'])
         data = kick_cursor.find({})
 
         if data.count() == 0:
@@ -132,9 +133,9 @@ class KickMember(CogExtension):
         for member in data:
             kick_user = ctx.guild.get_member(member["_id"])
 
-            msg = await huma_get('kick/kick_all', '\n')
+            msg = await JsonApi.get_humanity('kick/kick_all', '\n')
             msg += f'> Levelling index reached {member["lvl_ind"]}.\n'
-            msg += await huma_get('kick/re_join')
+            msg += await JsonApi.get_humanity('kick/re_join')
             await kick_user.send(msg)
 
             try:
@@ -159,17 +160,17 @@ class NT(CogExtension):
 
     @commands.command()
     async def list(self, ctx):
-        id_list = JsonApi().get('NT')["id_list"]
+        id_list = JsonApi.get('NT')["id_list"]
         await ctx.send(id_list)
 
     @commands.command(aliases=['push', 'insert'])
     async def add(self, ctx, user_id: int = None):
-        nt_json = JsonApi().get('NT')
+        nt_json = JsonApi.get('NT')
         if user_id is None:
             return
 
         nt_json['id_list'].append(user_id)
-        JsonApi().put('NT', nt_json)
+        JsonApi.put('NT', nt_json)
         await ctx.send(':white_check_mark: 指令執行完畢！')
 
 

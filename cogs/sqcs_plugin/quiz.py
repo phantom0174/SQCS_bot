@@ -1,5 +1,6 @@
 from discord.ext import commands, tasks
-from core.db import self_client, huma_get, fluctlight_client
+from core.db.jsonstorage import JsonApi
+import core.db.mongodb as mongo
 from core.utils import Time, DiscordExt
 from core.fluctlight_ext import guild_weekly_update, Fluct
 from core.cog_config import CogExtension
@@ -16,7 +17,7 @@ class Quiz(CogExtension):
     # push back stand by answer
     @quiz.command()
     async def alter_standby_ans(self, ctx, alter_answer: str):
-        quiz_set_cursor = self_client["QuizSetting"]
+        quiz_set_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizSetting'])
 
         execute = {
             "$set": {
@@ -28,7 +29,7 @@ class Quiz(CogExtension):
 
     @quiz.command()
     async def alter_formal_ans(self, ctx, alter_answer: str):
-        quiz_set_cursor = self_client["QuizSetting"]
+        quiz_set_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizSetting'])
 
         execute = {
             "$set": {
@@ -40,7 +41,7 @@ class Quiz(CogExtension):
 
     @quiz.command()
     async def set_qns_link(self, ctx, qns_link: str):
-        quiz_set_cursor = self_client["QuizSetting"]
+        quiz_set_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizSetting'])
 
         execute = {
             "$set": {
@@ -52,7 +53,7 @@ class Quiz(CogExtension):
 
     @quiz.command()
     async def set_ans_link(self, ctx, ans_link: str):
-        quiz_set_cursor = self_client["QuizSetting"]
+        quiz_set_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizSetting'])
 
         execute = {
             "$set": {
@@ -67,7 +68,7 @@ class Quiz(CogExtension):
         if new_result not in [0, 1]:
             return await ctx.send(':x: 答題正確狀態參數必須為 0 或 1！')
 
-        quiz_set_cursor = self_client["QuizSetting"]
+        quiz_set_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizSetting'])
         execute = {
             "$set": {
                 "correct": bool(new_result)
@@ -81,7 +82,7 @@ class Quiz(CogExtension):
     @quiz.command()
     async def repost_qns(self, ctx):
         await ctx.message.delete()
-        quiz_set_cursor = self_client["QuizSetting"]
+        quiz_set_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizSetting'])
         qns_link = quiz_set_cursor.find_one({"_id": 0})["qns_link"]
         await ctx.send(
             f':exclamation: 以下為更新後的問題！\n'
@@ -91,7 +92,7 @@ class Quiz(CogExtension):
     @quiz.command()
     async def repost_ans(self, ctx):
         await ctx.message.delete()
-        quiz_set_cursor = self_client["QuizSetting"]
+        quiz_set_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizSetting'])
         ans_link = quiz_set_cursor.find_one({"_id": 0})["ans_link"]
         await ctx.send(
             f':exclamation: 以下為更新後的解答！\n'
@@ -111,7 +112,10 @@ class Quiz(CogExtension):
         if msg.content.startswith('~') or msg.content.startswith('+'):
             return
 
-        quiz_set_cursor = self_client["QuizSetting"]
+        quiz_set_cursor, quiz_cursor = await mongo.get_cursors(
+            'sqcs-bot',
+            ['QuizSetting', 'QuizOngoing']
+        )
 
         quiz_status = quiz_set_cursor.find_one({"_id": 0})["event_status"]
         if not quiz_status:
@@ -119,12 +123,10 @@ class Quiz(CogExtension):
 
         await msg.delete()
 
-        quiz_cursor = self_client["QuizOngoing"]
-
         # whether the member had submit answer
         data = quiz_cursor.find_one({"_id": msg.author.id})
         if data:
-            message = await huma_get('quiz/repeat_answer')
+            message = await JsonApi.get_humanity('quiz/repeat_answer')
             return await msg.author.send(message)
 
         # if answer fit standard format
@@ -142,7 +144,7 @@ class Quiz(CogExtension):
             await fluct_ext.active_log_update()
             await fluct_ext.quiz_submit_update()
 
-            message = await huma_get('quiz/get_answer')
+            message = await JsonApi.get_humanity('quiz/get_answer')
             await msg.author.send(message)
 
             # add score to member fluctlight if answer is correct
@@ -150,9 +152,9 @@ class Quiz(CogExtension):
                 await fluct_ext.add_score()
                 await fluct_ext.quiz_correct_update()
         else:
-            message = await huma_get('quiz/invalid_syntax/pt_1', '\n')
-            message += await huma_get('quiz/answer_tut', '\n')
-            message += await huma_get('quiz/invalid_syntax/pt_2')
+            message = await JsonApi.get_humanity('quiz/invalid_syntax/pt_1', '\n')
+            message += await JsonApi.get_humanity('quiz/answer_tut', '\n')
+            message += await JsonApi.get_humanity('quiz/invalid_syntax/pt_2')
             await msg.author.send(message)
 
 
@@ -160,7 +162,7 @@ class QuizAuto(CogExtension):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.quiz_set_cursor = self_client["QuizSetting"]
+        self.quiz_set_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizSetting'])
 
         self.quiz_auto.start()
 
@@ -193,7 +195,7 @@ async def quiz_start(bot):
     main_channel = bot.get_channel(746014424086610012)
     gm_channel = bot.get_channel(743677861000380527)
 
-    quiz_set_cursor = self_client["QuizSetting"]
+    quiz_set_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizSetting'])
     quiz_data = quiz_set_cursor.find_one({"_id": 0})
     stand_by_answer = quiz_data["stand_by_answer"]
 
@@ -216,9 +218,9 @@ async def quiz_start(bot):
         f'correct answer set to {correct_answer}!'
     )
 
-    msg = await huma_get('quiz/start/pt_1', '\n')
-    msg += await huma_get('quiz/answer_tut', '\n')
-    msg += await huma_get('quiz/start/pt_2')
+    msg = await JsonApi.get_humanity('quiz/start/pt_1', '\n')
+    msg += await JsonApi.get_humanity('quiz/answer_tut', '\n')
+    msg += await JsonApi.get_humanity('quiz/start/pt_2')
     await main_channel.send(msg)
     await main_channel.send(f'活動開始於 {Time.get_info("whole")}')
 
@@ -238,7 +240,7 @@ async def quiz_end(bot):
     main_channel = bot.get_channel(746014424086610012)
     gm_channel = bot.get_channel(743677861000380527)
 
-    quiz_set_cursor = self_client["QuizSetting"]
+    quiz_set_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizSetting'])
     quiz_data = quiz_set_cursor.find_one({"_id": 0})
     old_correct_ans = quiz_data["correct_answer"]
     answer_link = quiz_data["ans_link"]
@@ -263,11 +265,11 @@ async def quiz_end(bot):
         f'correct answer set to {correct_answer}!'
     )
 
-    quiz_ongoing_cursor = self_client["QuizOngoing"]
-    fluctlight_cursor = fluctlight_client["MainFluctlights"]
-    msg = await huma_get('quiz/end/main/pt_1', '\n')
+    quiz_ongoing_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizOngoing'])
+    fluctlight_cursor, = await mongo.get_cursors('LightCube', ['MainFluctlights'])
+    msg = await JsonApi.get_humanity('quiz/end/main/pt_1', '\n')
     msg += f':white_check_mark: 這次的答案呢...是 `{old_correct_ans}`！\n'
-    msg += await huma_get('quiz/end/main/pt_2', '\n')
+    msg += await JsonApi.get_humanity('quiz/end/main/pt_2', '\n')
 
     attend_count = quiz_ongoing_cursor.find({}).count()
     countable_member_count = fluctlight_cursor.find({"deep_freeze": {"$eq": False}}).count()
@@ -276,7 +278,7 @@ async def quiz_end(bot):
     quiz_attend_level = min(quiz_attend_level, 7)
 
     msg += f'我這次有 {round((attend_count / countable_member_count) * 100, 1)} 分飽！\n'
-    msg += await huma_get(f'quiz/end/reactions/{quiz_attend_level}')
+    msg += await JsonApi.get_humanity(f'quiz/end/reactions/{quiz_attend_level}')
     await main_channel.send(msg)
     await main_channel.send(f':stopwatch: 活動結束於 {Time.get_info("whole")}')
 

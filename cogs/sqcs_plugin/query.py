@@ -1,7 +1,8 @@
 from discord.ext import commands
 import random
 from core.utils import DiscordExt
-from core.db import self_client, fluctlight_client, JsonApi
+from core.db.jsonstorage import JsonApi
+import core.db.mongodb as mongo
 from core.cog_config import CogExtension
 import discord
 
@@ -15,7 +16,7 @@ class Query(CogExtension):
     @query.command()
     @commands.has_any_role('總召', 'Administrator')
     async def quiz(self, ctx):
-        quiz_ongoing_cursor = self_client["QuizOngoing"]
+        quiz_ongoing_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizOngoing'])
         data = quiz_ongoing_cursor.find({})
 
         if data.count() == 0:
@@ -44,7 +45,7 @@ class Query(CogExtension):
     # guild active percentage
     @query.command()
     async def guild_active(self, ctx):
-        fluct_cursor = fluctlight_client["MainFluctlights"]
+        fluct_cursor, = await mongo.get_cursors('LightCube', ['MainFluctlights'])
         week_active_match = {
             "deep_freeze": {
                 "$ne": True
@@ -65,7 +66,7 @@ class Query(CogExtension):
 
 
 async def create_fluct_data_embed(member_id) -> discord.Embed:
-    fluct_cursor = fluctlight_client["MainFluctlights"]
+    fluct_cursor, = await mongo.get_cursors('LightCube', ['MainFluctlights'])
     data = fluct_cursor.find_one({"_id": member_id})
 
     # method used when checking a dict is empty or not
@@ -98,7 +99,7 @@ async def create_fluct_data_embed(member_id) -> discord.Embed:
         data["deep_freeze"]
     ]
 
-    icon_json = JsonApi().get('StaticSetting')
+    icon_json = JsonApi.get('StaticSetting')
     rand_icon = random.choice(icon_json['fluctlight_query_gifs'])
 
     embed_para = [

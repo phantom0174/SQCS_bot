@@ -6,9 +6,10 @@
       <sourceFolder url="file://$MODULE_DIR$/jsons" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/cogs" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/wrapper" isTestSource="false" />
-      <excludeFolder url="file://$MODULE_DIR$/devdata" />
+      <sourceFolder url="file://$MODULE_DIR$/local_module" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../SQCS-TW-Github/bot-developing/devdata" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Python 3.9.4" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="SQCS-TW-Github" />
   </component>

@@ -1,7 +1,7 @@
-from core.db import fluctlight_client
 from discord.ext import tasks
 from core.cog_config import CogExtension
 from core.fluctlight_ext import Fluct
+import core.db.mongodb as mongo
 
 
 class Task(CogExtension):
@@ -17,7 +17,7 @@ class Task(CogExtension):
         guild = self.bot.get_guild(743507979369709639)
         auto_role = guild.get_role(823804080199565342)
         neutral_role = guild.get_role(823803958052257813)
-        fluctlight_cursor = fluctlight_client["MainFluctlights"]
+        fluctlight_cursor, = await mongo.get_cursors('LightCube', ['MainFluctlights'])
 
         fluct_ext = Fluct()
         for member in guild.members:

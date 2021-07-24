@@ -1,11 +1,11 @@
-from core.db import JsonApi
+from core.db.jsonstorage import JsonApi
 import discord
 from core.utils import Time
 from core.fluctlight_ext import Fluct
 
 
 async def report_lect_attend(bot, attendants: list, week: int) -> None:
-    report_json = JsonApi().get('LectureLogging')
+    report_json = JsonApi.get('LectureLogging')
     guild = bot.get_guild(784607509629239316)
     report_channel = discord.utils.get(guild.text_channels, name='sqcs-lecture-attend')
 
@@ -24,4 +24,4 @@ async def report_lect_attend(bot, attendants: list, week: int) -> None:
         f'{attendants}\n'
         f'[{Time.get_info("whole")}]'
     )
-    JsonApi().put('LectureLogging', report_json)
+    JsonApi.put('LectureLogging', report_json)

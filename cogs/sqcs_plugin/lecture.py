@@ -2,7 +2,8 @@ from discord.ext import commands, tasks
 import asyncio
 import random
 import core.sqcs_module as sm
-from core.db import self_client, huma_get
+from core.db.jsonstorage import JsonApi
+import core.db.mongodb as mongo
 from core.utils import Time, DiscordExt
 from core.cog_config import CogExtension
 from core.fluctlight_ext import Fluct
@@ -19,7 +20,7 @@ class LectureConfig(CogExtension):
 
     @lect_config.command()
     async def list(self, ctx):
-        lect_set_cursor = self_client["LectureSetting"]
+        lect_set_cursor, = await mongo.get_cursors('sqcs-bot', ['LectureSetting'])
         data = lect_set_cursor.find({})
 
         if data.count() == 0:
@@ -62,7 +63,7 @@ class LectureConfig(CogExtension):
             "status": False,
             "population": list()
         }
-        lect_set_cursor = self_client["LectureSetting"]
+        lect_set_cursor, = await mongo.get_cursors('sqcs-bot', ['LectureSetting'])
         lect_set_cursor.insert_one(lecture_config)
 
         lect_category_channel = ctx.guild.get_channel(743517006040662127)
@@ -85,7 +86,7 @@ class LectureConfig(CogExtension):
 
     @lect_config.command()
     async def remove(self, ctx, del_lect_week: int):
-        lect_set_cursor = self_client["LectureSetting"]
+        lect_set_cursor, = await mongo.get_cursors('sqcs-bot', ['LectureSetting'])
 
         try:
             lect_set_cursor.delete_one({"week": del_lect_week})
@@ -103,7 +104,7 @@ class Lecture(CogExtension):
 
     @lect.command()
     async def start(self, ctx, week: int):
-        lect_set_cursor = self_client["LectureSetting"]
+        lect_set_cursor, = await mongo.get_cursors('sqcs-bot', ['LectureSetting'])
         lect_config = lect_set_cursor.find_one({"week": week})
 
         text_channel = discord.utils.get(ctx.guild.text_channels, name=lect_config['name'])
@@ -115,9 +116,9 @@ class Lecture(CogExtension):
         if lect_config["status"]:
             return await ctx.send(':x: 講座已經開始了！')
 
-        msg = await huma_get('lecture/start/pt_1', '\n')
+        msg = await JsonApi.get_humanity('lecture/start/pt_1', '\n')
         msg += f'星期 `{week}` 的講座－`{lect_config["name"]}` 開始了呦 \\^~^\n'
-        msg += await huma_get('lecture/start/pt_2')
+        msg += await JsonApi.get_humanity('lecture/start/pt_2')
         await text_channel.send(msg)
 
         execute = {
@@ -154,7 +155,7 @@ class Lecture(CogExtension):
     # origin: lecture ans check
     @lect.command()
     async def add_point(self, ctx, delta_value: float, members_id: commands.Greedy[int]):
-        lect_ongoing_cursor = self_client["LectureOngoing"]
+        lect_ongoing_cursor, = await mongo.get_cursors('sqcs-bot', ['LectureOngoing'])
 
         fluct_ext = Fluct(score_mode='custom')
         for member_id in members_id:
@@ -182,7 +183,7 @@ class Lecture(CogExtension):
 
     @lect.command()
     async def end(self, ctx, week: int):
-        lect_set_cursor = self_client["LectureSetting"]
+        lect_set_cursor, = await mongo.get_cursors('sqcs-bot', ['LectureSetting'])
         lect_config = lect_set_cursor.find_one({"week": week})
 
         text_channel = discord.utils.get(ctx.guild.text_channels, name=lect_config['name'])
@@ -191,13 +192,13 @@ class Lecture(CogExtension):
         if not lect_set_cursor["status"]:
             return await ctx.send(':exclamation: 講座已經結束了！')
 
-        msg = await huma_get('lecture/end/main', '\n')
+        msg = await JsonApi.get_humanity('lecture/end/main', '\n')
 
         population_list = [pop['count'] for pop in lect_config["population"]]
         average_population = statistics.mean(population_list)
 
         population_level = int(round(average_population / 10))
-        msg += await huma_get(f'lecture/end/reactions/{population_level}')
+        msg += await JsonApi.get_humanity(f'lecture/end/reactions/{population_level}')
         await text_channel.send(msg)
         execute = {
             "$set": {
@@ -216,7 +217,7 @@ class Lecture(CogExtension):
         await voice_client.disconnect()
 
         # show lecture final data
-        lect_ongoing_cursor = self_client["LectureOngoing"]
+        lect_ongoing_cursor, = await mongo.get_cursors('sqcs-bot', ['LectureOngoing'])
         answered_member_list = lect_ongoing_cursor.find({}).sort("score", -1)
 
         if answered_member_list.count() == 0:
@@ -276,7 +277,7 @@ class LectureAttendVerify(CogExtension):
     @commands.dm_only()
     @commands.cooldown(1, 15, commands.BucketType.user)
     async def attend(self, ctx, token: str):
-        verify_cursor = self_client['Verification']
+        verify_cursor, = await mongo.get_cursors('sqcs-bot', ['Verification'])
         data = verify_cursor.find_one({"TOKEN": token, "reason": "lect"})
 
         if not data:
@@ -308,7 +309,7 @@ class LectureAuto(CogExtension):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.lect_set_cursor = self_client['LectureSetting']
+        self.lect_set_cursor, = await mongo.get_cursors('sqcs-bot', ['LectureSetting'])
         self.lect_population_log = False
 
     @tasks.loop()

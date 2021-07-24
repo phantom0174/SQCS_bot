@@ -1,8 +1,10 @@
 # 📜 ChangeLog
 
-`version 1.28.6.26`
+`version 1.29.7.17`
 
 ```markdown
+- 2021/07/17: Integrate Storj, beautify lecture email
+
 - 2021/06/26: Mega update
   - Project structure re-design.
   - Delete unused feature.

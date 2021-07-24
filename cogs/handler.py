@@ -1,7 +1,7 @@
 from discord.ext import commands
 from core.utils import Time
 from core.cog_config import CogExtension
-from core.db import JsonApi
+from core.db.jsonstorage import JsonApi
 import traceback
 import discord
 
@@ -60,9 +60,9 @@ class ErrorHandler(CogExtension):
 
         full_log = f'[cmd exec]{log_msg}[{Time.get_info("whole")}]'
 
-        log_json = JsonApi().get('CmdLogging')
+        log_json = JsonApi.get('CmdLogging')
         log_json['logs'].append(full_log)
-        JsonApi().put('CmdLogging', log_json)
+        JsonApi.put('CmdLogging', log_json)
 
 
 def setup(bot):
