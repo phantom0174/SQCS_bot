@@ -148,15 +148,18 @@ for filename in os.listdir('./cogs'):
             # soft handling
             try:
                 bot.load_extension(f'cogs.{filename[:-3]}')
-            except:
+            except Exception as e:
                 print(f'Error loading cogs.{filename[:-3]}')
+                print(e)
+
     elif filename.find('.') == -1:
         for sub_filename in os.listdir(f'./cogs/{filename}'):
             if sub_filename.endswith('.py'):
                 try:
                     bot.load_extension(f'cogs.{filename}.{sub_filename[:-3]}')
-                except:
+                except Exception as e:
                     print(f'Error loading cogs.{filename}.{sub_filename[:-3]}')
+                    print(e)
 
 keep_alive.keep_alive()
 
