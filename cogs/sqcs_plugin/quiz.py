@@ -1,6 +1,6 @@
 from discord.ext import commands, tasks
 from core.db.jsonstorage import JsonApi
-import core.db.mongodb as mongo
+from core.db.mongodb import Mongo
 from core.utils import Time, DiscordExt
 from core.fluctlight_ext import guild_weekly_update, Fluct
 from core.cog_config import CogExtension
@@ -17,7 +17,7 @@ class Quiz(CogExtension):
     # push back stand by answer
     @quiz.command()
     async def alter_standby_ans(self, ctx, alter_answer: str):
-        quiz_set_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizSetting'])
+        quiz_set_cursor = Mongo('sqcs-bot').get_cur('QuizSetting')
 
         execute = {
             "$set": {
@@ -29,7 +29,7 @@ class Quiz(CogExtension):
 
     @quiz.command()
     async def alter_formal_ans(self, ctx, alter_answer: str):
-        quiz_set_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizSetting'])
+        quiz_set_cursor = Mongo('sqcs-bot').get_cur('QuizSetting')
 
         execute = {
             "$set": {
@@ -41,7 +41,7 @@ class Quiz(CogExtension):
 
     @quiz.command()
     async def set_qns_link(self, ctx, qns_link: str):
-        quiz_set_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizSetting'])
+        quiz_set_cursor = Mongo('sqcs-bot').get_cur('QuizSetting')
 
         execute = {
             "$set": {
@@ -53,7 +53,7 @@ class Quiz(CogExtension):
 
     @quiz.command()
     async def set_ans_link(self, ctx, ans_link: str):
-        quiz_set_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizSetting'])
+        quiz_set_cursor = Mongo('sqcs-bot').get_cur('QuizSetting')
 
         execute = {
             "$set": {
@@ -68,7 +68,7 @@ class Quiz(CogExtension):
         if new_result not in [0, 1]:
             return await ctx.send(':x: 答題正確狀態參數必須為 0 或 1！')
 
-        quiz_set_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizSetting'])
+        quiz_set_cursor = Mongo('sqcs-bot').get_cur('QuizSetting')
         execute = {
             "$set": {
                 "correct": bool(new_result)
@@ -82,7 +82,7 @@ class Quiz(CogExtension):
     @quiz.command()
     async def repost_qns(self, ctx):
         await ctx.message.delete()
-        quiz_set_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizSetting'])
+        quiz_set_cursor = Mongo('sqcs-bot').get_cur('QuizSetting')
         qns_link = quiz_set_cursor.find_one({"_id": 0})["qns_link"]
         await ctx.send(
             f':exclamation: 以下為更新後的問題！\n'
@@ -92,7 +92,7 @@ class Quiz(CogExtension):
     @quiz.command()
     async def repost_ans(self, ctx):
         await ctx.message.delete()
-        quiz_set_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizSetting'])
+        quiz_set_cursor = Mongo('sqcs-bot').get_cur('QuizSetting')
         ans_link = quiz_set_cursor.find_one({"_id": 0})["ans_link"]
         await ctx.send(
             f':exclamation: 以下為更新後的解答！\n'
@@ -112,10 +112,7 @@ class Quiz(CogExtension):
         if msg.content.startswith('~') or msg.content.startswith('+'):
             return
 
-        quiz_set_cursor, quiz_cursor = await mongo.get_cursors(
-            'sqcs-bot',
-            ['QuizSetting', 'QuizOngoing']
-        )
+        quiz_set_cursor, quiz_cursor = Mongo(sqcs-bot).get_curs(['QuizSetting', 'QuizOngoing'])
 
         quiz_status = quiz_set_cursor.find_one({"_id": 0})["event_status"]
         if not quiz_status:
@@ -162,7 +159,7 @@ class QuizAuto(CogExtension):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.quiz_set_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizSetting'])
+        self.quiz_set_cursor = Mongo('sqcs-bot').get_cur('QuizSetting')
 
         self.quiz_auto.start()
 
@@ -195,7 +192,7 @@ async def quiz_start(bot):
     main_channel = bot.get_channel(746014424086610012)
     gm_channel = bot.get_channel(743677861000380527)
 
-    quiz_set_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizSetting'])
+    quiz_set_cursor = Mongo('sqcs-bot').get_cur('QuizSetting')
     quiz_data = quiz_set_cursor.find_one({"_id": 0})
     stand_by_answer = quiz_data["stand_by_answer"]
 
@@ -240,7 +237,7 @@ async def quiz_end(bot):
     main_channel = bot.get_channel(746014424086610012)
     gm_channel = bot.get_channel(743677861000380527)
 
-    quiz_set_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizSetting'])
+    quiz_set_cursor = Mongo('sqcs-bot').get_cur('QuizSetting')
     quiz_data = quiz_set_cursor.find_one({"_id": 0})
     old_correct_ans = quiz_data["correct_answer"]
     answer_link = quiz_data["ans_link"]
@@ -265,8 +262,8 @@ async def quiz_end(bot):
         f'correct answer set to {correct_answer}!'
     )
 
-    quiz_ongoing_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizOngoing'])
-    fluctlight_cursor, = await mongo.get_cursors('LightCube', ['MainFluctlights'])
+    quiz_ongoing_cursor = Mongo('sqcs-bot').get_cur('QuizOngoing')
+    fluctlight_cursor = Mongo('LightCube').get_cur('MainFluctlights')
     msg = await JsonApi.get_humanity('quiz/end/main/pt_1', '\n')
     msg += f':white_check_mark: 這次的答案呢...是 `{old_correct_ans}`！\n'
     msg += await JsonApi.get_humanity('quiz/end/main/pt_2', '\n')

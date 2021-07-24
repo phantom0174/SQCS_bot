@@ -1,7 +1,7 @@
 from discord.ext import commands
 from core.cog_config import CogExtension
 from core.db.jsonstorage import JsonApi
-import core.db.mongodb as mongo
+from core.db.mongodb import Mongo
 from typing import Union
 import discord
 from core.fluctlight_ext import Fluct
@@ -18,7 +18,7 @@ class KickMember(CogExtension):
     async def list(self, ctx):
         await ctx.send(content=':hourglass_flowing_sand: 尋找中...', delete_after=3.0)
 
-        kick_cursor, = await mongo.get_cursors('sqcs-bot', ['ReadyToKick'])
+        kick_cursor = Mongo('sqcs-bot').get_cur('ReadyToKick')
         data = kick_cursor.find({})
 
         if data.count() == 0:
@@ -51,7 +51,7 @@ class KickMember(CogExtension):
         else:
             member_id = target_member
 
-        fluctlight_cursor, = await mongo.get_cursors('LightCube', ['MainFluctlights'])
+        fluctlight_cursor = Mongo('LightCube').get_cur('MainFluctlights')
         data = fluctlight_cursor.find_one({"_id": member_id})
 
         if not data:
@@ -63,7 +63,7 @@ class KickMember(CogExtension):
             "contrib": data["contrib"],
             "lvl_ind": data["lvl_ind"]
         }
-        kick_cursor, = await mongo.get_cursors('sqcs-bot', ['ReadyToKick'])
+        kick_cursor = Mongo('sqcs-bot').get_cur('ReadyToKick')
         kick_cursor.insert_one(member_info)
 
         await ctx.send(f':white_check_mark: 成員 {data["name"]} - {member_id} 已被加到待踢除名單！')
@@ -75,7 +75,7 @@ class KickMember(CogExtension):
         else:
             member_id = target_member
 
-        kick_cursor, = await mongo.get_cursors('sqcs-bot', ['ReadyToKick'])
+        kick_cursor = Mongo('sqcs-bot').get_cur('ReadyToKick')
         data = kick_cursor.find_one({"_id": member_id})
 
         if not data:
@@ -92,7 +92,7 @@ class KickMember(CogExtension):
         else:
             member_id = target_member
 
-        kick_cursor, = await mongo.get_cursors('sqcs-bot', ['ReadyToKick'])
+        kick_cursor = Mongo('sqcs-bot').get_cur('ReadyToKick')
         data = kick_cursor.find_one({"_id": member_id})
 
         if not data:
@@ -123,7 +123,7 @@ class KickMember(CogExtension):
 
     @kick.command(aliases=['all'])
     async def kick_all(self, ctx):
-        kick_cursor, = await mongo.get_cursors('sqcs-bot', ['ReadyToKick'])
+        kick_cursor = Mongo('sqcs-bot').get_cur('ReadyToKick')
         data = kick_cursor.find({})
 
         if data.count() == 0:

@@ -2,7 +2,7 @@ from discord.ext import commands
 import random
 from core.utils import DiscordExt
 from core.db.jsonstorage import JsonApi
-import core.db.mongodb as mongo
+from core.db.mongodb import Mongo
 from core.cog_config import CogExtension
 import discord
 
@@ -16,7 +16,7 @@ class Query(CogExtension):
     @query.command()
     @commands.has_any_role('總召', 'Administrator')
     async def quiz(self, ctx):
-        quiz_ongoing_cursor, = await mongo.get_cursors('sqcs-bot', ['QuizOngoing'])
+        quiz_ongoing_cursor = Mongo('sqcs-bot').get_cur('QuizOngoing')
         data = quiz_ongoing_cursor.find({})
 
         if data.count() == 0:
@@ -45,7 +45,7 @@ class Query(CogExtension):
     # guild active percentage
     @query.command()
     async def guild_active(self, ctx):
-        fluct_cursor, = await mongo.get_cursors('LightCube', ['MainFluctlights'])
+        fluct_cursor = Mongo('LightCube').get_cur('MainFluctlights')
         week_active_match = {
             "deep_freeze": {
                 "$ne": True
@@ -66,7 +66,7 @@ class Query(CogExtension):
 
 
 async def create_fluct_data_embed(member_id) -> discord.Embed:
-    fluct_cursor, = await mongo.get_cursors('LightCube', ['MainFluctlights'])
+    fluct_cursor = Mongo('LightCube').get_cur('MainFluctlights')
     data = fluct_cursor.find_one({"_id": member_id})
 
     # method used when checking a dict is empty or not

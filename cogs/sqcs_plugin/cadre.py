@@ -2,7 +2,7 @@ from discord.ext import commands
 import os
 from core.cog_config import CogExtension
 from core.db.jsonstorage import JsonApi
-import core.db.mongodb as mongo
+from core.db.mongodb import Mongo
 from core.utils import Time
 import discord
 
@@ -16,10 +16,8 @@ class Cadre(CogExtension):
     @ca.command()
     async def apply(self, ctx, cadre: str):
 
-        cadre_set_cursor, cadre_cursor = await mongo.get_cursors(
-            'sqcs-bot',
-            ['CadreSetting', 'Cadre']
-        )
+        cadre_set_cursor, cadre_cursor = Mongo('sqcs-bot').get_curs(['CadreSetting', 'Cadre'])
+        
         cadre_setting = cadre_set_cursor.find_one({"_id": 0})
 
         if ctx.channel.id != cadre_setting['apply_channel']:
@@ -63,7 +61,7 @@ class Cadre(CogExtension):
     @ca.command()
     @commands.has_any_role('總召', 'Administrator')
     async def list(self, ctx):
-        cadre_cursor, = await mongo.get_cursors('sqcs-bot', ['Cadre'])
+        cadre_cursor = Mongo('sqcs-bot').get_cur('Cadre')
         data = cadre_cursor.find({})
 
         if data.count() == 0:
@@ -87,7 +85,7 @@ class Cadre(CogExtension):
     @ca.command()
     @commands.has_any_role('總召', 'Administrator')
     async def permit(self, ctx, permit_id: int):
-        cadre_cursor, = await mongo.get_cursors('sqcs-bot', ['Cadre'])
+        cadre_cursor = Mongo('sqcs-bot').get_cur('Cadre')
         data = cadre_cursor.find_one({"_id": permit_id})
 
         if not data:
@@ -109,7 +107,7 @@ class Cadre(CogExtension):
     @ca.command()
     @commands.has_any_role('總召', 'Administrator')
     async def search(self, ctx, search_id: int):
-        cadre_cursor, = await mongo.get_cursors('sqcs-bot', ['Cadre'])
+        cadre_cursor = Mongo('sqcs-bot').get_cur('Cadre')
         data = cadre_cursor.find_one({"_id": search_id})
 
         if not data:
@@ -124,7 +122,7 @@ class Cadre(CogExtension):
     @ca.command(aliases=['delete'])
     @commands.has_any_role('總召', 'Administrator')
     async def remove(self, ctx, delete_id: int):
-        cadre_cursor, = await mongo.get_cursors('sqcs-bot', ['Cadre'])
+        cadre_cursor = Mongo('sqcs-bot').get_cur('Cadre')
         data = cadre_cursor.find_one({"_id": delete_id})
 
         if not data:
@@ -133,7 +131,7 @@ class Cadre(CogExtension):
         cadre_cursor.delete_one({"_id": delete_id})
         await ctx.send(f':white_check_mark: 成員 {data["name"]}({delete_id}) 的申請已被刪除！')
 
-
+# need to be fixed!
 class GuildRole(CogExtension):
     @commands.group(aliases=['rl'])
     @commands.has_any_role('總召', 'Administrator')

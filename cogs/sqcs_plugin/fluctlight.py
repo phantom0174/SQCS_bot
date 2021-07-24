@@ -1,7 +1,7 @@
 from discord.ext import commands, tasks
 from core.cog_config import CogExtension
 from core.db.jsonstorage import JsonApi
-import core.db.mongodb as mongo
+from core.db.mongodb import Mongo
 from core.fluctlight_ext import Fluct
 
 
@@ -64,7 +64,7 @@ class FluctlightAuto(CogExtension):
 
     @tasks.loop(hours=3)
     async def create_missing_member_fluctlight(self):
-        main_cursor, vice_cursor = await mongo.get_cursors('LightCube', ['MainFluctlights', 'ViceFluctlights'])
+        main_cursor, vice_cursor = Mongo('LightCube').get_curs(['MainFluctlights', 'ViceFluctlights'])
 
         await self.bot.wait_until_ready()
         guild = self.bot.get_guild(743507979369709639)
@@ -85,7 +85,7 @@ class FluctlightAuto(CogExtension):
 
     @tasks.loop(hours=12)
     async def delete_unused_fluctlight(self):
-        main_cursor, vice_cursor = await mongo.get_cursors('LightCube', ['MainFluctlights', 'ViceFluctlights'])
+        main_cursor, vice_cursor = Mongo('LightCube').get_curs(['MainFluctlights', 'ViceFluctlights'])
 
         main_data = main_cursor.find({})
         vice_data = vice_cursor.find({})

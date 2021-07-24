@@ -3,7 +3,7 @@ import asyncio
 import random
 import core.sqcs_module as sm
 from core.db.jsonstorage import JsonApi
-import core.db.mongodb as mongo
+from core.db.mongodb import Mongo
 from core.utils import Time, DiscordExt
 from core.cog_config import CogExtension
 from core.fluctlight_ext import Fluct
@@ -20,7 +20,7 @@ class LectureConfig(CogExtension):
 
     @lect_config.command()
     async def list(self, ctx):
-        lect_set_cursor, = await mongo.get_cursors('sqcs-bot', ['LectureSetting'])
+        lect_set_cursor = Mongo('sqcs-bot').get_cur('LectureSetting')
         data = lect_set_cursor.find({})
 
         if data.count() == 0:
@@ -63,7 +63,7 @@ class LectureConfig(CogExtension):
             "status": False,
             "population": list()
         }
-        lect_set_cursor, = await mongo.get_cursors('sqcs-bot', ['LectureSetting'])
+        lect_set_cursor = Mongo('sqcs-bot').get_cur('LectureSetting')
         lect_set_cursor.insert_one(lecture_config)
 
         lect_category_channel = ctx.guild.get_channel(743517006040662127)
@@ -86,7 +86,7 @@ class LectureConfig(CogExtension):
 
     @lect_config.command()
     async def remove(self, ctx, del_lect_week: int):
-        lect_set_cursor, = await mongo.get_cursors('sqcs-bot', ['LectureSetting'])
+        lect_set_cursor = Mongo('sqcs-bot').get_cur('LectureSetting')
 
         try:
             lect_set_cursor.delete_one({"week": del_lect_week})
@@ -104,7 +104,7 @@ class Lecture(CogExtension):
 
     @lect.command()
     async def start(self, ctx, week: int):
-        lect_set_cursor, = await mongo.get_cursors('sqcs-bot', ['LectureSetting'])
+        lect_set_cursor = Mongo('sqcs-bot').get_cur('LectureSetting')
         lect_config = lect_set_cursor.find_one({"week": week})
 
         text_channel = discord.utils.get(ctx.guild.text_channels, name=lect_config['name'])
@@ -155,7 +155,7 @@ class Lecture(CogExtension):
     # origin: lecture ans check
     @lect.command()
     async def add_point(self, ctx, delta_value: float, members_id: commands.Greedy[int]):
-        lect_ongoing_cursor, = await mongo.get_cursors('sqcs-bot', ['LectureOngoing'])
+        lect_ongoing_cursor = Mongo('sqcs-bot').get_cur('LectureOngoing')
 
         fluct_ext = Fluct(score_mode='custom')
         for member_id in members_id:
@@ -183,7 +183,7 @@ class Lecture(CogExtension):
 
     @lect.command()
     async def end(self, ctx, week: int):
-        lect_set_cursor, = await mongo.get_cursors('sqcs-bot', ['LectureSetting'])
+        lect_set_cursor = Mongo('sqcs-bot').get_cur('LectureSetting')
         lect_config = lect_set_cursor.find_one({"week": week})
 
         text_channel = discord.utils.get(ctx.guild.text_channels, name=lect_config['name'])
@@ -217,7 +217,7 @@ class Lecture(CogExtension):
         await voice_client.disconnect()
 
         # show lecture final data
-        lect_ongoing_cursor, = await mongo.get_cursors('sqcs-bot', ['LectureOngoing'])
+        lect_ongoing_cursor = Mongo('sqcs-bot').get_cur('LectureOngoing')
         answered_member_list = lect_ongoing_cursor.find({}).sort("score", -1)
 
         if answered_member_list.count() == 0:
@@ -277,7 +277,7 @@ class LectureAttendVerify(CogExtension):
     @commands.dm_only()
     @commands.cooldown(1, 15, commands.BucketType.user)
     async def attend(self, ctx, token: str):
-        verify_cursor, = await mongo.get_cursors('sqcs-bot', ['Verification'])
+        verify_cursor = Mongo('sqcs-bot').get_cur('Verification')
         data = verify_cursor.find_one({"TOKEN": token, "reason": "lect"})
 
         if not data:
@@ -309,7 +309,7 @@ class LectureAuto(CogExtension):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.lect_set_cursor, = await mongo.get_cursors('sqcs-bot', ['LectureSetting'])
+        self.lect_set_cursor = Mongo('sqcs-bot').get_cur('LectureSetting')
         self.lect_population_log = False
 
     @tasks.loop()

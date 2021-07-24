@@ -1,22 +1,21 @@
 import statistics
 import discord
-from core.db import self_client, fluctlight_client
+from core.db.mongodb import Mongo
 from core.utils import Time, FluctMath, DiscordExt
 from typing import NoReturn
 
 
 class Fluct:
     def __init__(self, member_id=None, score_mode=None):
-        # fluctlight cursor
-        self.main_fluct_cursor = fluctlight_client["MainFluctlights"]
-        self.vice_fluct_cursor = fluctlight_client["ViceFluctlights"]
+        self.main_fluct_cursor, self.vice_fluct_cursor = \
+            Mongo('LightCube').get_curs(['MainFluctlights', 'ViceFluctlights'])
 
         # score setting cursor
         self.delta_score = None
         if score_mode is not None:
             self.score_mode = score_mode
 
-            score_set_cursor = self_client["ScoreSetting"]
+            score_set_cursor = Mongo('sqcs-bot').get_cur('ScoreSetting')
             score_setting = score_set_cursor.find_one({"_id": 0})
             self.score_weight = score_setting["score_weight"]
 
@@ -161,8 +160,9 @@ async def guild_weekly_update(bot) -> NoReturn:
     # ------------------------------
 
     # set-up self_client
-    fluctlight_cursor = fluctlight_client["MainFluctlights"]
-    score_set_cursor = self_client["ScoreSetting"]
+    
+    fluctlight_cursor = Mongo('LightCube').get_cur('MainFluctlights')
+    score_set_cursor = Mongo('sqcs-bot').get_cur('ScoreSetting')
 
     # calculate total score, max, min score
     max_score = fluctlight_cursor.find({}, {"score": 1}).sort("score", -1)[0]["score"]
@@ -271,7 +271,7 @@ async def lvl_ind_update(fluctlight_cursor, avr_contrib) -> None:
 
 
 async def lvl_ind_detect(bot, fluctlight_cursor) -> None:
-    kick_cursor = self_client["ReadyToKick"]
+    kick_cursor = Mongo('sqcs-bot').get_cur('ReadyToKick')
     guild = bot.get_guild(743507979369709639)
 
     data = fluctlight_cursor.find({})

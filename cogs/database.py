@@ -1,6 +1,6 @@
 from discord.ext import commands
 from core.cog_config import CogExtension
-import core.db.mongodb as mongo
+from core.db.mongodb import Mongo
 
 
 class DataBase(CogExtension):
@@ -11,7 +11,7 @@ class DataBase(CogExtension):
 
     @db.command()
     async def refresh_db(self, ctx):
-        cursors = list(await mongo.get_cursors('LightCube', ['MainFluctlights', 'ViceFluctlights']))
+        cursors = list(Mongo('LightCube').get_curs(['MainFluctlights', 'ViceFluctlights']))
         members_id = [member.id for member in ctx.guild.members]
 
         condition = {
@@ -30,10 +30,10 @@ class DataBase(CogExtension):
             return await ctx.send(':x: 任何一個參數都不能為空字串！')
 
         # origin
-        ori_coll_cursor, = await mongo.get_cursors(ori_db_name, [ori_coll_name])
+        ori_coll_cursor = Mongo(ori_db_name).get_cur(ori_coll_name)
 
         # target
-        target_coll_cursor, = await mongo.get_cursors(target_db_name, [target_coll_name])
+        target_coll_cursor = Mongo(target_db_name).get_cur(target_coll_name)
 
         ori_data = ori_coll_cursor.find({})
         for datum in ori_data:
@@ -51,10 +51,10 @@ class DataBase(CogExtension):
             return await ctx.send(':x: 任何一個參數都不能為空字串！')
 
         # origin
-        ori_coll_cursor, = await mongo.get_cursors(ori_db_name, [ori_coll_name])
+        ori_coll_cursor = Mongo(ori_db_name).get_cur(ori_coll_name)
 
         # target
-        target_coll_cursor, = await mongo.get_cursors(target_db_name, [target_coll_name])
+        target_coll_cursor = Mongo(target_db_name).get_cur(target_coll_name)
 
         ori_data = ori_coll_cursor.find({})
         for datum in ori_data:

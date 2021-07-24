@@ -2,7 +2,7 @@ from discord.ext import commands
 from core.cog_config import CogExtension
 from random import randint
 from core.mail import send_email
-import core.db.mongodb as mongo
+from core.db.mongodb import Mongo
 from core.utils import Time
 
 
@@ -15,10 +15,7 @@ class Verify(CogExtension):
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
     async def lect_generate_token(self, ctx, lecture_week: int, *, accounts):
-        lect_set_cursor, verify_cursor = await mongo.get_cursors(
-            'sqcs-bot',
-            ['LectureSetting', 'Verification']
-        )
+        lect_set_cursor, verify_cursor = Mongo('sqcs-bot').get_curs(['LectureSetting', 'Verification'])
         lect_data = lect_set_cursor.find_one({"week": lecture_week})
         if not lect_data:
             return await ctx.send(f":x: There's no lecture on week {lecture_week}")
