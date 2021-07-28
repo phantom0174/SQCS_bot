@@ -21,7 +21,6 @@ class Mongo:
         cursors = [self.client[collection] for collection in collections]
         return tuple(cursors)
 
-    def get_all_curs(self) -> List[pymongo.cursor.CursorType]:
+    def get_all_curs(self) -> Tuple[pymongo.cursor.CursorType]:
         cursors = [self.client[collection] for collection in client.list_collection_names()]
         return tuple(cursors)
-
