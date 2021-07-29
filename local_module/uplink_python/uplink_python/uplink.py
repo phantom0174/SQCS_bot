@@ -2,7 +2,7 @@
 """Python Binding's Uplink Module for Storj (V3)"""
 
 # This file has been modified by phantom0174 at 2021/7/17, SQCS_bot version 1.29.7.17
-# modified content: change absolute import to relative import, and change .so to .dll for windows
+# modified content: change absolute import to relative import, and change .so to .dll for windows, fix literal
 
 import ctypes
 import os
@@ -64,7 +64,7 @@ class Uplink:
                                 content_length=object_.contents.system.content_length)
 
         array_size = object_.contents.custom.count
-        entries = list()
+        entries = []
         for i in range(array_size):
             if bool(object_.contents.custom.entries[i]):
                 entries_obj = object_.contents.custom.entries[i]

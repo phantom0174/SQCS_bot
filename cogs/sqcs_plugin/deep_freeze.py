@@ -41,7 +41,7 @@ class DeepFreeze(CogExtension):
         if data.count() == 0:
             return await ctx.send(':x: 沒有成員在凍結狀態中！')
 
-        member_list = str()
+        member_list = ''
         for member in data:
             member_name = await DiscordExt.get_member_nick_name(ctx.guild, member["_id"])
 

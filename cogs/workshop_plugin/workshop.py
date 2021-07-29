@@ -25,7 +25,7 @@ class WorkShop(CogExtension):
             "stream": True,
             "use_voice_activation": True
         }
-        member_list = str()
+        member_list = ''
         for member in voice_channel.members:
             member_list += f'{member.display_name}({member.id})\n'
 

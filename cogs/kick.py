@@ -24,7 +24,7 @@ class KickMember(CogExtension):
         if data.count() == 0:
             return await ctx.send(':x: 待踢除名單為空！')
 
-        kick_member_list = str()
+        kick_member_list = ''
         for member in data:
 
             member_info: str = (

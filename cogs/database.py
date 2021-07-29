@@ -26,7 +26,7 @@ class DataBase(CogExtension):
 
     @db.command()
     async def copy(self, ctx, ori_db_name: str, ori_coll_name: str, target_db_name: str, target_coll_name: str):
-        if ori_db_name == '' or ori_coll_name == '' or target_db_name == '' or target_coll_name == '':
+        if '' in [ori_db_name, ori_coll_name, target_db_name, target_coll_name]:
             return await ctx.send(':x: 任何一個參數都不能為空字串！')
 
         # origin
@@ -47,7 +47,7 @@ class DataBase(CogExtension):
 
     @db.command()
     async def move(self, ctx, ori_db_name: str, ori_coll_name: str, target_db_name: str, target_coll_name: str):
-        if ori_db_name == '' or ori_coll_name == '' or target_db_name == '' or target_coll_name == '':
+        if '' in [ori_db_name, ori_coll_name, target_db_name, target_coll_name]:
             return await ctx.send(':x: 任何一個參數都不能為空字串！')
 
         # origin

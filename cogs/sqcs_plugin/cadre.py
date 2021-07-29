@@ -67,7 +67,7 @@ class Cadre(CogExtension):
         if data.count() == 0:
             return await ctx.send(':x: 職位申請名單為空！')
 
-        apply_info = str()
+        apply_info = ''
         for item in data:
             apply_info += (
                 f'{item["name"]}({item["_id"]}): '

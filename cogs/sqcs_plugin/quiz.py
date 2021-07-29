@@ -112,7 +112,7 @@ class Quiz(CogExtension):
         if msg.content.startswith('~') or msg.content.startswith('+'):
             return
 
-        quiz_set_cursor, quiz_cursor = Mongo(sqcs-bot).get_curs(['QuizSetting', 'QuizOngoing'])
+        quiz_set_cursor, quiz_cursor = Mongo('sqcs-bot').get_curs(['QuizSetting', 'QuizOngoing'])
 
         quiz_status = quiz_set_cursor.find_one({"_id": 0})["event_status"]
         if not quiz_status:
@@ -290,7 +290,7 @@ async def quiz_end(bot):
     # list the winners
     data = quiz_ongoing_cursor.find({"correct": {"$eq": True}})
 
-    winners = str()
+    winners = ''
     for winner in data:
         winner_name = await DiscordExt.get_member_nick_name(guild, winner["_id"])
         winners += f'{winner_name}\n'

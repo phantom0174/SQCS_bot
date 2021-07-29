@@ -36,8 +36,7 @@ class Fluct:
     async def get_final_id(self, input_member_id):
         if self.member_id is not None:
             return self.member_id
-        else:
-            return input_member_id
+        return input_member_id
 
     async def create_main(self, guild, deep_freeze_status: bool, member_id: int = -1) -> None:
         member_final_id = await self.get_final_id(member_id)

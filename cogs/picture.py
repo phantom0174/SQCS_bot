@@ -39,7 +39,7 @@ class Picture(CogExtension):
     async def list(self, ctx):
         pic_json = JsonApi.get('DynamicSetting')
 
-        pic_str = str()
+        pic_str = ''
         for i, pic in enumerate(pic_json['picture_link']):
             pic_str += f'{i}: {pic}\n'
 

@@ -1,7 +1,7 @@
 """Module with Project class and project methods to work with buckets and objects"""
 
 # This file has been modified by phantom0174 at 2021/7/17, SQCS_bot version 1.29.7.17
-# modified content: change absolute import to relative import
+# modified content: change absolute import to relative import, fix literal
 
 import ctypes
 
@@ -207,7 +207,7 @@ class Project:
             raise _storj_exception(bucket_iterator_err.contents.code,
                                    bucket_iterator_err.contents.message.decode("utf-8"))
 
-        bucket_list = list()
+        bucket_list = []
         while self.uplink.m_libuplink.uplink_bucket_iterator_next(bucket_iterator):
             bucket = self.uplink.m_libuplink.uplink_bucket_iterator_item(bucket_iterator)
             bucket_list.append(self.uplink.bucket_from_result(bucket))
@@ -334,7 +334,7 @@ class Project:
             raise _storj_exception(object_iterator_err.contents.code,
                                    object_iterator_err.contents.message.decode("utf-8"))
 
-        object_list = list()
+        object_list = []
         while self.uplink.m_libuplink.uplink_object_iterator_next(object_iterator):
             object_ = self.uplink.m_libuplink.uplink_object_iterator_item(object_iterator)
             object_list.append(self.uplink.object_from_result(object_))

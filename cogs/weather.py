@@ -46,7 +46,7 @@ class WeatherQuery(CogExtension):
 
         location_weather_data = response.json()["cwbopendata"]["dataset"]["location"]
 
-        county_weather_info = str()
+        county_weather_info = ''
 
         if target_county == '':
             target_county = ctx.author.roles[1].name

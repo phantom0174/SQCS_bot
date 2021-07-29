@@ -61,7 +61,7 @@ class LectureConfig(CogExtension):
             "name": name,
             "week": int(week),
             "status": False,
-            "population": list()
+            "population": []
         }
         lect_set_cursor = Mongo('sqcs-bot').get_cur('LectureSetting')
         lect_set_cursor.insert_one(lecture_config)
@@ -229,7 +229,7 @@ class Lecture(CogExtension):
             2: ':third_place:'
         }
 
-        member_rank_list = str()
+        member_rank_list = ''
         for rank, member in enumerate(answered_member_list):
             medal = ranking_medal_prefix.get(rank, ':medal:')
             member_name = await DiscordExt.get_member_nick_name(ctx.guild, member["_id"])
@@ -310,9 +310,9 @@ class LectureAuto(CogExtension):
         super().__init__(*args, **kwargs)
 
         self.lect_set_cursor = Mongo('sqcs-bot').get_cur('LectureSetting')
-        self.lect_population_log = False
+        self.lect_population_log.start()
 
-    @tasks.loop()
+    @tasks.loop(minutes=2)
     async def lect_population_log(self):
         await self.bot.wait_until_ready()
 

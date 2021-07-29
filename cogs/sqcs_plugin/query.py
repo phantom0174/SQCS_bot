@@ -22,7 +22,7 @@ class Query(CogExtension):
         if data.count() == 0:
             return await ctx.send(':x: 沒有任何正在進行中的講座資料！')
 
-        status = str()
+        status = ''
         for item in data:
             member_name = await DiscordExt.get_member_nick_name(ctx.guild, item["_id"])
             status += f'{member_name}: {item["correct"]}\n'
