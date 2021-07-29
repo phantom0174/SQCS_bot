@@ -73,7 +73,8 @@ class Download:
         #
         # declare types of arguments and response of the corresponding golang function
         self.uplink.m_libuplink.uplink_download_read.argtypes = [ctypes.POINTER(_DownloadStruct),
-                                                                 ctypes.POINTER(ctypes.c_uint8),
+                                                                 ctypes.POINTER(
+                                                                     ctypes.c_uint8),
                                                                  ctypes.c_size_t]
         self.uplink.m_libuplink.uplink_download_read.restype = _ReadResult
         #
@@ -81,7 +82,8 @@ class Download:
         data_size = ctypes.c_int32(size_to_read)
         data_to_write = [0]
         data_to_write = (ctypes.c_uint8 * data_size.value)(*data_to_write)
-        data_to_write_ptr = ctypes.cast(data_to_write, ctypes.POINTER(ctypes.c_uint8))
+        data_to_write_ptr = ctypes.cast(
+            data_to_write, ctypes.POINTER(ctypes.c_uint8))
         size_to_read = ctypes.c_size_t(size_to_read)
 
         # read data from Storj by calling the exported golang function
@@ -99,7 +101,8 @@ class Download:
             # --------------------------------------------
             # data conversion to type python readable form
             # conversion of LP_c_ubyte to python readable data variable
-            data_read = ctypes.string_at(data_to_write_ptr, int(read_result.bytes_read))
+            data_read = ctypes.string_at(
+                data_to_write_ptr, int(read_result.bytes_read))
         return data_read, int(read_result.bytes_read)
 
     def read_file(self, file_handle, buffer_size: int = 0):
@@ -165,8 +168,10 @@ class Download:
         """
         #
         # declare types of arguments and response of the corresponding golang function
-        self.uplink.m_libuplink.uplink_close_download.argtypes = [ctypes.POINTER(_DownloadStruct)]
-        self.uplink.m_libuplink.uplink_close_download.restype = ctypes.POINTER(_Error)
+        self.uplink.m_libuplink.uplink_close_download.argtypes = [
+            ctypes.POINTER(_DownloadStruct)]
+        self.uplink.m_libuplink.uplink_close_download.restype = ctypes.POINTER(
+            _Error)
         #
         # close downloader by calling the exported golang function
         error = self.uplink.m_libuplink.uplink_close_download(self.download)
@@ -186,11 +191,13 @@ class Download:
         """
         #
         # declare types of arguments and response of the corresponding golang function
-        self.uplink.m_libuplink.uplink_download_info.argtypes = [ctypes.POINTER(_DownloadStruct)]
+        self.uplink.m_libuplink.uplink_download_info.argtypes = [
+            ctypes.POINTER(_DownloadStruct)]
         self.uplink.m_libuplink.uplink_download_info.restype = _ObjectResult
         #
         # get last download info by calling the exported golang function
-        object_result = self.uplink.m_libuplink.uplink_download_info(self.download)
+        object_result = self.uplink.m_libuplink.uplink_download_info(
+            self.download)
         #
         # if error occurred
         if bool(object_result.error):

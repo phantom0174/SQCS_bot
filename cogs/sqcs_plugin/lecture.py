@@ -107,8 +107,10 @@ class Lecture(CogExtension):
         lect_set_cursor = Mongo('sqcs-bot').get_cur('LectureSetting')
         lect_config = lect_set_cursor.find_one({"week": week})
 
-        text_channel = discord.utils.get(ctx.guild.text_channels, name=lect_config['name'])
-        voice_channel = discord.utils.get(ctx.guild.voice_channels, name=lect_config['name'])
+        text_channel = discord.utils.get(
+            ctx.guild.text_channels, name=lect_config['name'])
+        voice_channel = discord.utils.get(
+            ctx.guild.voice_channels, name=lect_config['name'])
 
         if not lect_config:
             return await ctx.send(f':x: 星期 `{week}` 沒有講座！')
@@ -131,7 +133,8 @@ class Lecture(CogExtension):
 
         # join the voice channel to speak
         voice_client = await voice_channel.connect()
-        audio_source = discord.FFmpegPCMAudio('./assets/audio/lecture_starts.mp3')
+        audio_source = discord.FFmpegPCMAudio(
+            './assets/audio/lecture_starts.mp3')
         voice_client.play(audio_source)
         while voice_client.is_playing():
             await asyncio.sleep(1)
@@ -162,7 +165,8 @@ class Lecture(CogExtension):
             final_delta_score = await fluct_ext.add_score(member_id, delta_value)
             await fluct_ext.active_log_update(member_id)
 
-            member_lecture_statistics = lect_ongoing_cursor.find_one({"_id": member_id})
+            member_lecture_statistics = lect_ongoing_cursor.find_one(
+                {"_id": member_id})
             if not member_lecture_statistics:
                 member_info = {
                     "_id": member_id,
@@ -186,8 +190,10 @@ class Lecture(CogExtension):
         lect_set_cursor = Mongo('sqcs-bot').get_cur('LectureSetting')
         lect_config = lect_set_cursor.find_one({"week": week})
 
-        text_channel = discord.utils.get(ctx.guild.text_channels, name=lect_config['name'])
-        voice_channel = discord.utils.get(ctx.guild.voice_channels, name=lect_config['name'])
+        text_channel = discord.utils.get(
+            ctx.guild.text_channels, name=lect_config['name'])
+        voice_channel = discord.utils.get(
+            ctx.guild.voice_channels, name=lect_config['name'])
 
         if not lect_set_cursor["status"]:
             return await ctx.send(':exclamation: 講座已經結束了！')
@@ -209,7 +215,8 @@ class Lecture(CogExtension):
 
         # join the voice channel to speak
         voice_client = await voice_channel.connect()
-        audio_source = discord.FFmpegPCMAudio('./assets/audio/lecture_ends.mp3')
+        audio_source = discord.FFmpegPCMAudio(
+            './assets/audio/lecture_ends.mp3')
         voice_client.play(audio_source)
         while voice_client.is_playing():
             await asyncio.sleep(1)
@@ -297,7 +304,8 @@ class LectureAttendVerify(CogExtension):
             await ctx.send(':white_check_mark: 操作成功！')
         except:
             guild = self.bot.get_guild(784607509629239316)
-            report_channel = discord.utils.get(guild.text_channels, name='sqcs-lecture-attend')
+            report_channel = discord.utils.get(
+                guild.text_channels, name='sqcs-lecture-attend')
 
             await report_channel.send(
                 f'[DB MANI ERROR][to: {ctx.author.id}][inc_score_mode: lecture_attend]'
@@ -321,7 +329,8 @@ class LectureAuto(CogExtension):
             return
 
         guild = self.bot.get_guild(743507979369709639)
-        voice_channel = discord.utils.get(guild.voice_channels, name=ongoing_lect['name'])
+        voice_channel = discord.utils.get(
+            guild.voice_channels, name=ongoing_lect['name'])
 
         population = len(voice_channel.members)
         if population:
@@ -333,7 +342,8 @@ class LectureAuto(CogExtension):
                     }
                 }
             }
-            self.lect_set_cursor.update_one({"week": ongoing_lect['week']}, execute)
+            self.lect_set_cursor.update_one(
+                {"week": ongoing_lect['week']}, execute)
 
 
 def setup(bot):

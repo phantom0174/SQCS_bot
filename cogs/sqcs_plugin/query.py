@@ -55,8 +55,10 @@ class Query(CogExtension):
             }
         }
         week_active_count = fluct_cursor.find(week_active_match).count()
-        countable_member_count = fluct_cursor.find({"deep_freeze": {"$ne": 1}}).count()
-        activeness = round((week_active_count / countable_member_count) * 100, 4)
+        countable_member_count = fluct_cursor.find(
+            {"deep_freeze": {"$ne": 1}}).count()
+        activeness = round(
+            (week_active_count / countable_member_count) * 100, 4)
 
         await ctx.send(
             f':scroll: 伺服器目前活躍度為 {activeness}%\n'

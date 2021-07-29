@@ -263,7 +263,8 @@ class CustomMetadataEntry:
 
         return _CustomMetadataEntryStruct(ctypes.c_char_p(self.key.encode('utf-8')),
                                           ctypes.c_size_t(self.key_length),
-                                          ctypes.c_char_p(self.value.encode('utf-8')),
+                                          ctypes.c_char_p(
+                                              self.value.encode('utf-8')),
                                           ctypes.c_size_t(self.value_length))
 
     def get_dict(self):
@@ -306,7 +307,8 @@ class CustomMetadata:
             entries = ctypes.POINTER(_CustomMetadataEntryStruct)()
         else:
             li_array_size = (_CustomMetadataEntryStruct * self.count)()
-            entries = ctypes.cast(li_array_size, ctypes.POINTER(_CustomMetadataEntryStruct))
+            entries = ctypes.cast(
+                li_array_size, ctypes.POINTER(_CustomMetadataEntryStruct))
             for i, val in enumerate(self.entries):
                 entries[i] = val.get_structure()
 
@@ -423,7 +425,8 @@ class ListObjectsOptions:
         """Converts python class object to ctypes structure _ListObjectsOptionsStruct"""
 
         return _ListObjectsOptionsStruct(ctypes.c_char_p(self.prefix.encode('utf-8')),
-                                         ctypes.c_char_p(self.cursor.encode('utf-8')),
+                                         ctypes.c_char_p(
+                                             self.cursor.encode('utf-8')),
                                          ctypes.c_bool(self.recursive),
                                          ctypes.c_bool(self.system),
                                          ctypes.c_bool(self.custom))

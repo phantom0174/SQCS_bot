@@ -7,19 +7,19 @@ from core.cog_config import CogExtension
 
 
 data_prefix = {
-  "0": "天氣描述",
-  "1": "最高溫度",
-  "2": "最低溫度",
-  "3": "體感描述",
-  "4": "降水機率"
+    "0": "天氣描述",
+    "1": "最高溫度",
+    "2": "最低溫度",
+    "3": "體感描述",
+    "4": "降水機率"
 }
 
 data_suffix = {
-  "0": "",
-  "1": "度",
-  "2": "度",
-  "3": "",
-  "4": "%"
+    "0": "",
+    "1": "度",
+    "2": "度",
+    "3": "",
+    "4": "%"
 }
 
 
@@ -42,7 +42,8 @@ class WeatherQuery(CogExtension):
             f'{str(os.environ.get("PHANTOM_TW_WEATHER_TOKEN"))}&format=json'
         )
 
-        location_weather_data = response.json()["cwbopendata"]["dataset"]["location"]
+        location_weather_data = response.json(
+        )["cwbopendata"]["dataset"]["location"]
 
         county_weather_info = ''
 

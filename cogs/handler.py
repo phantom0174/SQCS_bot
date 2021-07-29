@@ -13,7 +13,8 @@ class ErrorHandler(CogExtension):
         await ctx.send(content=f'`{error}`', delete_after=8.0)
 
         # search for real traceback breakpoint
-        error_message = traceback.format_exception(type(error), error, error.__traceback__)
+        error_message = traceback.format_exception(
+            type(error), error, error.__traceback__)
         until_index = None
 
         for index, msg in enumerate(error_message):

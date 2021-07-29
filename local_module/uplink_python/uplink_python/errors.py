@@ -89,7 +89,8 @@ class BandwidthLimitExceededError(StorjException):
     """
 
     def __init__(self, details):
-        super().__init__("bandwidth limit exceeded", ERROR_BANDWIDTH_LIMIT_EXCEEDED, details)
+        super().__init__("bandwidth limit exceeded",
+                         ERROR_BANDWIDTH_LIMIT_EXCEEDED, details)
 
 
 class BucketNameInvalidError(StorjException):

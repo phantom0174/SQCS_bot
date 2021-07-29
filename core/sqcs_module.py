@@ -7,7 +7,8 @@ from core.db.jsonstorage import JsonApi
 async def report_lect_attend(bot, attendants: list, week: int) -> None:
     report_json = JsonApi.get('LectureLogging')
     guild = bot.get_guild(784607509629239316)
-    report_channel = discord.utils.get(guild.text_channels, name='sqcs-lecture-attend')
+    report_channel = discord.utils.get(
+        guild.text_channels, name='sqcs-lecture-attend')
 
     fluct_ext = Fluct(score_mode='lect_attend')
     for member_id in attendants:

@@ -41,7 +41,8 @@ class Uplink:
         # private members of PyStorj class with reference objects
         # include the golang exported libuplink library functions
         if Uplink.__instance is None:
-            so_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'libuplinkc.dll')
+            so_path = os.path.join(os.path.dirname(
+                os.path.abspath(__file__)), 'libuplinkc.dll')
             if os.path.exists(so_path):
                 self.m_libuplink = ctypes.CDLL(so_path)
             else:
@@ -70,7 +71,8 @@ class Uplink:
                 entries_obj = object_.contents.custom.entries[i]
                 entries.append(CustomMetadataEntry(key=entries_obj.key.decode("utf-8"),
                                                    key_length=entries_obj.key_length,
-                                                   value=entries_obj.value.decode("utf-8"),
+                                                   value=entries_obj.value.decode(
+                                                       "utf-8"),
                                                    value_length=entries_obj.value_length))
             else:
                 entries.append(CustomMetadataEntry())
@@ -205,7 +207,8 @@ class Uplink:
 
         #
         # prepare the input for the function
-        serialized_access_ptr = ctypes.c_char_p(serialized_access.encode('utf-8'))
+        serialized_access_ptr = ctypes.c_char_p(
+            serialized_access.encode('utf-8'))
         #
         # declare types of arguments and response of the corresponding golang function
         self.m_libuplink.uplink_parse_access.argtypes = [ctypes.c_char_p]
@@ -213,7 +216,8 @@ class Uplink:
         #
 
         # get parsed access by calling the exported golang function
-        access_result = self.m_libuplink.uplink_parse_access(serialized_access_ptr)
+        access_result = self.m_libuplink.uplink_parse_access(
+            serialized_access_ptr)
         #
         # if error occurred
         if bool(access_result.error):

@@ -69,7 +69,8 @@ class FluctMath:
         theta2 = sgn(active_days - (1 / 2) * member_week_count)
 
         return float(
-            -sgn(theta1 + theta2) * abs((contrib - avr_contrib) * (theta1 + theta2)) / 2
+            -sgn(theta1 + theta2) *
+            abs((contrib - avr_contrib) * (theta1 + theta2)) / 2
         )
 
     @staticmethod

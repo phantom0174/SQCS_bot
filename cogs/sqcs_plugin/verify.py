@@ -13,7 +13,8 @@ class Verify(CogExtension):
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
     async def lect_generate_token(self, ctx, lecture_week: int, *, accounts):
-        lect_set_cursor, verify_cursor = Mongo('sqcs-bot').get_curs(['LectureSetting', 'Verification'])
+        lect_set_cursor, verify_cursor = Mongo(
+            'sqcs-bot').get_curs(['LectureSetting', 'Verification'])
         lect_data = lect_set_cursor.find_one({"week": lecture_week})
         if not lect_data:
             return await ctx.send(f":x: There's no lecture on week {lecture_week}")
@@ -43,9 +44,9 @@ class Verify(CogExtension):
 
                 with open('./assets/email/external_lecture_template.txt', mode='r', encoding='utf8') as template:
                     content = template.read() \
-                            .replace('{time_stamp}', Time.get_info('main')) \
-                            .replace('{lect_name}', lecture_name) \
-                            .replace('{lect_token}', token)
+                        .replace('{time_stamp}', Time.get_info('main')) \
+                        .replace('{lect_name}', lecture_name) \
+                        .replace('{lect_token}', token)
 
                     await send_email(
                         to_account=account,

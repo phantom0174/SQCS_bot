@@ -11,7 +11,8 @@ class DataBase(CogExtension):
 
     @db.command()
     async def refresh_db(self, ctx):
-        cursors = list(Mongo('LightCube').get_curs(['MainFluctlights', 'ViceFluctlights']))
+        cursors = list(Mongo('LightCube').get_curs(
+            ['MainFluctlights', 'ViceFluctlights']))
         members_id = [member.id for member in ctx.guild.members]
 
         condition = {

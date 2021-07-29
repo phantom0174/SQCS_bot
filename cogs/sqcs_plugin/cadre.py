@@ -15,8 +15,9 @@ class Cadre(CogExtension):
 
     @ca.command()
     async def apply(self, ctx, cadre: str):
-        cadre_set_cursor, cadre_cursor = Mongo('sqcs-bot').get_curs(['CadreSetting', 'Cadre'])
-        
+        cadre_set_cursor, cadre_cursor = Mongo(
+            'sqcs-bot').get_curs(['CadreSetting', 'Cadre'])
+
         cadre_setting = cadre_set_cursor.find_one({"_id": 0})
         if ctx.channel.id != cadre_setting['apply_channel']:
             return

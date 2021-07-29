@@ -51,10 +51,12 @@ async def delete_bucket(bucket_name: str) -> bool:
     # if delete bucket fails due to "not empty", delete all the objects and try again
     except BucketNotEmptyError as exception:
         logging.warning(f'Error while deleting bucket: {exception.message}')
-        logging.warning("Deleting object's inside bucket and try to delete bucket again...")
+        logging.warning(
+            "Deleting object's inside bucket and try to delete bucket again...")
 
         # list objects in given bucket recursively using ListObjectsOptions
-        objects_list = project.list_objects(bucket_name, ListObjectsOptions(recursive=True))
+        objects_list = project.list_objects(
+            bucket_name, ListObjectsOptions(recursive=True))
         # iterate through all objects path
         for obj in objects_list:
             # delete selected object

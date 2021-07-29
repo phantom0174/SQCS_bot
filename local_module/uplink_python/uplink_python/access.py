@@ -133,11 +133,13 @@ class Access:
 
         #
         # declare types of arguments and response of the corresponding golang function
-        self.uplink.m_libuplink.uplink_open_project.argtypes = [ctypes.POINTER(_AccessStruct)]
+        self.uplink.m_libuplink.uplink_open_project.argtypes = [
+            ctypes.POINTER(_AccessStruct)]
         self.uplink.m_libuplink.uplink_open_project.restype = _ProjectResult
         #
         # open project by calling the exported golang function
-        project_result = self.uplink.m_libuplink.uplink_open_project(self.access)
+        project_result = self.uplink.m_libuplink.uplink_open_project(
+            self.access)
         #
         # if error occurred
         if bool(project_result.error):
@@ -171,7 +173,8 @@ class Access:
             config_obj = config.get_structure()
         #
         # open project by calling the exported golang function
-        project_result = self.uplink.m_libuplink.uplink_config_open_project(config_obj, self.access)
+        project_result = self.uplink.m_libuplink.uplink_config_open_project(
+            config_obj, self.access)
         #
         # if error occurred
         if bool(project_result.error):
@@ -191,11 +194,13 @@ class Access:
 
         #
         # declare types of arguments and response of the corresponding golang function
-        self.uplink.m_libuplink.uplink_access_serialize.argtypes = [ctypes.POINTER(_AccessStruct)]
+        self.uplink.m_libuplink.uplink_access_serialize.argtypes = [
+            ctypes.POINTER(_AccessStruct)]
         self.uplink.m_libuplink.uplink_access_serialize.restype = _StringResult
         #
         # get serialized access by calling the exported golang function
-        string_result = self.uplink.m_libuplink.uplink_access_serialize(self.access)
+        string_result = self.uplink.m_libuplink.uplink_access_serialize(
+            self.access)
         #
         # if error occurred
         if bool(string_result.error):
@@ -228,7 +233,8 @@ class Access:
         # declare types of arguments and response of the corresponding golang function
         self.uplink.m_libuplink.uplink_access_share.argtypes = [ctypes.POINTER(_AccessStruct),
                                                                 _PermissionStruct,
-                                                                ctypes.POINTER(_SharePrefixStruct),
+                                                                ctypes.POINTER(
+                                                                    _SharePrefixStruct),
                                                                 ctypes.c_size_t]
         self.uplink.m_libuplink.uplink_access_share.restype = _AccessResult
         #
@@ -246,7 +252,8 @@ class Access:
         else:
             num_of_structs = len(shared_prefix)
             li_array_size = (_SharePrefixStruct * num_of_structs)()
-            array = ctypes.cast(li_array_size, ctypes.POINTER(_SharePrefixStruct))
+            array = ctypes.cast(
+                li_array_size, ctypes.POINTER(_SharePrefixStruct))
             for i, val in enumerate(shared_prefix):
                 array[i] = val.get_structure()
             shared_prefix_obj = array

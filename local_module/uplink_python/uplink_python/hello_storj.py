@@ -61,7 +61,8 @@ if __name__ == "__main__":
             print("Deleting object's inside bucket and try to delete bucket again...")
             # list objects in given bucket recursively using ListObjectsOptions
             print("Listing and deleting object's inside bucket...")
-            objects_list = project.list_objects(MY_BUCKET, ListObjectsOptions(recursive=True))
+            objects_list = project.list_objects(
+                MY_BUCKET, ListObjectsOptions(recursive=True))
             # iterate through all objects path
             for obj in objects_list:
                 # delete selected object

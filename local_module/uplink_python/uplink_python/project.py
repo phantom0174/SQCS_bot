@@ -85,7 +85,8 @@ class Project:
         bucket_name_ptr = ctypes.c_char_p(bucket_name.encode('utf-8'))
 
         # create bucket by calling the exported golang function
-        bucket_result = self.uplink.m_libuplink.uplink_create_bucket(self.project, bucket_name_ptr)
+        bucket_result = self.uplink.m_libuplink.uplink_create_bucket(
+            self.project, bucket_name_ptr)
         #
         # if error occurred
         if bool(bucket_result.error):
@@ -118,7 +119,8 @@ class Project:
         bucket_name_ptr = ctypes.c_char_p(bucket_name.encode('utf-8'))
 
         # open bucket if doesn't exist by calling the exported golang function
-        bucket_result = self.uplink.m_libuplink.uplink_ensure_bucket(self.project, bucket_name_ptr)
+        bucket_result = self.uplink.m_libuplink.uplink_ensure_bucket(
+            self.project, bucket_name_ptr)
         #
         # if error occurred
         if bool(bucket_result.error):
@@ -149,7 +151,8 @@ class Project:
         bucket_name_ptr = ctypes.c_char_p(bucket_name.encode('utf-8'))
 
         # get bucket information by calling the exported golang function
-        bucket_result = self.uplink.m_libuplink.uplink_stat_bucket(self.project, bucket_name_ptr)
+        bucket_result = self.uplink.m_libuplink.uplink_stat_bucket(
+            self.project, bucket_name_ptr)
         #
         # if error occurred
         if bool(bucket_result.error):
@@ -173,7 +176,8 @@ class Project:
         #
         # declare types of arguments and response of the corresponding golang function
         self.uplink.m_libuplink.uplink_list_buckets.argtypes =\
-            [ctypes.POINTER(_ProjectStruct), ctypes.POINTER(_ListBucketsOptionsStruct)]
+            [ctypes.POINTER(_ProjectStruct), ctypes.POINTER(
+                _ListBucketsOptionsStruct)]
         self.uplink.m_libuplink.uplink_list_buckets.restype =\
             ctypes.POINTER(_BucketIterator)
         #
@@ -194,22 +198,26 @@ class Project:
         #
         # prepare the input for the function
         if list_bucket_options is None:
-            list_bucket_options_obj = ctypes.POINTER(_ListBucketsOptionsStruct)()
+            list_bucket_options_obj = ctypes.POINTER(
+                _ListBucketsOptionsStruct)()
         else:
-            list_bucket_options_obj = ctypes.byref(list_bucket_options.get_structure())
+            list_bucket_options_obj = ctypes.byref(
+                list_bucket_options.get_structure())
 
         # get bucket list by calling the exported golang function
         bucket_iterator = self.uplink.m_libuplink.uplink_list_buckets(self.project,
                                                                       list_bucket_options_obj)
 
-        bucket_iterator_err = self.uplink.m_libuplink.uplink_bucket_iterator_err(bucket_iterator)
+        bucket_iterator_err = self.uplink.m_libuplink.uplink_bucket_iterator_err(
+            bucket_iterator)
         if bool(bucket_iterator_err):
             raise _storj_exception(bucket_iterator_err.contents.code,
                                    bucket_iterator_err.contents.message.decode("utf-8"))
 
         bucket_list = []
         while self.uplink.m_libuplink.uplink_bucket_iterator_next(bucket_iterator):
-            bucket = self.uplink.m_libuplink.uplink_bucket_iterator_item(bucket_iterator)
+            bucket = self.uplink.m_libuplink.uplink_bucket_iterator_item(
+                bucket_iterator)
             bucket_list.append(self.uplink.bucket_from_result(bucket))
 
         return bucket_list
@@ -239,7 +247,8 @@ class Project:
         bucket_name_ptr = ctypes.c_char_p(bucket_name.encode('utf-8'))
 
         # delete bucket by calling the exported golang function
-        bucket_result = self.uplink.m_libuplink.uplink_delete_bucket(self.project, bucket_name_ptr)
+        bucket_result = self.uplink.m_libuplink.uplink_delete_bucket(
+            self.project, bucket_name_ptr)
         #
         # if error occurred
         if bool(bucket_result.error):
@@ -320,23 +329,27 @@ class Project:
         #
         # prepare the input for the function
         if list_object_options is None:
-            list_object_options_obj = ctypes.POINTER(_ListObjectsOptionsStruct)()
+            list_object_options_obj = ctypes.POINTER(
+                _ListObjectsOptionsStruct)()
         else:
-            list_object_options_obj = ctypes.byref(list_object_options.get_structure())
+            list_object_options_obj = ctypes.byref(
+                list_object_options.get_structure())
         bucket_name_ptr = ctypes.c_char_p(bucket_name.encode('utf-8'))
 
         # get object list by calling the exported golang function
         object_iterator = self.uplink.m_libuplink.uplink_list_objects(self.project, bucket_name_ptr,
                                                                       list_object_options_obj)
 
-        object_iterator_err = self.uplink.m_libuplink.uplink_object_iterator_err(object_iterator)
+        object_iterator_err = self.uplink.m_libuplink.uplink_object_iterator_err(
+            object_iterator)
         if bool(object_iterator_err):
             raise _storj_exception(object_iterator_err.contents.code,
                                    object_iterator_err.contents.message.decode("utf-8"))
 
         object_list = []
         while self.uplink.m_libuplink.uplink_object_iterator_next(object_iterator):
-            object_ = self.uplink.m_libuplink.uplink_object_iterator_item(object_iterator)
+            object_ = self.uplink.m_libuplink.uplink_object_iterator_item(
+                object_iterator)
             object_list.append(self.uplink.object_from_result(object_))
         return object_list
 
@@ -384,8 +397,10 @@ class Project:
         """
         #
         # declare types of arguments and response of the corresponding golang function
-        self.uplink.m_libuplink.uplink_close_project.argtypes = [ctypes.POINTER(_ProjectStruct)]
-        self.uplink.m_libuplink.uplink_close_project.restype = ctypes.POINTER(_Error)
+        self.uplink.m_libuplink.uplink_close_project.argtypes = [
+            ctypes.POINTER(_ProjectStruct)]
+        self.uplink.m_libuplink.uplink_close_project.restype = ctypes.POINTER(
+            _Error)
         #
         # close Storj project by calling the exported golang function
         error = self.uplink.m_libuplink.uplink_close_project(self.project)
@@ -463,7 +478,8 @@ class Project:
         if download_options is None:
             download_options_obj = ctypes.POINTER(_DownloadOptionsStruct)()
         else:
-            download_options_obj = ctypes.byref(download_options.get_structure())
+            download_options_obj = ctypes.byref(
+                download_options.get_structure())
 
         bucket_name_ptr = ctypes.c_char_p(bucket_name.encode('utf-8'))
         storj_path_ptr = ctypes.c_char_p(storj_path.encode('utf-8'))
