@@ -4,9 +4,7 @@ from core.utils import DiscordExt
 from core.cog_config import CogExtension
 
 
-"""
-This extension is currently not in use.
-"""
+# This extension is currently not in use.
 
 
 class WorkShop(CogExtension):

@@ -1,10 +1,10 @@
+import discord
 from discord.ext import commands
 from core.cog_config import CogExtension
 from core.db.jsonstorage import JsonApi
 from core.db.mongodb import Mongo
-from typing import Union
-import discord
 from core.fluctlight_ext import Fluct
+from typing import Union
 
 
 class KickMember(CogExtension):

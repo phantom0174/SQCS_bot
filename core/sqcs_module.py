@@ -1,7 +1,7 @@
-from core.db.jsonstorage import JsonApi
 import discord
 from core.utils import Time
 from core.fluctlight_ext import Fluct
+from core.db.jsonstorage import JsonApi
 
 
 async def report_lect_attend(bot, attendants: list, week: int) -> None:

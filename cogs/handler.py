@@ -41,7 +41,7 @@ class ErrorHandler(CogExtension):
         cmd_parents = ctx.command.full_parent_name
 
         if isinstance(ctx.channel, discord.DMChannel):
-            channel_name = f'user dm_channel'
+            channel_name = 'user dm_channel'
         else:
             channel_name = ctx.channel.name
         user_name = ctx.author.name

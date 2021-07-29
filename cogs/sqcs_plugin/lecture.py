@@ -282,8 +282,8 @@ class LectureAttendVerify(CogExtension):
 
         if not data:
             return await ctx.send(
-                f':x: 講座資料庫中不存在這個token\n'
-                f'請在15秒後重試或聯絡總召'
+                ':x: 講座資料庫中不存在這個token\n'
+                '請在15秒後重試或聯絡總召'
             )
 
         # fetching score parameters

@@ -10,6 +10,7 @@ link_header = 'https://api.jsonstorage.net/v1/json/'
 json_links = str(os.environ.get("JSON_API_ADAPTER_LINK"))
 link_dict = requests.get(link_header + json_links).json()['links']
 
+
 class JsonApi:
     @staticmethod
     def reload_switcher():
@@ -23,13 +24,13 @@ class JsonApi:
 
         response = requests.get(link_header + link_dict[name])
         return response.json()
-
+    
     @staticmethod
     def put(name, alter_json) -> None:
         if name not in link_dict.keys():
             return None
 
-        requests.put(link_header + link_dict[name], json=alter_json)
+        return requests.put(link_header + link_dict[name], json=alter_json)
 
     # humanity extension parser
     @staticmethod

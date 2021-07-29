@@ -15,11 +15,9 @@ class Cadre(CogExtension):
 
     @ca.command()
     async def apply(self, ctx, cadre: str):
-
         cadre_set_cursor, cadre_cursor = Mongo('sqcs-bot').get_curs(['CadreSetting', 'Cadre'])
         
         cadre_setting = cadre_set_cursor.find_one({"_id": 0})
-
         if ctx.channel.id != cadre_setting['apply_channel']:
             return
 
@@ -131,6 +129,7 @@ class Cadre(CogExtension):
         cadre_cursor.delete_one({"_id": delete_id})
         await ctx.send(f':white_check_mark: 成員 {data["name"]}({delete_id}) 的申請已被刪除！')
 
+
 # need to be fixed!
 class GuildRole(CogExtension):
     @commands.group(aliases=['rl'])
@@ -154,7 +153,7 @@ class GuildRole(CogExtension):
                 except:
                     pass
 
-        await ctx.send(f':white_check_mark: 指令執行完畢！')
+        await ctx.send(':white_check_mark: 指令執行完畢！')
 
     @role_level.command()
     async def init_single(self, ctx, member: discord.Member):

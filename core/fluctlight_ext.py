@@ -158,8 +158,7 @@ async def guild_weekly_update(bot) -> NoReturn:
     # Very important update function
     # ------------------------------
 
-    # set-up self_client
-    
+    # set-up self_client    
     fluctlight_cursor = Mongo('LightCube').get_cur('MainFluctlights')
     score_set_cursor = Mongo('sqcs-bot').get_cur('ScoreSetting')
 

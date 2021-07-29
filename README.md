@@ -5,6 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![wakatime](https://wakatime.com/badge/github/phantom0174/SQCS_bot.svg)](https://wakatime.com/badge/github/phantom0174/SQCS_bot)
 [![CodeFactor](https://www.codefactor.io/repository/github/phantom0174/sqcs_bot/badge)](https://www.codefactor.io/repository/github/phantom0174/sqcs_bot)
+[![DeepSource](https://deepsource.io/gh/phantom0174/SQCS_bot.svg/?label=active+issues&show_trend=true&token=GuhjLeeI6k-xl0SVc50rSNH5)](https://deepsource.io/gh/phantom0174/SQCS_bot/?ref=repository-badge)
 ![current status](https://img.shields.io/uptimerobot/status/m786417212-72995a6e32a6e120933f8255)
 ![uptime ratio](https://img.shields.io/uptimerobot/ratio/7/m786417212-72995a6e32a6e120933f8255)
 

@@ -15,7 +15,7 @@ def sgn(num):
 
 class Time:
     @staticmethod
-    def get_info(mode: str = 'custom', custom_form: str = '') -> Union[str, int]:
+    def get_info(mode: str = 'custom', custom_form: str = '') -> Union[str, int, None]:
         dt1 = datetime.utcnow().replace(tzinfo=timezone.utc)
         dt2 = dt1.astimezone(timezone(timedelta(hours=8)))  # 轉換時區 -> 東八區
 
@@ -35,6 +35,8 @@ class Time:
             return int(dt2.isoweekday())
         if mode == 'day_of_week':
             return str(dt2.strftime("%A"))
+
+        return None
 
     @staticmethod
     def get_range(hour) -> str:

@@ -6,9 +6,7 @@ from core.db.mongodb import Mongo
 from core.utils import Time
 
 
-"""
-This extension is currently not in use.
-"""
+# This extension is currently not in use.
 
 
 class Verify(CogExtension):

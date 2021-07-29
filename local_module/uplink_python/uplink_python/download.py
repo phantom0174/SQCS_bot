@@ -2,7 +2,7 @@
 # pylint: disable=too-many-arguments
 
 # This file has been modified by phantom0174 at 2021/7/17, SQCS_bot version 1.29.7.17
-# modified content: change absolute import to relative import
+# modified content: change absolute import to relative import, using min()
 
 import ctypes
 import os
@@ -124,8 +124,7 @@ class Download:
         if not buffer_size:
             buffer_size = COPY_BUFSIZE
         file_size = self.file_size()
-        if buffer_size > file_size:
-            buffer_size = file_size
+        buffer_size = min(buffer_size, file_size)
         while file_size:
             buf, bytes_read = self.read(buffer_size)
             if buf:
