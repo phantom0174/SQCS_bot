@@ -1,13 +1,13 @@
+import os
 from discord.ext import commands
 import discord
-import os
 from .core import utils as utl
 
 
 class SQCSBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.all()
-        self.client = super().__init__(
+        super().__init__(
             command_prefix='+',
             intents=intents,
             case_insensitive=True,
@@ -23,7 +23,7 @@ class SQCSBot(commands.Bot):
             if filename.endswith('.py'):
                 # soft handling
                 try:
-                    self.client.load_extension(f'bot.cogs.{filename[:-3]}')
+                    super().load_extension(f'bot.cogs.{filename[:-3]}')
                 except Exception as e:
                     print(f'Error loading bot.cogs.{filename[:-3]}')
                     print(e)
@@ -31,7 +31,7 @@ class SQCSBot(commands.Bot):
                 for sub_filename in os.listdir(f'./bot/cogs/{filename}'):
                     if sub_filename.endswith('.py'):
                         try:
-                            self.client.load_extension(f'bot.cogs.{filename}.{sub_filename[:-3]}')
+                            super().load_extension(f'bot.cogs.{filename}.{sub_filename[:-3]}')
                         except Exception as e:
                             print(f'Error loading bot.cogs.{filename}.{sub_filename[:-3]}')
                             print(e)
@@ -40,7 +40,7 @@ class SQCSBot(commands.Bot):
         self.setup()
 
         token = os.environ.get("BOT_TOKEN")
-        self.client.run(token, reconnect=True)
+        super().run(token, reconnect=True)
 
     async def on_ready(self):
         print(">--->> Bot is online <<---<")
@@ -52,5 +52,5 @@ class SQCSBot(commands.Bot):
         )
 
     async def on_disconnect(self):
-        report_channel = self.client.get_channel(785146879004508171)
+        report_channel = super().get_channel(785146879004508171)
         await report_channel.send(f':exclamation: Bot disconnected! {utl.Time.get_info("whole")}')

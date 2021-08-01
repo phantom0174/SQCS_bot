@@ -13,7 +13,7 @@ Format = (
 )
 
 logging.basicConfig(
-    filename='./buffer/bot.log',
+    filename='./bot/buffer/bot.log',
     level=logging.WARNING,
     format=Format
 )

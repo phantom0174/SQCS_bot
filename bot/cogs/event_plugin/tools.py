@@ -1,5 +1,5 @@
 from discord.ext import commands
-from core.cog_config import CogExtension
+from ...core.cog_config import CogExtension
 import discord
 
 
