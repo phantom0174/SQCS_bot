@@ -6,7 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/jsons" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/cogs" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/wrapper" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/local_module" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/../../SQCS-TW-Github/bot-developing/devdata" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.9.4" jdkType="Python SDK" />
