@@ -1,7 +1,9 @@
 """Module with Access class and access methods to get access grant to access project"""
 
 # This file has been modified by phantom0174 at 2021/7/17, SQCS_bot version 1.29.7.17
-# modified content: change absolute import to relative import
+# modified content: change absolute import to relative import, typing
+
+from typing import List
 
 import ctypes
 import hashlib
@@ -203,7 +205,7 @@ class Access:
                                    string_result.error.contents.message.decode("utf-8"))
         return string_result.string.decode("utf-8")
 
-    def share(self, permission: Permission = None, shared_prefix: [SharePrefix] = None):
+    def share(self, permission: Permission = None, shared_prefix: List[SharePrefix] = None):
         """
         function Share creates a new access grant with specific permissions.
 

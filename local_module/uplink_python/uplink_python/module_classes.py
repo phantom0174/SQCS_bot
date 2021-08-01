@@ -2,7 +2,9 @@
 # pylint: disable=too-few-public-methods, too-many-arguments
 
 # This file has been modified by phantom0174 at 2021/7/17, SQCS_bot version 1.29.7.17
-# modified content: change absolute import to relative import
+# modified content: change absolute import to relative import, typing
+
+from typing import List
 
 import ctypes
 
@@ -292,7 +294,7 @@ class CustomMetadata:
         converts python class object to python dictionary
     """
 
-    def __init__(self, entries: [CustomMetadataEntry] = None, count: int = 0):
+    def __init__(self, entries: List[CustomMetadataEntry] = None, count: int = 0):
         """Constructs all the necessary attributes for the CustomMetadata object."""
 
         self.entries = entries
