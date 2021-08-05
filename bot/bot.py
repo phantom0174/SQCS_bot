@@ -40,7 +40,7 @@ class SQCSBot(commands.Bot):
         self.setup()
 
         token = os.environ.get("BOT_TOKEN")
-        super().run(token, reconnect=True)
+        super().run(token)
 
     async def on_ready(self):
         print(">--->> Bot is online <<---<")

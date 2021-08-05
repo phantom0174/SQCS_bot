@@ -63,7 +63,7 @@ class CmdLogAuto(CogExtension):
             JsonApi.put('CmdLogging', logs_json)
 
 
-class LocalLogAuto(CmdLogAuto):
+class LocalLogAuto(CogExtension):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -71,7 +71,7 @@ class LocalLogAuto(CmdLogAuto):
 
     @tasks.loop(minutes=30)
     async def local_log_upload(self):
-        with open('./buffer/bot.log', mode='r', encoding='utf8') as temp_file:
+        with open('./bot/buffer/bot.log', mode='r', encoding='utf8') as temp_file:
             local_logs = temp_file.read().split('\n')
 
         if local_logs is None:
@@ -86,7 +86,7 @@ class LocalLogAuto(CmdLogAuto):
         JsonApi.put('CmdLogging', log_json)
 
         # flush local logs
-        with open('./buffer/bot.log', mode='w', encoding='utf8') as temp_file:
+        with open('./bot/buffer/bot.log', mode='w', encoding='utf8') as temp_file:
             temp_file.write('')
 
 
@@ -94,19 +94,19 @@ async def release_log(title, target_channel: discord.TextChannel, report_channel
     logs_json = JsonApi.get(title)
     logs = '\n'.join(logs_json["logs"])
 
-    with open('./buffer/report.txt', mode='w', encoding='utf8') as temp_file:
+    with open('./bot/buffer/report.txt', mode='w', encoding='utf8') as temp_file:
         temp_file.write(logs)
 
     if logs == '':
         return
 
-    await target_channel.send(file=discord.File('./buffer/report.txt'))
+    await target_channel.send(file=discord.File('./bot/buffer/report.txt'))
 
     if report_channel is not None:
         await report_channel.send(f':white_check_mark: 記錄檔 {title} 已釋出！')
 
     # clear buffer content
-    with open('./buffer/report.txt', mode='w', encoding='utf8') as temp_file:
+    with open('./bot/buffer/report.txt', mode='w', encoding='utf8') as temp_file:
         temp_file.write('')
 
     logs_json["logs"].clear()
@@ -116,3 +116,4 @@ async def release_log(title, target_channel: discord.TextChannel, report_channel
 def setup(bot):
     bot.add_cog(Log(bot))
     bot.add_cog(CmdLogAuto(bot))
+    bot.add_cog(LocalLogAuto(bot))

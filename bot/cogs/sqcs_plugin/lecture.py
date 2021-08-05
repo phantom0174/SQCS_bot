@@ -131,7 +131,7 @@ class Lecture(CogExtension):
 
         # join the voice channel to speak
         voice_client = await voice_channel.connect()
-        audio_source = discord.FFmpegPCMAudio('./assets/audio/lecture_starts.mp3')
+        audio_source = discord.FFmpegPCMAudio('./bot/assets/audio/lecture_starts.mp3')
         voice_client.play(audio_source)
         while voice_client.is_playing():
             await asyncio.sleep(1)
@@ -209,7 +209,7 @@ class Lecture(CogExtension):
 
         # join the voice channel to speak
         voice_client = await voice_channel.connect()
-        audio_source = discord.FFmpegPCMAudio('./assets/audio/lecture_ends.mp3')
+        audio_source = discord.FFmpegPCMAudio('./bot/assets/audio/lecture_ends.mp3')
         voice_client.play(audio_source)
         while voice_client.is_playing():
             await asyncio.sleep(1)

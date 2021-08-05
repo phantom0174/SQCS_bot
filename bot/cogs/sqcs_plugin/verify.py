@@ -41,7 +41,7 @@ class Verify(CogExtension):
                 }
                 verify_cursor.insert_one(token_data)
 
-                with open('./assets/email/external_lecture_template.txt', mode='r', encoding='utf8') as template:
+                with open('./bot/assets/email/external_lecture_template.txt', mode='r', encoding='utf8') as template:
                     content = template.read() \
                             .replace('{time_stamp}', Time.get_info('main')) \
                             .replace('{lect_name}', lecture_name) \
