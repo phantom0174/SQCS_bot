@@ -7,3 +7,4 @@ PyNaCl>=1.4.0
 python-dotenv>=0.18.0
 yagmail>=0.14.256
 cn2an>=0.5.11
+gcsa>=1.2.0
