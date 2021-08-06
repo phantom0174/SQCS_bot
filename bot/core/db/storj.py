@@ -21,18 +21,42 @@ access = uplink.request_access_with_passphrase(
 project = access.open_project()
 
 
-async def list_file(bucket: str):
+async def list_file(bucket_name: str, options: dict = None):
+    # default options
+    options = options or {
+        "prefix": '',
+        "recursive": True,
+        "system": False
+    }
+
     objects_list = project.list_objects(
-        bucket,
-        ListObjectsOptions(
-            recursive=True,
-            system=True
-        )
+        bucket_name,
+        ListObjectsOptions(**options)
     )
-    # print all objects path
-    for obj in objects_list:
-        print(obj.key, " | ", obj.is_prefix)  # as python class object
-        print(obj.get_dict())  # as python dictionary
+    
+    return [obj.key for obj in objects_list]
+
+
+async def delete_file(bucket_name: str, storj_path: str) -> bool:
+    try:
+        project.delete_object(bucket_name, storj_path)
+        return True
+    except:
+        logging.warning(f'Error while deleting files: {bucket_name}, {storj_path}')
+        return False
+
+
+async def delete_folder(bucket_name: str, storj_path: str):
+    search_options = {
+        "prefix": storj_path,
+        "recursive": False,
+        "system": False
+    }
+    for file in list_file(bucket_name, search_options):
+        if file.endswith('/'):
+            await delete_folder(bucket_name, file)
+        elif '.' in file.split('/')[-1]:
+            await delete_file(bucket_name, file)
 
 
 async def create_bucket(bucket_name: str) -> bool:
@@ -65,19 +89,19 @@ async def delete_bucket(bucket_name: str) -> bool:
         return False
 
 
-async def upload_file(bucket: str, local_file_path: str, target_file_path: str):
-    with open(local_file_path, 'r+b') as file_handle:
+async def upload_file(bucket_name: str, local_path: str, storj_path: str):
+    with open(local_path, 'r+b') as file_handle:
         # get upload handle to specified bucket and upload file path
-        upload = project.upload_object(bucket, target_file_path)
+        upload = project.upload_object(bucket_name, storj_path)
         # upload file on storj
         upload.write_file(file_handle)
         # commit the upload
         upload.commit()
 
 
-async def download_file(bucket: str, local_file_path: str, target_file_path: str):
-    with open(local_file_path, 'w+b') as file_handle:
-        download = project.download_object(bucket, target_file_path)
+async def download_file(bucket_name: str, local_path: str, storj_path: str):
+    with open(local_path, 'w+b') as file_handle:
+        download = project.download_object(bucket_name, storj_path)
         # download data from storj to file
         download.read_file(file_handle)
         # close the download stream

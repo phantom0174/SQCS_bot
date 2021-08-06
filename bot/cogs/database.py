@@ -1,6 +1,11 @@
-from discord.ext import commands
+from discord.ext import commands, tasks
 from ..core.cog_config import CogExtension
-from ..core.db.mongodb import Mongo
+from ..core.db.mongodb import Mongo, mongo_client
+from ..core.db import storj
+import pendulum as pend
+from ..core.utils import Time
+import os
+import json
 
 
 class DataBase(CogExtension):
@@ -68,5 +73,98 @@ class DataBase(CogExtension):
         await ctx.send(':white_check_mark: 指令執行完畢！')
 
 
+class MongoDBBackup(CogExtension):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.bucket = 'MongoDBBackup'
+
+        self.backup.start()
+        self.delete_outdated.start()
+
+    @tasks.loop(hours=1)
+    async def backup(self):
+        time_now = pend.now('Asia/Taipei')
+        time_tomorrow = pend.tomorrow('Asia/Taipei')
+
+        # backup at time 23:00 ~ 24:00
+        if (time_tomorrow - time_now).in_minutes() > 60:
+            return 
+
+        today = Time.get_info('main')
+
+        search_options = {
+            "prefix": f"{today}/",
+            "recursive": True,
+            "system": False
+        }
+        result = await storj.list_file(
+            bucket_name=self.bucket,
+            options=search_options
+        )
+
+        # database has been backuped
+        if result:
+            return 
+
+        dbs = mongo_client.list_database_names()
+        dbs = [item for item in dbs if item not in ['admin', 'local']]
+
+        for db in dbs:
+            for coll in db.list_collection_names():
+
+                cursor = db[coll]
+                coll_data = cursor.find_all({})
+
+                if not coll_data:
+                    continue
+                
+                coll_to_json = [dict(data) for data in coll_data]
+                with open(f'./bot/buffer/{coll}.json', 'w', encoding='utf8') as buffer:
+                    buffer.write(json.dumps(
+                        obj=coll_to_json,
+                        ensure_ascii=False,
+                        sort_keys=False,
+                        indent=4
+                    ))
+
+                await storj.upload_file(
+                    bucket_name=self.bucket,
+                    local_path=f'./bot/buffer/{coll}.json',
+                    storj_path=f'{today}/{db}/{coll}.json'
+                )
+
+                try:
+                    os.remove(f'./bot/buffer/{coll}.json')
+                except:
+                    pass
+
+    @tasks.loop(hours=2)
+    async def delete_outdated(self):
+        time_now = pend.now('Asia/Taipei')
+
+        search_options = {
+            "prefix": '',
+            "recursive": False,
+            "system": False
+        }
+        storj_root_folders = await storj.list_file(
+            bucket_name=self.bucket,
+            options=search_options
+        )
+
+        for folder_name in storj_root_folders:
+            # "name/" -> "name"
+            time_folder_create = pend.parser(folder_name[:-1], tz='Asia/Taipei')
+
+            if (time_folder_create - time_now).in_days() > 14:
+                await storj.delete_folder(
+                    bucket_name=self.bucket,
+                    storj_path=folder_name
+                )
+
+
+
 def setup(bot):
     bot.add_cog(DataBase(bot))
+    bot.add_cog(MongoDBBackup(bot))
