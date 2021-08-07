@@ -71,3 +71,7 @@ class Cogs(CogExtension):
         await self.bot.logout()
         await asyncio.sleep(1)
         sys.exit(0)
+
+
+def setup(bot):
+    bot.add_cog(Cogs(bot))

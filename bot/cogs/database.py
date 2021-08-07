@@ -6,6 +6,7 @@ import pendulum as pend
 from ..core.utils import Time
 import os
 import json
+import bson
 
 
 class DataBase(CogExtension):
@@ -77,12 +78,12 @@ class MongoDBBackup(CogExtension):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.bucket = 'MongoDBBackup'
+        self.bucket = 'mongodbbackup'
 
         self.backup.start()
         self.delete_outdated.start()
 
-    @tasks.loop(hours=1)
+    @tasks.loop(minutes=20)
     async def backup(self):
         time_now = pend.now('Asia/Taipei')
         time_tomorrow = pend.tomorrow('Asia/Taipei')
@@ -110,28 +111,35 @@ class MongoDBBackup(CogExtension):
         dbs = mongo_client.list_database_names()
         dbs = [item for item in dbs if item not in ['admin', 'local']]
 
-        for db in dbs:
+        for db_name in dbs:
+            db = mongo_client[db_name]
             for coll in db.list_collection_names():
 
                 cursor = db[coll]
-                coll_data = cursor.find_all({})
+                coll_data = cursor.find({})
 
                 if not coll_data:
                     continue
                 
-                coll_to_json = [dict(data) for data in coll_data]
+                def remake_id(obj: dict):
+                    if isinstance(obj["_id"], bson.objectid.ObjectId):
+                        obj["_id"] = str(obj["_id"])
+                    return obj
+
+                coll_to_json = [remake_id(item) for item in list(coll_data)]
+                
+                coll_to_json = json.dumps(
+                    coll_to_json,
+                    ensure_ascii=False,
+                    indent=4
+                )
                 with open(f'./bot/buffer/{coll}.json', 'w', encoding='utf8') as buffer:
-                    buffer.write(json.dumps(
-                        obj=coll_to_json,
-                        ensure_ascii=False,
-                        sort_keys=False,
-                        indent=4
-                    ))
+                    buffer.write(coll_to_json)
 
                 await storj.upload_file(
                     bucket_name=self.bucket,
                     local_path=f'./bot/buffer/{coll}.json',
-                    storj_path=f'{today}/{db}/{coll}.json'
+                    storj_path=f'{today}/{db_name}/{coll}.json'
                 )
 
                 try:
@@ -155,7 +163,7 @@ class MongoDBBackup(CogExtension):
 
         for folder_name in storj_root_folders:
             # "name/" -> "name"
-            time_folder_create = pend.parser(folder_name[:-1], tz='Asia/Taipei')
+            time_folder_create = pend.parse(folder_name[:-1], tz='Asia/Taipei')
 
             if (time_folder_create - time_now).in_days() > 14:
                 await storj.delete_folder(

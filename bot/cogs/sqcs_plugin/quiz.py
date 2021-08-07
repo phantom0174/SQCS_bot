@@ -10,7 +10,7 @@ import discord
 class Quiz(CogExtension):
 
     @commands.group()
-    @commands.has_any_role('總召', 'Administrator')
+    @commands.has_any_role('總召', 'Administrator', '學術')
     async def quiz(self, ctx):
         pass
 
