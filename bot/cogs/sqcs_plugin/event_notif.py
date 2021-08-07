@@ -22,9 +22,9 @@ class GoogleCalendarNotif(CogExtension):
 
         self.gc_cursor = Mongo('sqcs-bot').get_cur('GCEvents')
 
-        self.collect_new_event.start()
+        self.collect_event.start()
         self.notify_event.start()
-        self.update_event_in_db.start()
+        self.update_event.start()
 
     @tasks.loop(hours=1)
     async def collect_event(self):

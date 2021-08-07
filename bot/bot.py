@@ -4,6 +4,7 @@ import discord
 from .core import utils as utl
 
 
+
 class SQCSBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.all()
