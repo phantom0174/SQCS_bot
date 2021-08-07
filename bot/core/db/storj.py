@@ -1,8 +1,9 @@
 import os
+import shutil
 import logging
-from local_module.uplink_python.uplink_python.uplink import Uplink
-from local_module.uplink_python.uplink_python.errors import BucketNotEmptyError, BucketNotFoundError
-from local_module.uplink_python.uplink_python.module_classes import ListObjectsOptions
+from local_module import (
+    Uplink, BucketNotEmptyError, BucketNotFoundError, ListObjectsOptions
+)
 
 
 # Storj database
@@ -19,6 +20,9 @@ access = uplink.request_access_with_passphrase(
 )
 
 project = access.open_project()
+
+# Download options
+DOWNLOAD_BASE_PATH = './bot/buffer/storj_download'
 
 
 async def list_file(bucket_name: str, options: dict = None):
@@ -49,13 +53,11 @@ async def delete_file(bucket_name: str, storj_path: str) -> bool:
 async def delete_folder(bucket_name: str, storj_path: str):
     search_options = {
         "prefix": storj_path,
-        "recursive": False,
+        "recursive": True,
         "system": False
     }
     for file in list_file(bucket_name, search_options):
-        if file.endswith('/'):
-            await delete_folder(bucket_name, file)
-        elif '.' in file.split('/')[-1]:
+        if '.' in file.split('/')[-1]:
             await delete_file(bucket_name, file)
 
 
@@ -106,3 +108,45 @@ async def download_file(bucket_name: str, local_path: str, storj_path: str):
         download.read_file(file_handle)
         # close the download stream
         download.close()
+
+
+async def download_folder(bucket_name: str, storj_path: str):
+    download_path = (
+        f'{DOWNLOAD_BASE_PATH}/{"_".join(storj_path[:-1].split("/"))}'
+    )
+    try:
+        shutil.rmtree(DOWNLOAD_BASE_PATH)
+    except:
+        pass
+
+    os.makedirs(download_path)
+
+    async def traverse_folder(bucket_name: str, storj_path: str):
+        search_options = {
+            "prefix": storj_path,
+            "recursive": False,
+            "system": False
+        }
+        for child in list_file(bucket_name, search_options):
+            if child.endswith('/'):
+                # [:-1]: 'a/b/c/' -> 'a/b/c'
+                child_local_path = f'{download_path}/{child[:-1]}'
+                if not os.path.exists(child_local_path):
+                    os.makedirs(child_local_path)
+                
+                await traverse_folder(
+                    bucket_name=bucket_name,
+                    storj_path=child
+                )
+            elif '.' in child.split('/')[-1]:
+                child_local_path = f'{download_path}/{child}'
+                await download_file(
+                    bucket_name=bucket_name,
+                    local_path=child_local_path,
+                    storj_path=child
+                )
+
+    await traverse_folder(
+        bucket_name=bucket_name,
+        storj_path=storj_path
+    )
