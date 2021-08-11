@@ -85,6 +85,8 @@ class MongoDBBackup(CogExtension):
 
     @tasks.loop(minutes=20)
     async def backup(self):
+        await self.bot.wait_until_ready()
+
         time_now = pend.now('Asia/Taipei')
         time_tomorrow = pend.tomorrow('Asia/Taipei')
 
@@ -149,6 +151,8 @@ class MongoDBBackup(CogExtension):
 
     @tasks.loop(hours=2)
     async def delete_outdated(self):
+        await self.bot.wait_until_ready()
+        
         time_now = pend.now('Asia/Taipei')
 
         search_options = {

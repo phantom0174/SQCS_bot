@@ -1,8 +1,14 @@
 # 📜 ChangeLog
 
-`version 1.29.7.17`
+`version 1.31.8.6`
 
 ```markdown
+- 2021/08/06: MongoBD Backup
+  - Also added some storj api wrapper.
+
+- 2021/08/01: Pack Bot as a single module
+  - Better for reading main.py.
+
 - 2021/07/17: Integrate Storj, beautify lecture email
 
 - 2021/06/26: Mega update

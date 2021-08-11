@@ -53,10 +53,14 @@ class GoogleCalendarNotif(CogExtension):
 
     @tasks.loop(hours=1)
     async def notify_event(self):
+        await self.bot.wait_until_ready()
+
         pass
 
     @tasks.loop(hours=1)
     async def update_event(self):
+        await self.bot.wait_until_ready()
+        
         # first db, then discord
         pass
 

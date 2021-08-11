@@ -64,9 +64,10 @@ class FluctlightAuto(CogExtension):
 
     @tasks.loop(hours=3)
     async def create_missing_member_fluctlight(self):
+        await self.bot.wait_until_ready()
+
         main_cursor, vice_cursor = Mongo('LightCube').get_curs(['MainFluctlights', 'ViceFluctlights'])
 
-        await self.bot.wait_until_ready()
         guild = self.bot.get_guild(743507979369709639)
 
         fluct_ext = Fluct()
@@ -85,12 +86,13 @@ class FluctlightAuto(CogExtension):
 
     @tasks.loop(hours=12)
     async def delete_unused_fluctlight(self):
+        await self.bot.wait_until_ready()
+
         main_cursor, vice_cursor = Mongo('LightCube').get_curs(['MainFluctlights', 'ViceFluctlights'])
 
         main_data = main_cursor.find({})
         vice_data = vice_cursor.find({})
-
-        await self.bot.wait_until_ready()
+        
         guild = self.bot.get_guild(743507979369709639)
 
         fluct_ext = Fluct()
