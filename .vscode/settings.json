@@ -1,0 +1,12 @@
+{
+    "discord.enabled": true,
+    "files.autoSave": "afterDelay",
+    "editor.cursorStyle": "block",
+    "terminal.integrated.defaultProfile.windows": "Command Prompt",
+    "python.linting.pylintEnabled": true,
+    "python.linting.mypyEnabled": false,
+    "python.linting.enabled": false,
+    "python.analysis.completeFunctionParens": true,
+    "python.analysis.autoImportCompletions": false,
+    "python.analysis.diagnosticMode": "workspace"
+}

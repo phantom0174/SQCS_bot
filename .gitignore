@@ -1,7 +1,3 @@
 # Sensitive information
 .env
 .credentials
-
-# vscode
-.vscode
-.idea

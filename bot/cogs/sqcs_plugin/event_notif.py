@@ -4,6 +4,7 @@ from ...core.db.mongodb import Mongo
 from gcsa.google_calendar import GoogleCalendar
 from gcsa.serializers.event_serializer import EventSerializer
 import os
+import pendulum as pend
 
 
 
@@ -37,13 +38,16 @@ class GoogleCalendarNotif(CogExtension):
 
             event_obj = dict(EventSerializer.to_json(event))
 
+            event_start_time = pend.parse(str(event.start), tz='Asia/Taipei')
+            event_end_time = pend.parse(str(event.end), tz='Asia/Taipei')
+
             event_data = {
                 "_id": event.id,
                 "etag": event_obj["etag"],
                 "summary": event.summary,
                 "location": event.location,
-                "start": event.start,
-                "end": event.end,
+                "start": event_start_time,
+                "end": event_end_time,
                 "msg_id": None,
                 "notify_stage": None
             }
