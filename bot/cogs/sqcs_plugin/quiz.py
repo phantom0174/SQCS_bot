@@ -17,6 +17,11 @@ class Quiz(CogExtension):
     # push back stand by answer
     @quiz.command()
     async def alter_standby_ans(self, ctx, alter_answer: str):
+        """cmd
+        修改下次的懸賞答案。
+
+        .alter_answer: 下次的懸賞答案
+        """
         quiz_set_cursor = Mongo('sqcs-bot').get_cur('QuizSetting')
 
         execute = {
@@ -29,6 +34,11 @@ class Quiz(CogExtension):
 
     @quiz.command()
     async def alter_formal_ans(self, ctx, alter_answer: str):
+        """cmd
+        修改本次的懸賞答案。
+
+        .alter_answer: 新的本次的懸賞答案
+        """
         quiz_set_cursor = Mongo('sqcs-bot').get_cur('QuizSetting')
 
         execute = {
@@ -41,6 +51,11 @@ class Quiz(CogExtension):
 
     @quiz.command()
     async def set_qns_link(self, ctx, qns_link: str):
+        """cmd
+        設定問題連結。
+
+        .qns_link: 問題連結
+        """
         quiz_set_cursor = Mongo('sqcs-bot').get_cur('QuizSetting')
 
         execute = {
@@ -53,6 +68,11 @@ class Quiz(CogExtension):
 
     @quiz.command()
     async def set_ans_link(self, ctx, ans_link: str):
+        """cmd
+        設定答案連結。
+
+        .qns_link: 答案連結
+        """
         quiz_set_cursor = Mongo('sqcs-bot').get_cur('QuizSetting')
 
         execute = {
@@ -81,6 +101,9 @@ class Quiz(CogExtension):
 
     @quiz.command()
     async def repost_qns(self, ctx):
+        """cmd
+        重新公告問題。
+        """
         await ctx.message.delete()
         quiz_set_cursor = Mongo('sqcs-bot').get_cur('QuizSetting')
         qns_link = quiz_set_cursor.find_one({"_id": 0})["qns_link"]
@@ -91,6 +114,9 @@ class Quiz(CogExtension):
 
     @quiz.command()
     async def repost_ans(self, ctx):
+        """cmd
+        重新公告答案。
+        """
         await ctx.message.delete()
         quiz_set_cursor = Mongo('sqcs-bot').get_cur('QuizSetting')
         ans_link = quiz_set_cursor.find_one({"_id": 0})["ans_link"]

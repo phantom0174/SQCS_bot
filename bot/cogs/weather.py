@@ -38,6 +38,11 @@ class WeatherQuery(CogExtension):
 
     @wea.command()
     async def query(self, ctx, target_county: str = ''):
+        """cmd
+        查詢 城市<target_county> 的天氣狀況，如果沒有輸入即為使用者地區身分組之城市。
+
+        .target_county: 臺灣的縣市
+        """
         response = requests.get(
             f'{self.weather_api_link_header}'
             f'{str(os.environ.get("PHANTOM_TW_WEATHER_TOKEN"))}&format=json'

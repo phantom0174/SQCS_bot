@@ -20,6 +20,9 @@ class LectureConfig(CogExtension):
 
     @lect_config.command()
     async def list(self, ctx):
+        """cmd
+        列出所有有註冊的講座。
+        """
         lect_set_cursor = Mongo('sqcs-bot').get_cur('LectureSetting')
         data = lect_set_cursor.find({})
 
@@ -40,6 +43,9 @@ class LectureConfig(CogExtension):
 
     @lect_config.command()
     async def add(self, ctx):
+        """cmd
+        註冊講座資料。
+        """
         # ask for arguments
         def check(message):
             return message.channel == ctx.channel and message.author == ctx.author
@@ -86,6 +92,9 @@ class LectureConfig(CogExtension):
 
     @lect_config.command()
     async def remove(self, ctx, del_lect_week: int):
+        """cmd
+        刪除講座資料。
+        """
         lect_set_cursor = Mongo('sqcs-bot').get_cur('LectureSetting')
 
         try:
@@ -104,6 +113,11 @@ class Lecture(CogExtension):
 
     @lect.command()
     async def start(self, ctx, week: int):
+        """cmd
+        開始講座。
+
+        .week: 星期數
+        """
         lect_set_cursor = Mongo('sqcs-bot').get_cur('LectureSetting')
         lect_config = lect_set_cursor.find_one({"week": week})
 
@@ -183,6 +197,11 @@ class Lecture(CogExtension):
 
     @lect.command()
     async def end(self, ctx, week: int):
+        """cmd
+        結束講座。
+
+        .week: 星期數
+        """
         lect_set_cursor = Mongo('sqcs-bot').get_cur('LectureSetting')
         lect_config = lect_set_cursor.find_one({"week": week})
 
@@ -277,6 +296,9 @@ class LectureAttendVerify(CogExtension):
     @commands.dm_only()
     @commands.cooldown(1, 15, commands.BucketType.user)
     async def attend(self, ctx, token: str):
+        """cmd
+        尚未啟用。
+        """
         verify_cursor = Mongo('sqcs-bot').get_cur('Verification')
         data = verify_cursor.find_one({"TOKEN": token, "reason": "lect"})
 

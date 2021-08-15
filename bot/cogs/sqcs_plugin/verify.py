@@ -13,6 +13,9 @@ class Verify(CogExtension):
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
     async def lect_generate_token(self, ctx, lecture_week: int, *, accounts):
+        """cmd
+        尚未啟用。
+        """
         lect_set_cursor, verify_cursor = Mongo('sqcs-bot').get_curs(['LectureSetting', 'Verification'])
         lect_data = lect_set_cursor.find_one({"week": lecture_week})
         if not lect_data:

@@ -15,6 +15,11 @@ class WorkShop(CogExtension):
 
     @ws.command()
     async def snapshot(self, ctx, voice_id: int):
+        """cmd
+        將 語音頻道<voice_id> 設定為目前在頻道中的成員所屬。
+
+        .voice_id: 語音頻道的id
+        """
         voice_channel: discord.VoiceChannel = ctx.guild.get_channel(voice_id)
         voice_perms = {
             "connect": True,

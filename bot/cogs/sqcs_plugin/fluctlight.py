@@ -32,6 +32,11 @@ class Fluctlight(CogExtension):
 
     @fluct.command()
     async def create(self, ctx, member_id: int):
+        """cmd
+        幫 成員<member_id> 手動產生搖光。
+
+        .member_id: 成員在Discord中的id
+        """
         fluct_ext = Fluct()
         await fluct_ext.create_main(ctx.guild, False, member_id)
         await fluct_ext.create_vice(member_id)
@@ -40,6 +45,11 @@ class Fluctlight(CogExtension):
 
     @fluct.command()
     async def delete(self, ctx, member_id: int):
+        """cmd
+        幫 成員<member_id> 手動刪除搖光。
+
+        .member_id: 成員在Discord中的id
+        """
         fluct_ext = Fluct()
         await fluct_ext.delete_main(member_id)
         await fluct_ext.delete_vice(member_id)
@@ -48,6 +58,11 @@ class Fluctlight(CogExtension):
 
     @fluct.command()
     async def reset(self, ctx, member_id: int):
+        """cmd
+        幫 成員<member_id> 手動重新設定搖光。
+
+        .member_id: 成員在Discord中的id
+        """
         fluct_ext = Fluct()
         await fluct_ext.reset_main(ctx.guild, False, member_id)
         await fluct_ext.reset_vice(member_id)

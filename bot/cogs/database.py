@@ -17,6 +17,9 @@ class DataBase(CogExtension):
 
     @db.command()
     async def refresh_db(self, ctx):
+        """cmd
+        重新整理搖光資料庫。
+        """
         cursors = list(Mongo('LightCube').get_curs(['MainFluctlights', 'ViceFluctlights']))
         members_id = [member.id for member in ctx.guild.members]
 
@@ -32,6 +35,9 @@ class DataBase(CogExtension):
 
     @db.command()
     async def copy(self, ctx, ori_db_name: str, ori_coll_name: str, target_db_name: str, target_coll_name: str):
+        """cmd
+        複製集合中的資料。
+        """
         if '' in [ori_db_name, ori_coll_name, target_db_name, target_coll_name]:
             return await ctx.send(':x: 任何一個參數都不能為空字串！')
 
@@ -53,6 +59,9 @@ class DataBase(CogExtension):
 
     @db.command()
     async def move(self, ctx, ori_db_name: str, ori_coll_name: str, target_db_name: str, target_coll_name: str):
+        """cmd
+        移動集合中的資料。
+        """
         if '' in [ori_db_name, ori_coll_name, target_db_name, target_coll_name]:
             return await ctx.send(':x: 任何一個參數都不能為空字串！')
 

@@ -16,6 +16,9 @@ class KickMember(CogExtension):
 
     @kick.command()
     async def list(self, ctx):
+        """cmd
+        列出待踢除名單。
+        """
         await ctx.send(content=':hourglass_flowing_sand: 尋找中...', delete_after=3.0)
 
         kick_cursor = Mongo('sqcs-bot').get_cur('ReadyToKick')
@@ -46,6 +49,11 @@ class KickMember(CogExtension):
 
     @kick.command(aliases=['insert'])
     async def add(self, ctx, target_member: Union[discord.Member, int]):
+        """cmd
+        將 成員<target_member> 加入待踢除名單。
+
+        .target_member: 可直接標註成員，或是成員在Discord中的id
+        """
         if isinstance(target_member, discord.Member):
             member_id = target_member.id
         else:
@@ -70,6 +78,11 @@ class KickMember(CogExtension):
 
     @kick.command(aliases=['delete', 'del'])
     async def remove(self, ctx, target_member: Union[discord.Member, int]):
+        """cmd
+        將 成員<target_member> 移出待踢除名單。
+
+        .target_member: 可直接標註成員，或是成員在Discord中的id
+        """
         if isinstance(target_member, discord.Member):
             member_id = target_member.id
         else:
@@ -87,6 +100,12 @@ class KickMember(CogExtension):
 
     @kick.command(aliases=['single'])
     async def kick_single(self, ctx, target_member: Union[discord.Member, int], kick_reason: str):
+        """cmd
+        將 成員<target_member> 踢除（需要在待踢除名單中）。
+
+        .target_member: 可直接標註成員，或是成員在Discord中的id
+        .kick_reason: 踢除原因
+        """
         if isinstance(target_member, discord.Member):
             member_id = target_member.id
         else:
@@ -123,6 +142,9 @@ class KickMember(CogExtension):
 
     @kick.command(aliases=['all'])
     async def kick_all(self, ctx):
+        """cmd
+        將所有在踢除名單中的成員踢除。
+        """
         kick_cursor = Mongo('sqcs-bot').get_cur('ReadyToKick')
         data = kick_cursor.find({})
 
@@ -160,11 +182,19 @@ class NT(CogExtension):
 
     @commands.command()
     async def list(self, ctx):
+        """cmd
+        列出黑名單。
+        """
         id_list = JsonApi.get('NT')["id_list"]
         await ctx.send(id_list)
 
     @commands.command(aliases=['push', 'insert'])
     async def add(self, ctx, user_id: int = None):
+        """cmd
+        將 成員<user_id> 加入黑名單。
+
+        .user_id: 成員的Discord id
+        """
         nt_json = JsonApi.get('NT')
         if user_id is None:
             return

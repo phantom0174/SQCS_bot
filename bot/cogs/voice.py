@@ -13,6 +13,12 @@ class Voice(CogExtension):
     # remove member in voice channel
     @voice.command()
     async def timer(self, ctx, channel_id: int, countdown: int):
+        """cmd
+        在 <countdown>秒後將 語音頻道<channel_id> 中的所有成員移出。
+
+        .channel_id: 語音頻道的Discord id
+        .countdown: 倒數的時間
+        """
         countdown_duration = countdown
         voice_channel = self.bot.get_channel(channel_id)
 
@@ -33,6 +39,12 @@ class Voice(CogExtension):
     @voice.command()
     @commands.has_any_role('總召', 'Administrator')
     async def default_role_connect(self, ctx, channel_id: int, mode: int):
+        """cmd
+        將 語音頻道<channel_id> 設置為普通成員 可/否 連結
+
+        .channel_id: 語音頻道的id
+        .mode: 1 -> 可； 0 -> 不可
+        """
         protect_target_channel = ctx.guild.get_channel(channel_id)
         await protect_target_channel.set_permissions(ctx.guild.default_role, connect=bool(mode))
 
@@ -45,6 +57,11 @@ class GroupVCChannel(CogExtension):
 
     @personal.command(aliases=['make'])
     async def make_channel(self, ctx, members: commands.Greedy[discord.Member]):
+        """cmd
+        在語音終端機時使用指令，便可為 成員們<members> 創立私人語音包廂。
+
+        .members: 一次性@所有要加入的成員
+        """
         terminal_channel = ctx.guild.get_channel(839170475309006979)
 
         if ctx.author.voice.channel != terminal_channel:

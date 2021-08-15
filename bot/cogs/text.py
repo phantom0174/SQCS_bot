@@ -12,6 +12,11 @@ class Text(CogExtension):
     # delete message
     @text.command()
     async def clear(self, ctx, msg_id: int):
+        """cmd
+        從目前的訊息往上刪除至 訊息<msg_id>
+
+        .msg_id: 訊息在Discord中的id
+        """
         find = bool(False)
         while not find:
             msg_logs = await ctx.channel.history(limit=50).flatten()

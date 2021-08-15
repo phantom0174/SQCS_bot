@@ -13,6 +13,11 @@ class Protect(CogExtension):
 
     @protect.command()
     async def on(self, ctx, channel_id: int = -1):
+        """cmd
+        開啟 頻道<channel_id> 的保護模式，如果沒有輸入代表目前的頻道。
+
+        .channel_id: Discord 中頻道的id
+        """
         dyn_json = JsonApi.get('DynamicSetting')
 
         if channel_id != -1:
@@ -30,6 +35,11 @@ class Protect(CogExtension):
 
     @protect.command()
     async def off(self, ctx, channel_id: int = -1):
+        """cmd
+        關閉 頻道<channel_id> 的保護模式，如果沒有輸入代表目前的頻道。
+
+        .channel_id: Discord 中頻道的id
+        """
         dyn_json = JsonApi.get('DynamicSetting')
 
         if channel_id != -1:
@@ -47,6 +57,9 @@ class Protect(CogExtension):
 
     @protect.command()
     async def all_on(self, ctx):
+        """cmd
+        開啟伺服器中所有頻道的保護模式。
+        """
         dyn_json = JsonApi.get('DynamicSetting')
 
         for channel in ctx.guild.channels:
@@ -58,6 +71,9 @@ class Protect(CogExtension):
 
     @protect.command()
     async def all_off(self, ctx):
+        """cmd
+        關閉伺服器中所有頻道的保護模式。
+        """
         dyn_json = JsonApi.get('DynamicSetting')
 
         for channel in ctx.guild.channels:
@@ -69,6 +85,9 @@ class Protect(CogExtension):
 
     @protect.command(aliases=['cpl'])
     async def clear_list(self, ctx):
+        """cmd
+        清除資料庫中的頻道保護列表。
+        """
         dyn_json = JsonApi.get('DynamicSetting')
         dyn_json['channel_in_protect'].clear()
 
@@ -145,6 +164,11 @@ class Meeting(CogExtension):
     # for voice meeting usage
     @meeting.command()
     async def on(self, ctx, channel_id: int):
+        """cmd
+        開啟 語音頻道<channel_id> 的開會模式。
+
+        .channel_id: Discord 中頻道的id
+        """
         target_channel = ctx.guild.get_channel(channel_id)
         if target_channel is None:
             return await ctx.send(':x: 這是一個無效頻道！')
@@ -162,6 +186,11 @@ class Meeting(CogExtension):
 
     @meeting.command()
     async def off(self, ctx, channel_id: int):
+        """cmd
+        關閉 語音頻道<channel_id> 的開會模式。
+
+        .channel_id: Discord 中頻道的id
+        """
         target_channel = ctx.guild.get_channel(channel_id)
         if target_channel is None:
             return await ctx.send(':x: 這是一個無效頻道！')

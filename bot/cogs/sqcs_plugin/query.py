@@ -16,11 +16,14 @@ class Query(CogExtension):
     @query.command()
     @commands.has_any_role('總召', 'Administrator')
     async def quiz(self, ctx):
+        """cmd
+        查詢懸賞活動的目前狀態。
+        """
         quiz_ongoing_cursor = Mongo('sqcs-bot').get_cur('QuizOngoing')
         data = quiz_ongoing_cursor.find({})
 
         if data.count() == 0:
-            return await ctx.send(':x: 沒有任何正在進行中的講座資料！')
+            return await ctx.send(':x: 沒有任何正在進行中的懸賞活動！')
 
         status = ''
         for item in data:
@@ -35,16 +38,27 @@ class Query(CogExtension):
 
     @query.command()
     async def my_data(self, ctx):
+        """cmd
+        查詢個人搖光資料。
+        """
         await ctx.author.send(embed=(await create_fluct_data_embed(ctx.author.id)))
 
     @query.command()
     @commands.has_any_role('總召', 'Administrator')
     async def member_data(self, ctx, target_id: int):
+        """cmd
+        查詢 成員<target_id> 的搖光資料。
+
+        .target_id: 成員的Discord id
+        """
         await ctx.author.send(embed=(await create_fluct_data_embed(target_id)))
 
     # guild active percentage
     @query.command()
     async def guild_active(self, ctx):
+        """cmd
+        查詢伺服器活躍度。
+        """
         fluct_cursor = Mongo('LightCube').get_cur('MainFluctlights')
         week_active_match = {
             "deep_freeze": {

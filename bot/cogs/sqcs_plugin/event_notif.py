@@ -38,8 +38,8 @@ class GoogleCalendarNotif(CogExtension):
 
             event_obj = dict(EventSerializer.to_json(event))
 
-            event_start_time = pend.parse(str(event.start), tz='Asia/Taipei')
-            event_end_time = pend.parse(str(event.end), tz='Asia/Taipei')
+            event_start_time = pend.parse(str(event.start), tz='Asia/Taipei').to_datetime_string()
+            event_end_time = pend.parse(str(event.end), tz='Asia/Taipei').to_datetime_string()
 
             event_data = {
                 "_id": event.id,
@@ -110,7 +110,7 @@ class GoogleCalendarNotif(CogExtension):
             pass
         
         for event in self.gc:
-            event_data = self.gc_cursor.find_one({"_id": event["_id"]})
+            event_data = self.gc_cursor.find_one({"_id": event.id})
 
             if not event_data:
                 continue
@@ -132,10 +132,10 @@ class GoogleCalendarNotif(CogExtension):
                         "end": event_end_time
                     }
                 }
-                self.gc_cursor.update_one({"_id": event["_id"]}, execute)
+                self.gc_cursor.update_one({"_id": event.id}, execute)
 
                 # repost notify
-                old_notify_dc_msg = notify_channel.fetch_message(event["msg_id"])
+                old_notify_dc_msg = notify_channel.fetch_message(event_data["msg_id"])
                 await old_notify_dc_msg.delete()
 
                 notify_msg = get_new_notify_msg()
@@ -146,7 +146,7 @@ class GoogleCalendarNotif(CogExtension):
                         "msg_id": notify_dc_msg.id
                     }
                 }
-                self.gc_cursor.update_one({"_id": event["_id"]}, execute)
+                self.gc_cursor.update_one({"_id": event.id}, execute)
 
 
 def setup(bot):

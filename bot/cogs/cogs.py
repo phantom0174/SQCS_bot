@@ -31,9 +31,16 @@ def find_cog(bot, target_cog: str, mode: str) -> Tuple[bool, str]:
 
 
 class Cogs(CogExtension):
-    @commands.command()
+    @commands.group()
     @commands.has_any_role('總召', 'Administrator')
+    async def cogs(self, ctx):
+        pass
+
+    @cogs.command()
     async def load(self, ctx, target_cog: str):
+        """cmd
+        加載 插件<target_cog>。
+        """
         find, msg = find_cog(self.bot, target_cog, 'load')
         if find:
             return await ctx.send(msg)
@@ -42,9 +49,11 @@ class Cogs(CogExtension):
             f':exclamation: There are no extension called {target_cog}!'
         )
 
-    @commands.command()
-    @commands.has_any_role('總召', 'Administrator')
+    @cogs.command()
     async def unload(self, ctx, target_cog: str):
+        """cmd
+        卸載 插件<target_cog>。
+        """
         find, msg = find_cog(self.bot, target_cog, 'unload')
         if find:
             return await ctx.send(msg)
@@ -53,9 +62,11 @@ class Cogs(CogExtension):
             f':exclamation: There are no extension called {target_cog}!'
         )
 
-    @commands.command()
-    @commands.has_any_role('總召', 'Administrator')
+    @cogs.command()
     async def reload(self, ctx, target_cog: str):
+        """cmd
+        重新加載 插件<target_cog>。
+        """
         find, msg = find_cog(self.bot, target_cog, 'reload')
         if find:
             return await ctx.send(msg)
@@ -65,8 +76,11 @@ class Cogs(CogExtension):
         )
 
     @commands.command(aliases=['logout', 'shutdown'])
-    @commands.has_any_role('總召')
+    @commands.has_any_role('總召', 'Administrator')
     async def shut_down(self, ctx):
+        """cmd
+        安全關閉機器人。
+        """
         await ctx.send(':white_check_mark: The bot is shutting down...')
         await self.bot.logout()
         await asyncio.sleep(1)

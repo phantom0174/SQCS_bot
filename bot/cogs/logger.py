@@ -13,6 +13,11 @@ class Log(CogExtension):
 
     @log.command(aliases=['query', 'len'])
     async def query_len(self, ctx, title: str = "CmdLogging"):
+        """cmd
+        查詢在 日誌<title> 中的資料。
+
+        .title: 可為 `CmdLogging` 或是 `LectureLogging`
+        """
         title_options = ['CmdLogging', 'LectureLogging']
         if title not in title_options:
             return await ctx.send(
@@ -25,6 +30,11 @@ class Log(CogExtension):
 
     @log.command(aliases=['get'])
     async def release(self, ctx, title: str = "CmdLogging"):
+        """cmd
+        釋放在 日誌<title> 中的資料。
+
+        .title: 可為 `CmdLogging` 或是 `LectureLogging`
+        """
         logging_channel = {
             "CmdLogging": 785146879004508171,
             "LectureLogging": 828286118420021250

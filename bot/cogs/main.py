@@ -7,6 +7,9 @@ class Main(CogExtension):
     # bot info
     @commands.command()
     async def info(self, ctx):
+        """cmd
+        查詢SQCS_bot的資料。
+        """
         embed = discord.Embed(
             title='Bot information',
             colour=self.bot.user.colour
@@ -27,11 +30,17 @@ class Main(CogExtension):
     # ping
     @commands.command()
     async def ping(self, ctx):
+        """cmd
+        戳一下機器人。
+        """
         await ctx.send(f':stopwatch: {round(self.bot.latency * 1000)} (ms)')
 
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
     async def fix_role(self, ctx):
+        """cmd
+        手動修復身分組。
+        """
         decline_lvl_roles = [
             ctx.guild.get_role(840633610256121867),
             ctx.guild.get_role(823804274647236618),
@@ -57,12 +66,11 @@ class Main(CogExtension):
 
     @commands.command()
     @commands.has_any_role('總召', 'Administrator')
-    async def findvname(self, ctx, search_via_name: str):
-
+    async def findvname(self, ctx, name: str):
         for member in ctx.guild.members:
             member_name = member.name
 
-            if member_name.find(search_via_name) != -1:
+            if member_name.find(name) != -1:
                 await ctx.send(f'{member_name} {member.id}')
 
     @commands.command()

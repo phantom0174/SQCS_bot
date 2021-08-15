@@ -15,6 +15,11 @@ class Cadre(CogExtension):
 
     @ca.command()
     async def apply(self, ctx, cadre: str):
+        """cmd
+        於幹部申請區申請 幹部<cadre>
+
+        .cadre: 可為SQCS現在有的幹部部門
+        """
         cadre_set_cursor, cadre_cursor = Mongo('sqcs-bot').get_curs(['CadreSetting', 'Cadre'])
         
         cadre_setting = cadre_set_cursor.find_one({"_id": 0})
@@ -59,6 +64,9 @@ class Cadre(CogExtension):
     @ca.command()
     @commands.has_any_role('總召', 'Administrator')
     async def list(self, ctx):
+        """cmd
+        列出現在的所有幹部申請。
+        """
         cadre_cursor = Mongo('sqcs-bot').get_cur('Cadre')
         data = cadre_cursor.find({})
 
@@ -83,6 +91,11 @@ class Cadre(CogExtension):
     @ca.command()
     @commands.has_any_role('總召', 'Administrator')
     async def permit(self, ctx, permit_id: int):
+        """cmd
+        批准 成員<permit_id> 的幹部申請。
+
+        .permit_id: 要批准成員的Discord id 
+        """
         cadre_cursor = Mongo('sqcs-bot').get_cur('Cadre')
         data = cadre_cursor.find_one({"_id": permit_id})
 
@@ -105,6 +118,11 @@ class Cadre(CogExtension):
     @ca.command()
     @commands.has_any_role('總召', 'Administrator')
     async def search(self, ctx, search_id: int):
+        """cmd
+        查詢 成員<permit_id> 的幹部申請。
+
+        .permit_id: 要查詢成員的Discord id 
+        """
         cadre_cursor = Mongo('sqcs-bot').get_cur('Cadre')
         data = cadre_cursor.find_one({"_id": search_id})
 
@@ -120,6 +138,11 @@ class Cadre(CogExtension):
     @ca.command(aliases=['delete'])
     @commands.has_any_role('總召', 'Administrator')
     async def remove(self, ctx, delete_id: int):
+        """cmd
+        移除 成員<permit_id> 的幹部申請。
+
+        .permit_id: 要移除的成員之Discord id 
+        """
         cadre_cursor = Mongo('sqcs-bot').get_cur('Cadre')
         data = cadre_cursor.find_one({"_id": delete_id})
 

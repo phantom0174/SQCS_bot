@@ -26,9 +26,9 @@
 - Everyone is welcome to contribute to the project. For further information, please see CONTRIBUTE.md.
 - The developer spend lots of time on it, so even it isn't necessary to cite the source while using relevant data, the developer will thank you if doing so.
 
-## 📃 Command list (warning: outdated)
+## 📃 Command list
 
-- There's a brand-new document for commands, check [it](https://github.com/SQCS-TW/Community-Structure/blob/main/Discord%20Guild%20Bot%20Team/SQCS%20Bot%20Command.md) out!
+- There's a brand-new document for commands, check [it]() out!
 
 ## 💖 Thanks
 

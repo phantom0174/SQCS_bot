@@ -13,6 +13,12 @@ class DeepFreeze(CogExtension):
 
     @df.command()
     async def mani(self, ctx, member_id: int, status: int):
+        """cmd
+        將 成員<member_id> 的深度凍結狀態設定為 status
+
+        .member_id: 成員在Discord中的id
+        .status: 0 -> 無凍結； 1 -> 凍結 
+        """
         if status not in [0, 1]:
             return await ctx.send(':x: 狀態參數必須為 0 或 1！')
 
@@ -33,6 +39,9 @@ class DeepFreeze(CogExtension):
 
     @df.command()
     async def list(self, ctx):
+        """cmd
+        列出所有目前在深度凍結中的成員。
+        """
         await ctx.send(':hourglass_flowing_sand: 尋找中...')
 
         fluct_cursor = Mongo('LightCube').get_cur('MainFluctlights')
