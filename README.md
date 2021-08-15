@@ -28,7 +28,7 @@
 
 ## 📃 Command list
 
-- There's a brand-new document for commands, check [it]() out!
+- There's a brand-new document for commands, check [it](https://github.com/phantom0174/SQCS_bot/blob/main/command_list.md) out!
 
 ## 💖 Thanks
 
