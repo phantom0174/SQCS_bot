@@ -125,7 +125,12 @@ class KickMember(CogExtension):
         msg = await JsonApi.get_humanity('kick/kick_single', '\n')
         msg += f'> {kick_reason}\n'
         msg += await JsonApi.get_humanity('kick/re_join')
-        await kick_user.send(msg)
+
+        # no perm to send msg to user via server
+        try:
+            await kick_user.send(msg)
+        except:
+            pass
 
         try:
             await kick_user.kick(reason=kick_reason)
@@ -158,7 +163,12 @@ class KickMember(CogExtension):
             msg = await JsonApi.get_humanity('kick/kick_all', '\n')
             msg += f'> Levelling index reached {member["lvl_ind"]}.\n'
             msg += await JsonApi.get_humanity('kick/re_join')
-            await kick_user.send(msg)
+            
+            # no perm to send msg to user via server
+            try:
+                await kick_user.send(msg)
+            except:
+                pass
 
             try:
                 await kick_user.kick(reason=f'違反指數達到了 {member["lvl_ind"]}')

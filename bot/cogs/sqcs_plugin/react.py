@@ -25,11 +25,17 @@ class React(CogExtension):
 
         msg = await JsonApi.get_humanity(f'join/opening/{time_status}', '\n')
         msg += await JsonApi.get_humanity('join/opening/main')
-        await member.send(msg)
+        try:
+            await member.send(msg)
+        except:
+            pass
         await asyncio.sleep(30)
 
         msg = await JsonApi.get_humanity('join/hackmd_read')
-        reaction_msg = await member.send(msg)
+        try:
+            reaction_msg = await member.send(msg)
+        except:
+            pass
         await reaction_msg.add_reaction('⭕')
         await reaction_msg.add_reaction('❌')
 
@@ -52,7 +58,10 @@ class React(CogExtension):
 
         msg += await JsonApi.get_humanity('join/contact_method')
 
-        await member.send(msg)
+        try:
+            await member.send(msg)
+        except:
+            pass
 
         # create personal fluctlight data
         start_time = time.time()
@@ -62,9 +71,12 @@ class React(CogExtension):
         end_time = time.time()
 
         msg = await JsonApi.get_humanity('join/fl_create_finish')
-        await member.send(msg)
-        time_duration = round(end_time - start_time, 2)
-        await member.send(f'順帶一提，我用了 {time_duration} (sec) 建立你的檔案><!')
+        try:
+            await member.send(msg)
+            time_duration = round(end_time - start_time, 2)
+            await member.send(f'順帶一提，我用了 {time_duration} (sec) 建立你的檔案><!')
+        except:
+            pass
 
 
 def setup(bot):

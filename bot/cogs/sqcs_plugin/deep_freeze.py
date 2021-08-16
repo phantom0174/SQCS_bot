@@ -32,7 +32,12 @@ class DeepFreeze(CogExtension):
             fluct_cursor.update_one({"_id": member_id}, execute)
             member = ctx.guild.get_member(member_id)
 
-            await member.send(f':exclamation: 你的 `deep freeze` 狀態被設定為 {bool(status)} 了！')
+            # no perm to send msg to user via server
+            try:
+                await member.send(f':exclamation: 你的 `deep freeze` 狀態被設定為 {bool(status)} 了！')
+            except:
+                pass
+
             await ctx.send(':white_check_mark: 指令執行完畢！')
         except Exception as e:
             return await ctx.send(content=e, delete_after=8)

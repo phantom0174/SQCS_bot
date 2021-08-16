@@ -53,13 +53,17 @@ class Cadre(CogExtension):
 
         cadre_cursor.insert_one(apply_info)
 
-        await ctx.author.send(
-            f':white_check_mark: 我收到你的申請了！請耐心等待審核\n'
-            f'申請人名字：{ctx.author.display_name},\n'
-            f'申請人id：{ctx.author.id},\n'
-            f'申請職位：{cadre},\n'
-            f'申請時間：{apply_time}'
-        )
+        # no perm to send msg to user via server
+        try:
+            await ctx.author.send(
+                f':white_check_mark: 我收到你的申請了！請耐心等待審核\n'
+                f'申請人名字：{ctx.author.display_name},\n'
+                f'申請人id：{ctx.author.id},\n'
+                f'申請職位：{cadre},\n'
+                f'申請時間：{apply_time}'
+            )
+        except:
+            pass
 
     @ca.command()
     @commands.has_any_role('總召', 'Administrator')
@@ -86,7 +90,11 @@ class Cadre(CogExtension):
                 apply_info = ''
 
         if len(apply_info) > 0:
-            await ctx.author.send(apply_info)
+            # no perm to send msg to user via server
+            try:
+                await ctx.author.send(apply_info)
+            except:
+                pass
 
     @ca.command()
     @commands.has_any_role('總召', 'Administrator')
@@ -102,16 +110,25 @@ class Cadre(CogExtension):
         if not data:
             return await ctx.send(f':x: 申請名單中沒有id為 {permit_id} 的申請！')
 
-        await ctx.author.send(
-            f':white_check_mark: 你已批准 {data["name"]} 對職位 {data["apply_cadre"]} 的申請！'
-        )
+        # no perm to send msg to user via server
+        try:
+            await ctx.author.send(
+                f':white_check_mark: 你已批准 {data["name"]} 對職位 {data["apply_cadre"]} 的申請！'
+            )
+        except:
+            pass
 
         member = ctx.guild.get_member(data["_id"])
-        await member.send(
-            f':white_check_mark: 你於 {data["apply_time"]} 申請 {data["apply_cadre"]} 的程序已通過！\n'
-            f'此為幹部群的連結，請在加入之後使用指令領取屬於你的身分組\n'
-            f'{os.environ.get("WORKING_DC_GUILD_LINK")}'
-        )
+        
+        # no perm to send msg to user via server
+        try:
+            await member.send(
+                f':white_check_mark: 你於 {data["apply_time"]} 申請 {data["apply_cadre"]} 的程序已通過！\n'
+                f'此為幹部群的連結，請在加入之後使用指令領取屬於你的身分組\n'
+                f'{os.environ.get("WORKING_DC_GUILD_LINK")}'
+            )
+        except:
+            pass
 
         cadre_cursor.delete_one({"_id": data["_id"]})
 

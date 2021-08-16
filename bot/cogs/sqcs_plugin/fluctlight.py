@@ -24,7 +24,11 @@ class Fluctlight(CogExtension):
                 member = ctx.guild.get_member(member_id)
                 msg = f'耶！你被加了 {final_delta_score} 分！' + '\n'
                 msg += await JsonApi.get_humanity('main/remedy/pt_1')
-                await member.send(msg)
+
+                try:
+                    await member.send(msg)
+                except:
+                    pass
             except:
                 await ctx.send(f':x: 彌補 {member_id} 時發生了錯誤！彌補分數：{delta_value}')
 

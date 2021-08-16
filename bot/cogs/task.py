@@ -36,7 +36,12 @@ class Task(CogExtension):
                 if quiz_crt_count >= 2 and lect_attend_count >= 4:
                     await member.remove_roles(neutral_role)
                     await member.add_roles(auto_role)
-                    await member.send(':partying_face: 恭喜！你已升級為自由量子！')
+
+                    # no perm to send msg to user via server
+                    try:
+                        await member.send(':partying_face: 恭喜！你已升級為自由量子！')
+                    except:
+                        pass
 
 
 def setup(bot):

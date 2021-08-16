@@ -150,7 +150,10 @@ class Quiz(CogExtension):
         data = quiz_cursor.find_one({"_id": msg.author.id})
         if data:
             message = await JsonApi.get_humanity('quiz/repeat_answer')
-            return await msg.author.send(message)
+            try:
+                return await msg.author.send(message)
+            except:
+                pass
 
         # if answer fit standard format
         if msg.content.startswith('||') and msg.content.endswith('||'):
@@ -168,7 +171,10 @@ class Quiz(CogExtension):
             await fluct_ext.quiz_submit_update()
 
             message = await JsonApi.get_humanity('quiz/get_answer')
-            await msg.author.send(message)
+            try:
+                await msg.author.send(message)
+            except:
+                pass
 
             # add score to member fluctlight if answer is correct
             if answer_correctness:
@@ -178,7 +184,10 @@ class Quiz(CogExtension):
             message = await JsonApi.get_humanity('quiz/invalid_syntax/pt_1', '\n')
             message += await JsonApi.get_humanity('quiz/answer_tut', '\n')
             message += await JsonApi.get_humanity('quiz/invalid_syntax/pt_2')
-            await msg.author.send(message)
+            try:
+                await msg.author.send(message)
+            except:
+                pass
 
 
 class QuizAuto(CogExtension):

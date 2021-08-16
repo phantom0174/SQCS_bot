@@ -41,7 +41,10 @@ class Query(CogExtension):
         """cmd
         查詢個人搖光資料。
         """
-        await ctx.author.send(embed=(await create_fluct_data_embed(ctx.author.id)))
+        try:
+            await ctx.author.send(embed=(await create_fluct_data_embed(ctx.author.id)))
+        except:
+            pass
 
     @query.command()
     @commands.has_any_role('總召', 'Administrator')
@@ -51,7 +54,10 @@ class Query(CogExtension):
 
         .target_id: 成員的Discord id
         """
-        await ctx.author.send(embed=(await create_fluct_data_embed(target_id)))
+        try:
+            await ctx.author.send(embed=(await create_fluct_data_embed(target_id)))
+        except:
+            pass
 
     # guild active percentage
     @query.command()

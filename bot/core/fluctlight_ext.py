@@ -276,10 +276,16 @@ async def lvl_ind_detect(bot, fluctlight_cursor) -> None:
     for member in data:
         if 1 <= member["lvl_ind"] < 1.5:
             user = guild.get_member(member["_id"])
-            await user.send(f'Your levelling index has reached warning range!({member["lvl_ind"]});')
+            try:
+                await user.send(f'Your levelling index has reached warning range!({member["lvl_ind"]});')
+            except:
+                pass
         elif member["lvl_ind"] >= 1.5:
             user = guild.get_member(member["_id"])
-            await user.send(f'Your levelling index has reached danger range!({member["lvl_ind"]});')
+            try:
+                await user.send(f'Your levelling index has reached danger range!({member["lvl_ind"]});')
+            except:
+                pass
 
             member_info = {
                 "_id": user.id,
