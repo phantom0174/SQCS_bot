@@ -162,7 +162,7 @@ class Meeting(CogExtension):
         pass
 
     # for voice meeting usage
-    @meeting.command()
+    @meeting.command(aliases=['shit!'])
     async def on(self, ctx, channel_id: int):
         """cmd
         開啟 語音頻道<channel_id> 的開會模式。
