@@ -1,13 +1,17 @@
 # 📜 ChangeLog
 
-`version 1.31.8.6`
+`version 1.32.8.16`
 
 ```markdown
+- 2021/08/16: Add auto cmd_list generator
+  > Because the author is too lazy to write documentations.
+  > This may be the last commit of ver 1.x
+
 - 2021/08/06: MongoBD Backup
-  - Also added some storj api wrapper.
+  > Also added some storj api wrapper.
 
 - 2021/08/01: Pack Bot as a single module
-  - Better for reading main.py.
+  > Better for reading main.py.
 
 - 2021/07/17: Integrate Storj, beautify lecture email
 

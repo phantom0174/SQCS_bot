@@ -4,6 +4,7 @@ import os
 COGS_PATH = './bot/cogs'
 DOC_PATH = './command_list.md'
 PREFIX = '+'
+VERSION = '1.32.8.16'
 
 if os.path.isfile(DOC_PATH):
     os.remove(DOC_PATH)
@@ -79,9 +80,6 @@ def traverse_folder(folder_path):
             ctx = file.read()
 
         ctx_ast = ast.parse(ctx)
-
-        with open('result.txt', mode='w', encoding='utf-8') as file:
-            file.write(ast.dump(ctx_ast, indent=4))
 
         for base_obj in ctx_ast.body:
             if not isinstance(base_obj, ast.ClassDef):
@@ -280,6 +278,8 @@ def traverse_folder(folder_path):
 
 with open(DOC_PATH, mode='a', encoding='utf-8') as file:
     file.write(f'# SQCS_bot command list\n\n')
+    file.write(f'Bot version: {VERSION}\n\n')
+    file.write('此文件為由程式自動生成的，如果有使用上的疑慮請直接詢問總召。\n\n')
 
 traverse_folder(COGS_PATH)
 

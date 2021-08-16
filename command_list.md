@@ -1,5 +1,9 @@
 # SQCS_bot command list
 
+Bot version: 1.32.8.16
+
+此文件為由程式自動生成的，如果有使用上的疑慮請直接詢問總召。
+
 ## channel.py
 
 ### +protect on <channel_id: int>
@@ -551,3 +555,4 @@
 ```markdown
 <voice_id: 語音頻道的id>
 ```
+
