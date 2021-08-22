@@ -37,3 +37,7 @@
 - Thanks for the lecture from `@Proladon`.
 - Thanks for the help from members in Shelter-Zone.
 - Thanks for the channel-protecting concept from `@BłÜɪᴄᴇ.#1015 (Discord Name)`'s discord bot - `PRØ-TECTER`
+
+## A Codebase Visualization
+
+![Visualization of the codebase](./diagram.svg)
