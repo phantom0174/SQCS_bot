@@ -152,7 +152,7 @@ class Quiz(CogExtension):
             message = await JsonApi.get_humanity('quiz/repeat_answer')
             try:
                 return await msg.author.send(message)
-            except:
+            except BaseException:
                 pass
 
         # if answer fit standard format
@@ -173,7 +173,7 @@ class Quiz(CogExtension):
             message = await JsonApi.get_humanity('quiz/get_answer')
             try:
                 await msg.author.send(message)
-            except:
+            except BaseException:
                 pass
 
             # add score to member fluctlight if answer is correct
@@ -186,7 +186,7 @@ class Quiz(CogExtension):
             message += await JsonApi.get_humanity('quiz/invalid_syntax/pt_2')
             try:
                 await msg.author.send(message)
-            except:
+            except BaseException:
                 pass
 
 

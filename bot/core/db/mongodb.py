@@ -10,6 +10,7 @@ link = f"mongodb+srv://{account}:{password}@light-cube-cluster.5wswq.mongodb.net
 
 mongo_client = MongoClient(link)
 
+
 class Mongo:
     def __init__(self, database: str):
         self.client = mongo_client[database]
