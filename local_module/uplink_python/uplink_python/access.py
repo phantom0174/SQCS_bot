@@ -66,10 +66,10 @@ class Access:
         """
 
         #
-        # declare types of arguments and response of the corresponding golang function
-        self.uplink.m_libuplink.uplink_derive_encryption_key.argtypes = [ctypes.c_char_p,
-                                                                         ctypes.c_void_p,
-                                                                         ctypes.c_size_t]
+        # declare types of arguments and response of the corresponding golang
+        # function
+        self.uplink.m_libuplink.uplink_derive_encryption_key.argtypes = [
+            ctypes.c_char_p, ctypes.c_void_p, ctypes.c_size_t]
         self.uplink.m_libuplink.uplink_derive_encryption_key.restype = _EncryptionKeyResult
         #
         # prepare the input for the function
@@ -80,17 +80,21 @@ class Access:
         length_ptr = ctypes.c_size_t(hash_value.digest_size)
 
         # salted encryption key by calling the exported golang function
-        encryption_key_result = self.uplink.m_libuplink.uplink_derive_encryption_key(passphrase_ptr,
-                                                                                     salt_ptr,
-                                                                                     length_ptr)
+        encryption_key_result = self.uplink.m_libuplink.uplink_derive_encryption_key(
+            passphrase_ptr, salt_ptr, length_ptr)
         #
         # if error occurred
         if bool(encryption_key_result.error):
-            raise _storj_exception(encryption_key_result.error.contents.code,
-                                   encryption_key_result.error.contents.message.decode("utf-8"))
+            raise _storj_exception(
+                encryption_key_result.error.contents.code,
+                encryption_key_result.error.contents.message.decode("utf-8"))
         return encryption_key_result.encryption_key
 
-    def override_encryption_key(self, bucket_name: str, prefix: str, encryption_key):
+    def override_encryption_key(
+            self,
+            bucket_name: str,
+            prefix: str,
+            encryption_key):
         """
         function overrides the root encryption key for the prefix in bucket with encryptionKey.
 
@@ -103,7 +107,8 @@ class Access:
         """
 
         #
-        # declare types of arguments and response of the corresponding golang function
+        # declare types of arguments and response of the corresponding golang
+        # function
         self.uplink.m_libuplink.uplink_access_override_encryption_key.argtypes =\
             [ctypes.POINTER(_AccessStruct), ctypes.c_char_p, ctypes.c_char_p,
              ctypes.POINTER(_EncryptionKeyStruct)]
@@ -115,14 +120,14 @@ class Access:
         prefix_ptr = ctypes.c_char_p(prefix.encode('utf-8'))
 
         # salted encryption key by calling the exported golang function
-        error_result = self.uplink.m_libuplink.\
-            uplink_access_override_encryption_key(self.access, bucket_name_ptr, prefix_ptr,
-                                                  encryption_key)
+        error_result = self.uplink.m_libuplink. uplink_access_override_encryption_key(
+            self.access, bucket_name_ptr, prefix_ptr, encryption_key)
         #
         # if error occurred
         if bool(error_result):
-            raise _storj_exception(error_result.contents.code,
-                                   error_result.contents.message.decode("utf-8"))
+            raise _storj_exception(
+                error_result.contents.code,
+                error_result.contents.message.decode("utf-8"))
 
     def open_project(self):
         """
@@ -134,17 +139,21 @@ class Access:
         """
 
         #
-        # declare types of arguments and response of the corresponding golang function
-        self.uplink.m_libuplink.uplink_open_project.argtypes = [ctypes.POINTER(_AccessStruct)]
+        # declare types of arguments and response of the corresponding golang
+        # function
+        self.uplink.m_libuplink.uplink_open_project.argtypes = [
+            ctypes.POINTER(_AccessStruct)]
         self.uplink.m_libuplink.uplink_open_project.restype = _ProjectResult
         #
         # open project by calling the exported golang function
-        project_result = self.uplink.m_libuplink.uplink_open_project(self.access)
+        project_result = self.uplink.m_libuplink.uplink_open_project(
+            self.access)
         #
         # if error occurred
         if bool(project_result.error):
-            raise _storj_exception(project_result.error.contents.code,
-                                   project_result.error.contents.message.decode("utf-8"))
+            raise _storj_exception(
+                project_result.error.contents.code,
+                project_result.error.contents.message.decode("utf-8"))
         return Project(project_result.project, self.uplink)
 
     def config_open_project(self, config: Config):
@@ -161,7 +170,8 @@ class Access:
         """
 
         #
-        # declare types of arguments and response of the corresponding golang function
+        # declare types of arguments and response of the corresponding golang
+        # function
         self.uplink.m_libuplink.uplink_config_open_project.argtypes =\
             [_ConfigStruct, ctypes.POINTER(_AccessStruct)]
         self.uplink.m_libuplink.uplink_config_open_project.restype = _ProjectResult
@@ -173,12 +183,14 @@ class Access:
             config_obj = config.get_structure()
         #
         # open project by calling the exported golang function
-        project_result = self.uplink.m_libuplink.uplink_config_open_project(config_obj, self.access)
+        project_result = self.uplink.m_libuplink.uplink_config_open_project(
+            config_obj, self.access)
         #
         # if error occurred
         if bool(project_result.error):
-            raise _storj_exception(project_result.error.contents.code,
-                                   project_result.error.contents.message.decode("utf-8"))
+            raise _storj_exception(
+                project_result.error.contents.code,
+                project_result.error.contents.message.decode("utf-8"))
         return Project(project_result.project, self.uplink)
 
     def serialize(self):
@@ -192,20 +204,25 @@ class Access:
         """
 
         #
-        # declare types of arguments and response of the corresponding golang function
-        self.uplink.m_libuplink.uplink_access_serialize.argtypes = [ctypes.POINTER(_AccessStruct)]
+        # declare types of arguments and response of the corresponding golang
+        # function
+        self.uplink.m_libuplink.uplink_access_serialize.argtypes = [
+            ctypes.POINTER(_AccessStruct)]
         self.uplink.m_libuplink.uplink_access_serialize.restype = _StringResult
         #
         # get serialized access by calling the exported golang function
-        string_result = self.uplink.m_libuplink.uplink_access_serialize(self.access)
+        string_result = self.uplink.m_libuplink.uplink_access_serialize(
+            self.access)
         #
         # if error occurred
         if bool(string_result.error):
-            raise _storj_exception(string_result.error.contents.code,
-                                   string_result.error.contents.message.decode("utf-8"))
+            raise _storj_exception(
+                string_result.error.contents.code,
+                string_result.error.contents.message.decode("utf-8"))
         return string_result.string.decode("utf-8")
 
-    def share(self, permission: Permission = None, shared_prefix: List[SharePrefix] = None):
+    def share(self, permission: Permission = None,
+              shared_prefix: List[SharePrefix] = None):
         """
         function Share creates a new access grant with specific permissions.
 
@@ -227,11 +244,13 @@ class Access:
         """
 
         #
-        # declare types of arguments and response of the corresponding golang function
-        self.uplink.m_libuplink.uplink_access_share.argtypes = [ctypes.POINTER(_AccessStruct),
-                                                                _PermissionStruct,
-                                                                ctypes.POINTER(_SharePrefixStruct),
-                                                                ctypes.c_size_t]
+        # declare types of arguments and response of the corresponding golang
+        # function
+        self.uplink.m_libuplink.uplink_access_share.argtypes = [
+            ctypes.POINTER(_AccessStruct),
+            _PermissionStruct,
+            ctypes.POINTER(_SharePrefixStruct),
+            ctypes.c_size_t]
         self.uplink.m_libuplink.uplink_access_share.restype = _AccessResult
         #
         # prepare the input for the function
@@ -248,18 +267,21 @@ class Access:
         else:
             num_of_structs = len(shared_prefix)
             li_array_size = (_SharePrefixStruct * num_of_structs)()
-            array = ctypes.cast(li_array_size, ctypes.POINTER(_SharePrefixStruct))
+            array = ctypes.cast(
+                li_array_size,
+                ctypes.POINTER(_SharePrefixStruct))
             for i, val in enumerate(shared_prefix):
                 array[i] = val.get_structure()
             shared_prefix_obj = array
             array_size = ctypes.c_size_t(num_of_structs)
         #
         # get shareable access by calling the exported golang function
-        access_result = self.uplink.m_libuplink.uplink_access_share(self.access, permission_obj,
-                                                                    shared_prefix_obj, array_size)
+        access_result = self.uplink.m_libuplink.uplink_access_share(
+            self.access, permission_obj, shared_prefix_obj, array_size)
         #
         # if error occurred
         if bool(access_result.error):
-            raise _storj_exception(access_result.error.contents.code,
-                                   access_result.error.contents.message.decode("utf-8"))
+            raise _storj_exception(
+                access_result.error.contents.code,
+                access_result.error.contents.message.decode("utf-8"))
         return Access(access_result.access, self.uplink)

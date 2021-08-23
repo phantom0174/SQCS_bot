@@ -37,7 +37,7 @@ async def list_file(bucket_name: str, options: dict = None):
         bucket_name,
         ListObjectsOptions(**options)
     )
-    
+
     return [obj.key for obj in objects_list]
 
 
@@ -45,8 +45,9 @@ async def delete_file(bucket_name: str, storj_path: str) -> bool:
     try:
         project.delete_object(bucket_name, storj_path)
         return True
-    except:
-        logging.warning(f'Error while deleting files: {bucket_name}, {storj_path}')
+    except BaseException:
+        logging.warning(
+            f'Error while deleting files: {bucket_name}, {storj_path}')
         return False
 
 
@@ -65,7 +66,7 @@ async def create_bucket(bucket_name: str) -> bool:
     try:
         project.create_bucket(bucket_name)
         return True
-    except:
+    except BaseException:
         logging.warning(f'Error while creating bucket: {bucket_name}')
         return False
 
@@ -74,13 +75,16 @@ async def delete_bucket(bucket_name: str) -> bool:
     try:
         project.delete_bucket(bucket_name)
         return True
-    # if delete bucket fails due to "not empty", delete all the objects and try again
+    # if delete bucket fails due to "not empty", delete all the objects and
+    # try again
     except BucketNotEmptyError as exception:
         logging.warning(f'Error while deleting bucket: {exception.message}')
-        logging.warning("Deleting object's inside bucket and try to delete bucket again...")
+        logging.warning(
+            "Deleting object's inside bucket and try to delete bucket again...")
 
         # list objects in given bucket recursively using ListObjectsOptions
-        objects_list = project.list_objects(bucket_name, ListObjectsOptions(recursive=True))
+        objects_list = project.list_objects(
+            bucket_name, ListObjectsOptions(recursive=True))
         # iterate through all objects path
         for obj in objects_list:
             # delete selected object
@@ -116,7 +120,7 @@ async def download_folder(bucket_name: str, storj_path: str):
     )
     try:
         shutil.rmtree(DOWNLOAD_BASE_PATH)
-    except:
+    except BaseException:
         pass
 
     os.makedirs(download_path)
@@ -133,7 +137,7 @@ async def download_folder(bucket_name: str, storj_path: str):
                 child_local_path = f'{download_path}/{child[:-1]}'
                 if not os.path.exists(child_local_path):
                     os.makedirs(child_local_path)
-                
+
                 await traverse_folder(
                     bucket_name=bucket_name,
                     storj_path=child

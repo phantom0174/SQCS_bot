@@ -7,7 +7,6 @@ import os
 import pendulum as pend
 
 
-
 class GoogleCalendarNotif(CogExtension):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -38,8 +37,10 @@ class GoogleCalendarNotif(CogExtension):
 
             event_obj = dict(EventSerializer.to_json(event))
 
-            event_start_time = pend.parse(str(event.start), tz='Asia/Taipei').to_datetime_string()
-            event_end_time = pend.parse(str(event.end), tz='Asia/Taipei').to_datetime_string()
+            event_start_time = pend.parse(
+                str(event.start), tz='Asia/Taipei').to_datetime_string()
+            event_end_time = pend.parse(
+                str(event.end), tz='Asia/Taipei').to_datetime_string()
 
             event_data = {
                 "_id": event.id,
@@ -68,7 +69,8 @@ class GoogleCalendarNotif(CogExtension):
             now_time = pend.now('Asia/Taipei')
             event_start_time = pend.parse(event["start"])
 
-            if (event_start_time - now_time).in_days() == 5 and event["msg_id"] is None:
+            if (event_start_time -
+     now_time).in_days() == 5 and event["msg_id"] is None:
                 notify_msg = get_notify_msg()
                 notify_dc_msg = await notify_channel.send(notify_msg)
 
@@ -81,7 +83,8 @@ class GoogleCalendarNotif(CogExtension):
                 self.gc_cursor.update_one({"_id": event["_id"]}, execute)
             elif (event_start_time - now_time).in_days() == 3 and event["notify_stage"] == 5:
                 notify_msg = get_notify_msg()
-                old_notify_dc_msg = notify_channel.fetch_message(event["msg_id"])
+                old_notify_dc_msg = notify_channel.fetch_message(
+                    event["msg_id"])
                 notify_dc_msg = await old_notify_dc_msg.edit(notify_msg)
 
                 execute = {
@@ -91,7 +94,8 @@ class GoogleCalendarNotif(CogExtension):
                 }
             elif (event_start_time - now_time).in_days() == 1 and event["notify_stage"] == 3:
                 notify_msg = get_notify_msg()
-                old_notify_dc_msg = notify_channel.fetch_message(event["msg_id"])
+                old_notify_dc_msg = notify_channel.fetch_message(
+                    event["msg_id"])
                 notify_dc_msg = await old_notify_dc_msg.edit(notify_msg)
 
                 execute = {
@@ -108,7 +112,7 @@ class GoogleCalendarNotif(CogExtension):
 
         def get_new_notify_msg():
             pass
-        
+
         for event in self.gc:
             event_data = self.gc_cursor.find_one({"_id": event.id})
 
@@ -120,7 +124,8 @@ class GoogleCalendarNotif(CogExtension):
             # etag has been modified => event has been modified
             if event_obj["etag"] != event_data["etag"]:
                 # renew all info of event
-                event_start_time = pend.parse(str(event.start), tz='Asia/Taipei')
+                event_start_time = pend.parse(
+                    str(event.start), tz='Asia/Taipei')
                 event_end_time = pend.parse(str(event.end), tz='Asia/Taipei')
 
                 execute = {
@@ -135,7 +140,8 @@ class GoogleCalendarNotif(CogExtension):
                 self.gc_cursor.update_one({"_id": event.id}, execute)
 
                 # repost notify
-                old_notify_dc_msg = notify_channel.fetch_message(event_data["msg_id"])
+                old_notify_dc_msg = notify_channel.fetch_message(
+                    event_data["msg_id"])
                 await old_notify_dc_msg.delete()
 
                 notify_msg = get_new_notify_msg()

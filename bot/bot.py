@@ -4,7 +4,6 @@ import discord
 from .core import utils as utl
 
 
-
 class SQCSBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.all()
@@ -32,9 +31,11 @@ class SQCSBot(commands.Bot):
                 for sub_filename in os.listdir(f'./bot/cogs/{filename}'):
                     if sub_filename.endswith('.py'):
                         try:
-                            super().load_extension(f'bot.cogs.{filename}.{sub_filename[:-3]}')
+                            super().load_extension(
+                                f'bot.cogs.{filename}.{sub_filename[:-3]}')
                         except Exception as e:
-                            print(f'Error loading bot.cogs.{filename}.{sub_filename[:-3]}')
+                            print(
+                                f'Error loading bot.cogs.{filename}.{sub_filename[:-3]}')
                             print(e)
 
     def run(self):

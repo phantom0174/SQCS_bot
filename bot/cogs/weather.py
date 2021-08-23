@@ -48,7 +48,8 @@ class WeatherQuery(CogExtension):
             f'{str(os.environ.get("PHANTOM_TW_WEATHER_TOKEN"))}&format=json'
         )
 
-        location_weather_data = response.json()["cwbopendata"]["dataset"]["location"]
+        location_weather_data = response.json(
+        )["cwbopendata"]["dataset"]["location"]
 
         county_weather_info = ''
 
@@ -66,14 +67,12 @@ class WeatherQuery(CogExtension):
                     end_time_str = loc_json[0]["time"][time_range]["endTime"]
                     county_weather_info += (
                         f'{start_time_str.split("T")[0]} {start_time_str.split("T")[1].split("+")[0]} ～ '
-                        f'{end_time_str.split("T")[0]} {end_time_str.split("T")[1].split("+")[0]}::\n'
-                    )
+                        f'{end_time_str.split("T")[0]} {end_time_str.split("T")[1].split("+")[0]}::\n')
                     for (index, info) in enumerate(loc_json):
                         county_weather_info += (
                             f'{data_prefix[str(index)]}: '
                             f'{info["time"][time_range]["parameter"]["parameterName"]} '
-                            f'{data_suffix[str(index)]}\n'
-                        )
+                            f'{data_suffix[str(index)]}\n')
 
                 await ctx.send(county_weather_info)
             county_weather_info = ''

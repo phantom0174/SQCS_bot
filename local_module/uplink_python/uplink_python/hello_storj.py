@@ -29,8 +29,8 @@ if __name__ == "__main__":
         # function calls
         # request access using passphrase
         print("\nRequesting Access using passphrase...")
-        access = uplink.request_access_with_passphrase(MY_SATELLITE, MY_API_KEY,
-                                                       MY_ENCRYPTION_PASSPHRASE)
+        access = uplink.request_access_with_passphrase(
+            MY_SATELLITE, MY_API_KEY, MY_ENCRYPTION_PASSPHRASE)
         print("Request Access: SUCCESS!")
         #
 
@@ -55,13 +55,15 @@ if __name__ == "__main__":
         print("\nDeleting '" + MY_BUCKET + "' bucket...")
         try:
             bucket = project.delete_bucket(MY_BUCKET)
-        # if delete bucket fails due to "not empty", delete all the objects and try again
+        # if delete bucket fails due to "not empty", delete all the objects and
+        # try again
         except BucketNotEmptyError as exception:
             print("Error while deleting bucket: ", exception.message)
             print("Deleting object's inside bucket and try to delete bucket again...")
             # list objects in given bucket recursively using ListObjectsOptions
             print("Listing and deleting object's inside bucket...")
-            objects_list = project.list_objects(MY_BUCKET, ListObjectsOptions(recursive=True))
+            objects_list = project.list_objects(
+                MY_BUCKET, ListObjectsOptions(recursive=True))
             # iterate through all objects path
             for obj in objects_list:
                 # delete selected object
@@ -102,8 +104,9 @@ if __name__ == "__main__":
 
         # list objects in given bucket with above options or None
         print("\nListing object's names...")
-        objects_list = project.list_objects(MY_BUCKET, ListObjectsOptions(recursive=True,
-                                                                          system=True))
+        objects_list = project.list_objects(
+            MY_BUCKET, ListObjectsOptions(
+                recursive=True, system=True))
         # print all objects path
         for obj in objects_list:
             print(obj.key, " | ", obj.is_prefix)  # as python class object
@@ -116,7 +119,8 @@ if __name__ == "__main__":
         print("\nDownloading data...")
         # get handle of file which data has to be downloaded
         file_handle = open(DESTINATION_FULL_FILENAME, 'w+b')
-        # get download handle to specified bucket and object path to be downloaded
+        # get download handle to specified bucket and object path to be
+        # downloaded
         download = project.download_object(MY_BUCKET, MY_STORJ_UPLOAD_PATH)
         #
         # download data from storj to file
@@ -135,7 +139,8 @@ if __name__ == "__main__":
         print("\nCreating new Access...")
         # set permissions for the new access to be created
         permissions = Permission(allow_list=True, allow_delete=False)
-        # set shared prefix as list of dictionaries for the new access to be created
+        # set shared prefix as list of dictionaries for the new access to be
+        # created
         shared_prefix = [SharePrefix(bucket=MY_BUCKET, prefix="")]
         # create new access
         new_access = access.share(permissions, shared_prefix)
@@ -182,8 +187,9 @@ if __name__ == "__main__":
 
         # list objects in given bucket with above options or None
         print("\nListing object's names...")
-        objects_list = shared_project.list_objects(MY_BUCKET, ListObjectsOptions(recursive=True,
-                                                                                 system=True))
+        objects_list = shared_project.list_objects(
+            MY_BUCKET, ListObjectsOptions(
+                recursive=True, system=True))
         # print all objects path
         for obj in objects_list:
             print(obj.key, " | ", obj.is_prefix)  # as python class object

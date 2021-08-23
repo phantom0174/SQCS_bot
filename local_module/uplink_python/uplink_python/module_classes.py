@@ -34,8 +34,11 @@ class Config:
         _ConfigStruct
     """
 
-    def __init__(self, user_agent: str = "", dial_timeout_milliseconds: int = 0,
-                 temp_directory: str = ""):
+    def __init__(
+            self,
+            user_agent: str = "",
+            dial_timeout_milliseconds: int = 0,
+            temp_directory: str = ""):
         """Constructs all the necessary attributes for the Config object."""
 
         self.user_agent = user_agent
@@ -45,9 +48,13 @@ class Config:
     def get_structure(self):
         """Converts python class object to ctypes structure _ConfigStruct"""
 
-        return _ConfigStruct(ctypes.c_char_p(self.user_agent.encode('utf-8')),
-                             ctypes.c_int32(self.dial_timeout_milliseconds),
-                             ctypes.c_char_p(self.temp_directory.encode('utf-8')))
+        return _ConfigStruct(
+            ctypes.c_char_p(
+                self.user_agent.encode('utf-8')),
+            ctypes.c_int32(
+                self.dial_timeout_milliseconds),
+            ctypes.c_char_p(
+                self.temp_directory.encode('utf-8')))
 
 
 class Permission:
@@ -91,9 +98,14 @@ class Permission:
         _PermissionStruct
     """
 
-    def __init__(self, allow_download: bool = False, allow_upload: bool = False,
-                 allow_list: bool = False, allow_delete: bool = False,
-                 not_before: int = 0, not_after: int = 0):
+    def __init__(
+            self,
+            allow_download: bool = False,
+            allow_upload: bool = False,
+            allow_list: bool = False,
+            allow_delete: bool = False,
+            not_before: int = 0,
+            not_after: int = 0):
         """Constructs all the necessary attributes for the Permission object."""
 
         self.allow_download = allow_download
@@ -207,7 +219,11 @@ class SystemMetadata:
         converts python class object to python dictionary
     """
 
-    def __init__(self, created: int = 0, expires: int = 0, content_length: int = 0):
+    def __init__(
+            self,
+            created: int = 0,
+            expires: int = 0,
+            content_length: int = 0):
         """Constructs all the necessary attributes for the SystemMetadata object."""
 
         self.created = created
@@ -252,7 +268,12 @@ class CustomMetadataEntry:
         converts python class object to python dictionary
     """
 
-    def __init__(self, key: str = "", key_length: int = 0, value: str = "", value_length: int = 0):
+    def __init__(
+            self,
+            key: str = "",
+            key_length: int = 0,
+            value: str = "",
+            value_length: int = 0):
         """Constructs all the necessary attributes for the CustomMetadataEntry object."""
 
         self.key = key
@@ -263,16 +284,24 @@ class CustomMetadataEntry:
     def get_structure(self):
         """Converts python class object to ctypes structure _CustomMetadataEntryStruct"""
 
-        return _CustomMetadataEntryStruct(ctypes.c_char_p(self.key.encode('utf-8')),
-                                          ctypes.c_size_t(self.key_length),
-                                          ctypes.c_char_p(self.value.encode('utf-8')),
-                                          ctypes.c_size_t(self.value_length))
+        return _CustomMetadataEntryStruct(
+            ctypes.c_char_p(
+                self.key.encode('utf-8')),
+            ctypes.c_size_t(
+                self.key_length),
+            ctypes.c_char_p(
+                self.value.encode('utf-8')),
+            ctypes.c_size_t(
+                self.value_length))
 
     def get_dict(self):
         """Converts python class object to python dictionary"""
 
-        return {"key": self.key, "key_length": self.key_length, "value": self.value,
-                "value_length": self.value_length}
+        return {
+            "key": self.key,
+            "key_length": self.key_length,
+            "value": self.value,
+            "value_length": self.value_length}
 
 
 class CustomMetadata:
@@ -294,7 +323,10 @@ class CustomMetadata:
         converts python class object to python dictionary
     """
 
-    def __init__(self, entries: List[CustomMetadataEntry] = None, count: int = 0):
+    def __init__(
+            self,
+            entries: List[CustomMetadataEntry] = None,
+            count: int = 0):
         """Constructs all the necessary attributes for the CustomMetadata object."""
 
         self.entries = entries
@@ -308,7 +340,8 @@ class CustomMetadata:
             entries = ctypes.POINTER(_CustomMetadataEntryStruct)()
         else:
             li_array_size = (_CustomMetadataEntryStruct * self.count)()
-            entries = ctypes.cast(li_array_size, ctypes.POINTER(_CustomMetadataEntryStruct))
+            entries = ctypes.cast(li_array_size,
+     ctypes.POINTER(_CustomMetadataEntryStruct))
             for i, val in enumerate(self.entries):
                 entries[i] = val.get_structure()
 
@@ -321,7 +354,10 @@ class CustomMetadata:
         if entries is None or self.count == 0:
             self.count = 0
             entries = [CustomMetadataEntry()]
-        return {"entries": [entry.get_dict() for entry in entries], "count": self.count}
+        return {
+            "entries": [
+                entry.get_dict() for entry in entries],
+            "count": self.count}
 
 
 class Object:
@@ -346,8 +382,12 @@ class Object:
         converts python class object to python dictionary
     """
 
-    def __init__(self, key: str = "", is_prefix: bool = False, system: SystemMetadata = None,
-                 custom: CustomMetadata = None):
+    def __init__(
+            self,
+            key: str = "",
+            is_prefix: bool = False,
+            system: SystemMetadata = None,
+            custom: CustomMetadata = None):
         """Constructs all the necessary attributes for the Object object."""
 
         self.key = key
@@ -380,8 +420,11 @@ class Object:
             system = SystemMetadata()
         if custom is None:
             custom = CustomMetadata()
-        return {"key": self.key, "is_prefix": self.is_prefix, "system": system.get_dict(),
-                "custom": custom.get_dict()}
+        return {
+            "key": self.key,
+            "is_prefix": self.is_prefix,
+            "system": system.get_dict(),
+            "custom": custom.get_dict()}
 
 
 class ListObjectsOptions:
@@ -411,8 +454,13 @@ class ListObjectsOptions:
         _ListObjectsOptionsStruct
     """
 
-    def __init__(self, prefix: str = "", cursor: str = "", recursive: bool = False,
-                 system: bool = False, custom: bool = False):
+    def __init__(
+            self,
+            prefix: str = "",
+            cursor: str = "",
+            recursive: bool = False,
+            system: bool = False,
+            custom: bool = False):
         """Constructs all the necessary attributes for the ListObjectsOptions object."""
 
         self.prefix = prefix
@@ -424,11 +472,17 @@ class ListObjectsOptions:
     def get_structure(self):
         """Converts python class object to ctypes structure _ListObjectsOptionsStruct"""
 
-        return _ListObjectsOptionsStruct(ctypes.c_char_p(self.prefix.encode('utf-8')),
-                                         ctypes.c_char_p(self.cursor.encode('utf-8')),
-                                         ctypes.c_bool(self.recursive),
-                                         ctypes.c_bool(self.system),
-                                         ctypes.c_bool(self.custom))
+        return _ListObjectsOptionsStruct(
+            ctypes.c_char_p(
+                self.prefix.encode('utf-8')),
+            ctypes.c_char_p(
+                self.cursor.encode('utf-8')),
+            ctypes.c_bool(
+                self.recursive),
+            ctypes.c_bool(
+                self.system),
+            ctypes.c_bool(
+                self.custom))
 
 
 class ListBucketsOptions:
@@ -457,7 +511,8 @@ class ListBucketsOptions:
     def get_structure(self):
         """Converts python class object to ctypes structure _ListBucketsOptionsStruct"""
 
-        return _ListBucketsOptionsStruct(ctypes.c_char_p(self.cursor.encode('utf-8')))
+        return _ListBucketsOptionsStruct(
+            ctypes.c_char_p(self.cursor.encode('utf-8')))
 
 
 class UploadOptions:

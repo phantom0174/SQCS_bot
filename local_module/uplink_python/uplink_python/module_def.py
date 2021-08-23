@@ -6,8 +6,13 @@ import ctypes
 class _ConfigStruct(ctypes.Structure):
     """Config ctypes structure for internal processing."""
 
-    _fields_ = [("user_agent", ctypes.c_char_p), ("dial_timeout_milliseconds", ctypes.c_int32),
-                ("temp_directory", ctypes.c_char_p)]
+    _fields_ = [
+        ("user_agent",
+    ctypes.c_char_p),
+        ("dial_timeout_milliseconds",
+    ctypes.c_int32),
+        ("temp_directory",
+     ctypes.c_char_p)]
 
 
 class _AccessStruct(ctypes.Structure):
@@ -65,7 +70,8 @@ class _CustomMetadataEntryStruct(ctypes.Structure):
 class _CustomMetadataStruct(ctypes.Structure):
     """CustomMetadata ctypes structure for internal processing."""
 
-    _fields_ = [("entries", ctypes.POINTER(_CustomMetadataEntryStruct)), ("count", ctypes.c_size_t)]
+    _fields_ = [("entries", ctypes.POINTER(
+        _CustomMetadataEntryStruct)), ("count", ctypes.c_size_t)]
 
 
 class _ObjectStruct(ctypes.Structure):
@@ -78,8 +84,17 @@ class _ObjectStruct(ctypes.Structure):
 class _ListObjectsOptionsStruct(ctypes.Structure):
     """ListObjectsOptions ctypes structure for internal processing."""
 
-    _fields_ = [("prefix", ctypes.c_char_p), ("cursor", ctypes.c_char_p),
-                ("recursive", ctypes.c_bool), ("system", ctypes.c_bool), ("custom", ctypes.c_bool)]
+    _fields_ = [
+        ("prefix",
+    ctypes.c_char_p),
+        ("cursor",
+    ctypes.c_char_p),
+        ("recursive",
+    ctypes.c_bool),
+        ("system",
+    ctypes.c_bool),
+        ("custom",
+     ctypes.c_bool)]
 
 
 class _ListBucketsOptionsStruct(ctypes.Structure):
@@ -133,31 +148,36 @@ class _Error(ctypes.Structure):
 class _ProjectResult(ctypes.Structure):
     """ProjectResult ctypes structure"""
 
-    _fields_ = [("project", ctypes.POINTER(_ProjectStruct)), ("error", ctypes.POINTER(_Error))]
+    _fields_ = [("project", ctypes.POINTER(_ProjectStruct)),
+                ("error", ctypes.POINTER(_Error))]
 
 
 class _BucketResult(ctypes.Structure):
     """BucketResult ctypes structure"""
 
-    _fields_ = [("bucket", ctypes.POINTER(_BucketStruct)), ("error", ctypes.POINTER(_Error))]
+    _fields_ = [("bucket", ctypes.POINTER(_BucketStruct)),
+                ("error", ctypes.POINTER(_Error))]
 
 
 class _UploadResult(ctypes.Structure):
     """UploadResult ctypes structure"""
 
-    _fields_ = [("upload", ctypes.POINTER(_UploadStruct)), ("error", ctypes.POINTER(_Error))]
+    _fields_ = [("upload", ctypes.POINTER(_UploadStruct)),
+                ("error", ctypes.POINTER(_Error))]
 
 
 class _DownloadResult(ctypes.Structure):
     """DownloadResult ctypes structure"""
 
-    _fields_ = [("download", ctypes.POINTER(_DownloadStruct)), ("error", ctypes.POINTER(_Error))]
+    _fields_ = [("download", ctypes.POINTER(_DownloadStruct)),
+                ("error", ctypes.POINTER(_Error))]
 
 
 class _AccessResult(ctypes.Structure):
     """AccessResult ctypes structure"""
 
-    _fields_ = [("access", ctypes.POINTER(_AccessStruct)), ("error", ctypes.POINTER(_Error))]
+    _fields_ = [("access", ctypes.POINTER(_AccessStruct)),
+                ("error", ctypes.POINTER(_Error))]
 
 
 class _StringResult(ctypes.Structure):
@@ -169,19 +189,22 @@ class _StringResult(ctypes.Structure):
 class _ObjectResult(ctypes.Structure):
     """ObjectResult ctypes structure"""
 
-    _fields_ = [("object", ctypes.POINTER(_ObjectStruct)), ("error", ctypes.POINTER(_Error))]
+    _fields_ = [("object", ctypes.POINTER(_ObjectStruct)),
+                ("error", ctypes.POINTER(_Error))]
 
 
 class _WriteResult(ctypes.Structure):
     """WriteResult ctypes structure"""
 
-    _fields_ = [("bytes_written", ctypes.c_size_t), ("error", ctypes.POINTER(_Error))]
+    _fields_ = [("bytes_written", ctypes.c_size_t),
+                ("error", ctypes.POINTER(_Error))]
 
 
 class _ReadResult(ctypes.Structure):
     """ReadResult ctypes structure"""
 
-    _fields_ = [("bytes_read", ctypes.c_size_t), ("error", ctypes.POINTER(_Error))]
+    _fields_ = [("bytes_read", ctypes.c_size_t),
+                ("error", ctypes.POINTER(_Error))]
 
 
 class _EncryptionKeyResult(ctypes.Structure):

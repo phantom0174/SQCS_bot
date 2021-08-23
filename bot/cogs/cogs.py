@@ -19,13 +19,16 @@ def find_cog(bot, target_cog: str, mode: str) -> Tuple[bool, str]:
     for find_filename in os.listdir('./bot/cogs'):
         # normal cog file
         if find_filename.find('.') != -1:
-            if find_filename.startswith(target_cog) and find_filename.endswith('.py'):
+            if find_filename.startswith(
+                    target_cog) and find_filename.endswith('.py'):
                 load_ext(f'bot.cogs.{find_filename[:-3]}')
                 return True, f':white_check_mark: Extension {find_filename} {mode}ed!'
         else:
             for find_sub_filename in os.listdir(f'./bot/cogs/{find_filename}'):
-                if find_sub_filename.startswith(target_cog) and find_sub_filename.endswith('.py'):
-                    load_ext(f'bot.cogs.{find_filename}.{find_sub_filename[:-3]}')
+                if find_sub_filename.startswith(
+                        target_cog) and find_sub_filename.endswith('.py'):
+                    load_ext(
+                        f'bot.cogs.{find_filename}.{find_sub_filename[:-3]}')
                     return True, f':white_check_mark: Extension {find_sub_filename} {mode}ed!'
     return False, ''
 

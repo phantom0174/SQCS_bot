@@ -15,7 +15,9 @@ class Main(CogExtension):
             colour=self.bot.user.colour
         )
         embed.set_thumbnail(url="https://i.imgur.com/MbzRNTJ.png")
-        embed.set_author(name=self.bot.user.display_name, icon_url=self.bot.user.avatar_url)
+        embed.set_author(
+            name=self.bot.user.display_name,
+            icon_url=self.bot.user.avatar_url)
 
         embed.add_field(
             name='Join Time',
@@ -59,7 +61,7 @@ class Main(CogExtension):
 
                     try:
                         await member.add_roles(lvl_role)
-                    except:
+                    except BaseException:
                         pass
                     break
         await ctx.send(':white_check_mark: 身分組維修完成！')

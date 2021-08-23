@@ -40,7 +40,9 @@ class Text(CogExtension):
                 author_icon_url = msg.author.avatar_url_as(size=32)
                 embed = discord.Embed()
                 embed.set_thumbnail(url=author_icon_url)
-                embed.add_field(name=msg.author.display_name, value=msg.content)
+                embed.add_field(
+                    name=msg.author.display_name,
+                    value=msg.content)
                 await to_channel.send(embed=embed)
 
                 await msg.delete()

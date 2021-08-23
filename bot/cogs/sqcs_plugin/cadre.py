@@ -20,8 +20,9 @@ class Cadre(CogExtension):
 
         .cadre: 可為SQCS現在有的幹部部門
         """
-        cadre_set_cursor, cadre_cursor = Mongo('sqcs-bot').get_curs(['CadreSetting', 'Cadre'])
-        
+        cadre_set_cursor, cadre_cursor = Mongo(
+            'sqcs-bot').get_curs(['CadreSetting', 'Cadre'])
+
         cadre_setting = cadre_set_cursor.find_one({"_id": 0})
         if ctx.channel.id != cadre_setting['apply_channel']:
             return
@@ -62,7 +63,7 @@ class Cadre(CogExtension):
                 f'申請職位：{cadre},\n'
                 f'申請時間：{apply_time}'
             )
-        except:
+        except BaseException:
             pass
 
     @ca.command()
@@ -93,7 +94,7 @@ class Cadre(CogExtension):
             # no perm to send msg to user via server
             try:
                 await ctx.author.send(apply_info)
-            except:
+            except BaseException:
                 pass
 
     @ca.command()
@@ -102,7 +103,7 @@ class Cadre(CogExtension):
         """cmd
         批准 成員<permit_id> 的幹部申請。
 
-        .permit_id: 要批准成員的Discord id 
+        .permit_id: 要批准成員的Discord id
         """
         cadre_cursor = Mongo('sqcs-bot').get_cur('Cadre')
         data = cadre_cursor.find_one({"_id": permit_id})
@@ -115,11 +116,11 @@ class Cadre(CogExtension):
             await ctx.author.send(
                 f':white_check_mark: 你已批准 {data["name"]} 對職位 {data["apply_cadre"]} 的申請！'
             )
-        except:
+        except BaseException:
             pass
 
         member = ctx.guild.get_member(data["_id"])
-        
+
         # no perm to send msg to user via server
         try:
             await member.send(
@@ -127,7 +128,7 @@ class Cadre(CogExtension):
                 f'此為幹部群的連結，請在加入之後使用指令領取屬於你的身分組\n'
                 f'{os.environ.get("WORKING_DC_GUILD_LINK")}'
             )
-        except:
+        except BaseException:
             pass
 
         cadre_cursor.delete_one({"_id": data["_id"]})
@@ -138,7 +139,7 @@ class Cadre(CogExtension):
         """cmd
         查詢 成員<permit_id> 的幹部申請。
 
-        .permit_id: 要查詢成員的Discord id 
+        .permit_id: 要查詢成員的Discord id
         """
         cadre_cursor = Mongo('sqcs-bot').get_cur('Cadre')
         data = cadre_cursor.find_one({"_id": search_id})
@@ -158,7 +159,7 @@ class Cadre(CogExtension):
         """cmd
         移除 成員<permit_id> 的幹部申請。
 
-        .permit_id: 要移除的成員之Discord id 
+        .permit_id: 要移除的成員之Discord id
         """
         cadre_cursor = Mongo('sqcs-bot').get_cur('Cadre')
         data = cadre_cursor.find_one({"_id": delete_id})
@@ -190,7 +191,7 @@ class GuildRole(CogExtension):
                 try:
                     await member.remove_roles(default_role)
                     await member.add_roles(new_default_role)
-                except:
+                except BaseException:
                     pass
 
         await ctx.send(':white_check_mark: 指令執行完畢！')

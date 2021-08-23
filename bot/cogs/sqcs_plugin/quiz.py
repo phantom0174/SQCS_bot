@@ -138,7 +138,8 @@ class Quiz(CogExtension):
         if msg.content.startswith('~') or msg.content.startswith('+'):
             return
 
-        quiz_set_cursor, quiz_cursor = Mongo('sqcs-bot').get_curs(['QuizSetting', 'QuizOngoing'])
+        quiz_set_cursor, quiz_cursor = Mongo(
+            'sqcs-bot').get_curs(['QuizSetting', 'QuizOngoing'])
 
         quiz_status = quiz_set_cursor.find_one({"_id": 0})["event_status"]
         if not quiz_status:
@@ -152,12 +153,13 @@ class Quiz(CogExtension):
             message = await JsonApi.get_humanity('quiz/repeat_answer')
             try:
                 return await msg.author.send(message)
-            except:
+            except BaseException:
                 pass
 
         # if answer fit standard format
         if msg.content.startswith('||') and msg.content.endswith('||'):
-            correct_answer = quiz_set_cursor.find_one({"_id": 0})["correct_answer"]
+            correct_answer = quiz_set_cursor.find_one({"_id": 0})[
+                "correct_answer"]
 
             fluct_ext = Fluct(member_id=msg.author.id, score_mode='quiz')
 
@@ -173,7 +175,7 @@ class Quiz(CogExtension):
             message = await JsonApi.get_humanity('quiz/get_answer')
             try:
                 await msg.author.send(message)
-            except:
+            except BaseException:
                 pass
 
             # add score to member fluctlight if answer is correct
@@ -186,7 +188,7 @@ class Quiz(CogExtension):
             message += await JsonApi.get_humanity('quiz/invalid_syntax/pt_2')
             try:
                 await msg.author.send(message)
-            except:
+            except BaseException:
                 pass
 
 
@@ -203,15 +205,18 @@ class QuizAuto(CogExtension):
         await self.bot.wait_until_ready()
 
         guild = self.bot.get_guild(784607509629239316)
-        report_channel = discord.utils.get(guild.text_channels, name='sqcs-report')
+        report_channel = discord.utils.get(
+            guild.text_channels, name='sqcs-report')
 
         quiz_status = self.quiz_set_cursor.find_one({"_id": 0})["event_status"]
 
         def quiz_ready_to_start():
-            return Time.get_info('week_day') == 1 and Time.get_info('hour') >= 6 and not quiz_status
+            return Time.get_info('week_day') == 1 and Time.get_info(
+                'hour') >= 6 and not quiz_status
 
         def quiz_ready_to_end():
-            return Time.get_info('week_day') == 7 and Time.get_info('hour') >= 22 and quiz_status
+            return Time.get_info('week_day') == 7 and Time.get_info(
+                'hour') >= 22 and quiz_status
 
         if quiz_ready_to_start():
             await quiz_start(self.bot)
@@ -304,7 +309,8 @@ async def quiz_end(bot):
     msg += await JsonApi.get_humanity('quiz/end/main/pt_2', '\n')
 
     attend_count = quiz_ongoing_cursor.find({}).count()
-    countable_member_count = fluctlight_cursor.find({"deep_freeze": {"$eq": False}}).count()
+    countable_member_count = fluctlight_cursor.find(
+        {"deep_freeze": {"$eq": False}}).count()
     quiz_attend_level = int(attend_count / countable_member_count)
 
     quiz_attend_level = min(quiz_attend_level, 7)

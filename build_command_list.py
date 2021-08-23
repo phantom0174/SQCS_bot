@@ -9,9 +9,11 @@ VERSION = '1.32.8.16'
 if os.path.isfile(DOC_PATH):
     os.remove(DOC_PATH)
 
+
 def make_md_header(filename):
     with open(DOC_PATH, mode='a', encoding='utf-8') as file:
         file.write(f'## {filename}\n\n')
+
 
 def insert_docu(cmd: dict):
     cmd_usage = '+'
@@ -38,7 +40,8 @@ def insert_docu(cmd: dict):
 
     cmd_area = False
     cmd["cmd_doc"] = cmd["cmd_doc"].split('\n')
-    cmd["cmd_doc"] = [item.strip('  ') for item in cmd["cmd_doc"] if item.strip() and item != 'cmd']
+    cmd["cmd_doc"] = [
+        item.strip('  ') for item in cmd["cmd_doc"] if item.strip() and item != 'cmd']
 
     for item in cmd["cmd_doc"]:
         ctx = item.strip('  ')
@@ -69,11 +72,12 @@ def insert_docu(cmd: dict):
         else:
             file.write('\n')
 
+
 def traverse_folder(folder_path):
     for filename in os.listdir(folder_path):
         if not filename.endswith('.py'):
             continue
-        
+
         made_filename_docu_header = False
 
         with open(f'{folder_path}/{filename}', mode='r', encoding='utf-8') as file:
@@ -108,7 +112,7 @@ def traverse_folder(folder_path):
                         continue
 
                     attr_obj: ast.Attribute = decor.func
-                    
+
                     if attr_obj.attr == 'group':
                         is_group = True
 
@@ -155,7 +159,7 @@ def traverse_folder(folder_path):
                 # get group name
                 if is_group:
                     group_name = class_obj.name
-                    continue # group has no need to find a parent
+                    continue  # group has no need to find a parent
                 elif is_command:
                     cmd_name = class_obj.name
                 elif not is_command:
@@ -175,14 +179,15 @@ def traverse_folder(folder_path):
                         # if typing is tuple of Union
                         if isinstance(name_obj, ast.Subscript):
                             typing_name = name_obj.value
-                            if isinstance(typing_name, ast.Attribute): # discord.Greedy
+                            if isinstance(
+                                    typing_name, ast.Attribute):  # discord.Greedy
                                 typing_class_name: ast.Name = typing_name.value
                                 typing_class_prefix = typing_class_name.id
 
                                 typing_class_suffix = typing_name.attr
 
                                 typing_prefix = f'{typing_class_prefix}.{typing_class_suffix}'
-                            elif isinstance(typing_name, ast.Name): # Union
+                            elif isinstance(typing_name, ast.Name):  # Union
                                 typing_prefix = typing_name.id
 
                             typing_tuple = name_obj.slice
@@ -201,7 +206,8 @@ def traverse_folder(folder_path):
                                         )
                                     elif isinstance(elt, ast.Name):
                                         typing_class_type = elt.id
-                                        element_in_tuple.append(typing_class_type)
+                                        element_in_tuple.append(
+                                            typing_class_type)
                             elif isinstance(typing_tuple, ast.Attribute):
                                 typing_class_name: ast.Name = typing_tuple.value
                                 typing_class_prefix = typing_class_name.id
@@ -273,8 +279,9 @@ def traverse_folder(folder_path):
                 if not made_filename_docu_header:
                     make_md_header(filename)
                     made_filename_docu_header = True
-                
+
                 insert_docu(cmd_info)
+
 
 with open(DOC_PATH, mode='a', encoding='utf-8') as file:
     file.write(f'# SQCS_bot command list\n\n')

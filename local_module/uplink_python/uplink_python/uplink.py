@@ -2,7 +2,8 @@
 """Python Binding's Uplink Module for Storj (V3)"""
 
 # This file has been modified by phantom0174 at 2021/7/17, SQCS_bot version 1.29.7.17
-# modified content: change absolute import to relative import, and fix .so/.dll for windows and other os, fix literal
+# modified content: change absolute import to relative import, and fix
+# .so/.dll for windows and other os, fix literal
 
 import ctypes
 import os
@@ -47,12 +48,17 @@ class Uplink:
         # private members of PyStorj class with reference objects
         # include the golang exported libuplink library functions
         if Uplink.__instance is None:
-            so_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), f'libuplinkc{libuplinkc_file_suffix}')
+            so_path = os.path.join(
+                os.path.dirname(
+                    os.path.abspath(__file__)),
+                f'libuplinkc{libuplinkc_file_suffix}')
             if os.path.exists(so_path):
                 self.m_libuplink = ctypes.CDLL(so_path)
             else:
-                new_path = os.path.join(sysconfig.get_paths()['purelib'], "uplink_python",
-                                        f'libuplinkc{libuplinkc_file_suffix}')
+                new_path = os.path.join(
+                    sysconfig.get_paths()['purelib'],
+                    "uplink_python",
+                    f'libuplinkc{libuplinkc_file_suffix}')
                 if os.path.exists(new_path):
                     self.m_libuplink = ctypes.CDLL(so_path)
                 else:
@@ -65,27 +71,32 @@ class Uplink:
     def object_from_result(cls, object_):
         """Converts ctypes structure _ObjectStruct to python class object."""
 
-        system = SystemMetadata(created=object_.contents.system.created,
-                                expires=object_.contents.system.expires,
-                                content_length=object_.contents.system.content_length)
+        system = SystemMetadata(
+            created=object_.contents.system.created,
+            expires=object_.contents.system.expires,
+            content_length=object_.contents.system.content_length)
 
         array_size = object_.contents.custom.count
         entries = []
         for i in range(array_size):
             if bool(object_.contents.custom.entries[i]):
                 entries_obj = object_.contents.custom.entries[i]
-                entries.append(CustomMetadataEntry(key=entries_obj.key.decode("utf-8"),
-                                                   key_length=entries_obj.key_length,
-                                                   value=entries_obj.value.decode("utf-8"),
-                                                   value_length=entries_obj.value_length))
+                entries.append(
+                    CustomMetadataEntry(
+                        key=entries_obj.key.decode("utf-8"),
+                        key_length=entries_obj.key_length,
+                        value=entries_obj.value.decode("utf-8"),
+                        value_length=entries_obj.value_length))
             else:
                 entries.append(CustomMetadataEntry())
 
-        return Object(key=object_.contents.key.decode("utf-8"),
-                      is_prefix=object_.contents.is_prefix,
-                      system=system,
-                      custom=CustomMetadata(entries=entries,
-                                            count=object_.contents.custom.count))
+        return Object(
+            key=object_.contents.key.decode("utf-8"),
+            is_prefix=object_.contents.is_prefix,
+            system=system,
+            custom=CustomMetadata(
+                entries=entries,
+                count=object_.contents.custom.count))
 
     @classmethod
     def bucket_from_result(cls, bucket_):
@@ -95,7 +106,11 @@ class Uplink:
                       created=bucket_.contents.created)
 
     #
-    def request_access_with_passphrase(self, satellite: str, api_key: str, passphrase: str):
+    def request_access_with_passphrase(
+            self,
+            satellite: str,
+            api_key: str,
+            passphrase: str):
         """
         RequestAccessWithPassphrase generates a new access grant using a passhprase.
         It must talk to the Satellite provided to get a project-based salt for deterministic
@@ -117,10 +132,10 @@ class Uplink:
         Access
         """
         #
-        # declare types of arguments and response of the corresponding golang function
-        self.m_libuplink.uplink_request_access_with_passphrase.argtypes = [ctypes.c_char_p,
-                                                                           ctypes.c_char_p,
-                                                                           ctypes.c_char_p]
+        # declare types of arguments and response of the corresponding golang
+        # function
+        self.m_libuplink.uplink_request_access_with_passphrase.argtypes = [
+            ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
         self.m_libuplink.uplink_request_access_with_passphrase.restype = _AccessResult
         #
         # prepare the input for the function
@@ -129,18 +144,22 @@ class Uplink:
         passphrase_ptr = ctypes.c_char_p(passphrase.encode('utf-8'))
 
         # get access to Storj by calling the exported golang function
-        access_result = self.m_libuplink.uplink_request_access_with_passphrase(satellite_ptr,
-                                                                               api_key_ptr,
-                                                                               passphrase_ptr)
+        access_result = self.m_libuplink.uplink_request_access_with_passphrase(
+            satellite_ptr, api_key_ptr, passphrase_ptr)
         #
         # if error occurred
         if bool(access_result.error):
-            raise _storj_exception(access_result.error.contents.code,
-                                   access_result.error.contents.message.decode("utf-8"))
+            raise _storj_exception(
+                access_result.error.contents.code,
+                access_result.error.contents.message.decode("utf-8"))
         return Access(access_result.access, self)
 
-    def config_request_access_with_passphrase(self, config: Config, satellite: str, api_key: str,
-                                              passphrase: str):
+    def config_request_access_with_passphrase(
+            self,
+            config: Config,
+            satellite: str,
+            api_key: str,
+            passphrase: str):
         """
         RequestAccessWithPassphrase generates a new access grant using a passhprase and
         custom configuration.
@@ -165,11 +184,10 @@ class Uplink:
         """
 
         #
-        # declare types of arguments and response of the corresponding golang function
-        self.m_libuplink.uplink_config_request_access_with_passphrase.argtypes = [_ConfigStruct,
-                                                                                  ctypes.c_char_p,
-                                                                                  ctypes.c_char_p,
-                                                                                  ctypes.c_char_p]
+        # declare types of arguments and response of the corresponding golang
+        # function
+        self.m_libuplink.uplink_config_request_access_with_passphrase.argtypes = [
+            _ConfigStruct, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
         self.m_libuplink.uplink_config_request_access_with_passphrase.restype = _AccessResult
         #
         # prepare the input for the function
@@ -182,15 +200,14 @@ class Uplink:
         phrase_ptr = ctypes.c_char_p(passphrase.encode('utf-8'))
 
         # get access to Storj by calling the exported golang function
-        access_result = self.m_libuplink.uplink_config_request_access_with_passphrase(config_obj,
-                                                                                      satellite_ptr,
-                                                                                      api_key_ptr,
-                                                                                      phrase_ptr)
+        access_result = self.m_libuplink.uplink_config_request_access_with_passphrase(
+            config_obj, satellite_ptr, api_key_ptr, phrase_ptr)
         #
         # if error occurred
         if bool(access_result.error):
-            raise _storj_exception(access_result.error.contents.code,
-                                   access_result.error.contents.message.decode("utf-8"))
+            raise _storj_exception(
+                access_result.error.contents.code,
+                access_result.error.contents.message.decode("utf-8"))
         return Access(access_result.access, self)
 
     def parse_access(self, serialized_access: str):
@@ -211,18 +228,22 @@ class Uplink:
 
         #
         # prepare the input for the function
-        serialized_access_ptr = ctypes.c_char_p(serialized_access.encode('utf-8'))
+        serialized_access_ptr = ctypes.c_char_p(
+            serialized_access.encode('utf-8'))
         #
-        # declare types of arguments and response of the corresponding golang function
+        # declare types of arguments and response of the corresponding golang
+        # function
         self.m_libuplink.uplink_parse_access.argtypes = [ctypes.c_char_p]
         self.m_libuplink.uplink_parse_access.restype = _AccessResult
         #
 
         # get parsed access by calling the exported golang function
-        access_result = self.m_libuplink.uplink_parse_access(serialized_access_ptr)
+        access_result = self.m_libuplink.uplink_parse_access(
+            serialized_access_ptr)
         #
         # if error occurred
         if bool(access_result.error):
-            raise _storj_exception(access_result.error.contents.code,
-                                   access_result.error.contents.message.decode("utf-8"))
+            raise _storj_exception(
+                access_result.error.contents.code,
+                access_result.error.contents.message.decode("utf-8"))
         return Access(access_result.access, self)

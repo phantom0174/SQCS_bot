@@ -20,7 +20,8 @@ class DataBase(CogExtension):
         """cmd
         重新整理搖光資料庫。
         """
-        cursors = list(Mongo('LightCube').get_curs(['MainFluctlights', 'ViceFluctlights']))
+        cursors = list(Mongo('LightCube').get_curs(
+            ['MainFluctlights', 'ViceFluctlights']))
         members_id = [member.id for member in ctx.guild.members]
 
         condition = {
@@ -38,7 +39,11 @@ class DataBase(CogExtension):
         """cmd
         複製集合中的資料。
         """
-        if '' in [ori_db_name, ori_coll_name, target_db_name, target_coll_name]:
+        if '' in [
+                ori_db_name,
+                ori_coll_name,
+                target_db_name,
+                target_coll_name]:
             return await ctx.send(':x: 任何一個參數都不能為空字串！')
 
         # origin
@@ -52,7 +57,7 @@ class DataBase(CogExtension):
             try:
                 datum_dict = dict(datum)
                 target_coll_cursor.insert_one(datum_dict)
-            except:
+            except BaseException:
                 await ctx.send(f':x: 在複製id為 {datum["_id"]} 的檔案時發生了錯誤！')
 
         await ctx.send(':white_check_mark: 指令執行完畢！')
@@ -62,7 +67,11 @@ class DataBase(CogExtension):
         """cmd
         移動集合中的資料。
         """
-        if '' in [ori_db_name, ori_coll_name, target_db_name, target_coll_name]:
+        if '' in [
+                ori_db_name,
+                ori_coll_name,
+                target_db_name,
+                target_coll_name]:
             return await ctx.send(':x: 任何一個參數都不能為空字串！')
 
         # origin
@@ -77,7 +86,7 @@ class DataBase(CogExtension):
                 datum_dict = dict(datum)
                 target_coll_cursor.insert_one(datum_dict)
                 ori_coll_cursor.delete_one({"_id": datum["_id"]})
-            except:
+            except BaseException:
                 await ctx.send(f':x: 在轉移id為 {datum["_id"]} 的檔案時發生了錯誤！')
 
         await ctx.send(':white_check_mark: 指令執行完畢！')
@@ -101,7 +110,7 @@ class MongoDBBackup(CogExtension):
 
         # backup at time 23:00 ~ 24:00
         if (time_tomorrow - time_now).in_minutes() > 60:
-            return 
+            return
 
         today = Time.get_info('main')
 
@@ -117,7 +126,7 @@ class MongoDBBackup(CogExtension):
 
         # database has been backuped
         if result:
-            return 
+            return
 
         dbs = mongo_client.list_database_names()
         dbs = [item for item in dbs if item not in ['admin', 'local']]
@@ -131,14 +140,14 @@ class MongoDBBackup(CogExtension):
 
                 if not coll_data:
                     continue
-                
+
                 def remake_id(obj: dict):
                     if isinstance(obj["_id"], bson.objectid.ObjectId):
                         obj["_id"] = str(obj["_id"])
                     return obj
 
                 coll_to_json = [remake_id(item) for item in list(coll_data)]
-                
+
                 coll_to_json = json.dumps(
                     coll_to_json,
                     ensure_ascii=False,
@@ -155,13 +164,13 @@ class MongoDBBackup(CogExtension):
 
                 try:
                     os.remove(f'./bot/buffer/{coll}.json')
-                except:
+                except BaseException:
                     pass
 
     @tasks.loop(hours=2)
     async def delete_outdated(self):
         await self.bot.wait_until_ready()
-        
+
         time_now = pend.now('Asia/Taipei')
 
         search_options = {
@@ -183,7 +192,6 @@ class MongoDBBackup(CogExtension):
                     bucket_name=self.bucket,
                     storj_path=folder_name
                 )
-
 
 
 def setup(bot):

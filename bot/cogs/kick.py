@@ -129,7 +129,7 @@ class KickMember(CogExtension):
         # no perm to send msg to user via server
         try:
             await kick_user.send(msg)
-        except:
+        except BaseException:
             pass
 
         try:
@@ -163,11 +163,11 @@ class KickMember(CogExtension):
             msg = await JsonApi.get_humanity('kick/kick_all', '\n')
             msg += f'> Levelling index reached {member["lvl_ind"]}.\n'
             msg += await JsonApi.get_humanity('kick/re_join')
-            
+
             # no perm to send msg to user via server
             try:
                 await kick_user.send(msg)
-            except:
+            except BaseException:
                 pass
 
             try:

@@ -27,14 +27,14 @@ class React(CogExtension):
         msg += await JsonApi.get_humanity('join/opening/main')
         try:
             await member.send(msg)
-        except:
+        except BaseException:
             pass
         await asyncio.sleep(30)
 
         msg = await JsonApi.get_humanity('join/hackmd_read')
         try:
             reaction_msg = await member.send(msg)
-        except:
+        except BaseException:
             pass
         await reaction_msg.add_reaction('⭕')
         await reaction_msg.add_reaction('❌')
@@ -60,7 +60,7 @@ class React(CogExtension):
 
         try:
             await member.send(msg)
-        except:
+        except BaseException:
             pass
 
         # create personal fluctlight data
@@ -75,7 +75,7 @@ class React(CogExtension):
             await member.send(msg)
             time_duration = round(end_time - start_time, 2)
             await member.send(f'順帶一提，我用了 {time_duration} (sec) 建立你的檔案><!')
-        except:
+        except BaseException:
             pass
 
 

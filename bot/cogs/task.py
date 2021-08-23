@@ -25,7 +25,8 @@ class Task(CogExtension):
                 continue
 
             if neutral_role in member.roles:
-                member_active_data = fluctlight_cursor.find_one({"_id": member.id})
+                member_active_data = fluctlight_cursor.find_one(
+                    {"_id": member.id})
                 if member_active_data is None:
                     await fluct_ext.create_main(guild, False, member.id)
                     continue
@@ -40,7 +41,7 @@ class Task(CogExtension):
                     # no perm to send msg to user via server
                     try:
                         await member.send(':partying_face: 恭喜！你已升級為自由量子！')
-                    except:
+                    except BaseException:
                         pass
 
 

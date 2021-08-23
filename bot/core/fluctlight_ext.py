@@ -8,7 +8,8 @@ from typing import NoReturn
 class Fluct:
     def __init__(self, member_id=None, score_mode=None):
         cursors_collection = ['MainFluctlights', 'ViceFluctlights']
-        self.main_fluct_cursor, self.vice_fluct_cursor = Mongo('LightCube').get_curs(cursors_collection)
+        self.main_fluct_cursor, self.vice_fluct_cursor = Mongo(
+            'LightCube').get_curs(cursors_collection)
 
         # score setting cursor
         self.delta_score = None
@@ -25,7 +26,8 @@ class Fluct:
                     "quiz": "quiz_point"
                 }
                 if score_mode not in score_modes.keys():
-                    raise BaseException('ARGUMENT ERROR: score_mode', score_mode)
+                    raise BaseException(
+                        'ARGUMENT ERROR: score_mode', score_mode)
 
                 self.delta_score = score_setting[score_modes.get(score_mode)]
 
@@ -56,14 +58,14 @@ class Fluct:
         }
         try:
             self.main_fluct_cursor.insert_one(default_main_fluctlight)
-        except:
+        except BaseException:
             pass
 
     async def delete_main(self, member_id: int = -1) -> NoReturn:
         member_final_id = await self.get_final_id(member_id)
         try:
             self.main_fluct_cursor.delete_one({"_id": member_final_id})
-        except:
+        except BaseException:
             pass
 
     async def reset_main(self, guild, deep_freeze_status: bool, member_id: int = -1) -> NoReturn:
@@ -82,14 +84,14 @@ class Fluct:
         }
         try:
             self.vice_fluct_cursor.insert_one(default_vice_fluctlight)
-        except:
+        except BaseException:
             pass
 
     async def delete_vice(self, member_id: int = -1) -> NoReturn:
         member_final_id = await self.get_final_id(member_id)
         try:
             self.vice_fluct_cursor.delete_one({"_id": member_final_id})
-        except:
+        except BaseException:
             pass
 
     async def reset_vice(self, member_id: int = -1) -> NoReturn:
@@ -163,17 +165,26 @@ async def guild_weekly_update(bot) -> NoReturn:
     score_set_cursor = Mongo('sqcs-bot').get_cur('ScoreSetting')
 
     # calculate total score, max, min score
-    max_score = fluctlight_cursor.find({}, {"score": 1}).sort("score", -1)[0]["score"]
-    min_score = fluctlight_cursor.find({}, {"score": 1}).sort("score", 1)[0]["score"]
+    max_score = fluctlight_cursor.find(
+        {}, {
+            "score": 1}).sort(
+        "score", -1)[0]["score"]
+    min_score = fluctlight_cursor.find(
+        {}, {
+            "score": 1}).sort(
+        "score", 1)[0]["score"]
     score_set_cursor.update({"_id": 0}, {"$set": {"maximum_score": max_score}})
     score_set_cursor.update({"_id": 0}, {"$set": {"minimum_score": min_score}})
 
     # improved sum method
-    without_frozen_member_cursor = fluctlight_cursor.find({"deep_freeze": {"$ne": True}})
-    total_score = sum(map(lambda item: item["score"], without_frozen_member_cursor))
+    without_frozen_member_cursor = fluctlight_cursor.find(
+        {"deep_freeze": {"$ne": True}})
+    total_score = sum(
+        map(lambda item: item["score"], without_frozen_member_cursor))
 
     # save total score to week score log -> used in score weight update
-    score_set_cursor.update_one({"_id": 0}, {"$push": {"week_score_log": total_score}})
+    score_set_cursor.update_one({"_id": 0},
+     {"$push": {"week_score_log": total_score}})
 
     # update active logs
     # insert fluctlight_cursor, active_logs_cursor
@@ -193,13 +204,17 @@ async def guild_weekly_update(bot) -> NoReturn:
     await lvl_ind_detect(bot, fluctlight_cursor)
 
     # update score weight
-    week_score_log = list(score_set_cursor.find_one({"_id": 0})["week_score_log"])
+    week_score_log = list(score_set_cursor.find_one(
+        {"_id": 0})["week_score_log"])
     avr_score_log = float(statistics.mean(week_score_log))
 
-    new_weight = FluctMath.score_weight_update(total_score, avr_score_log, max_score, min_score)
-    score_set_cursor.update_one({"_id": 0}, {"$set": {"score_weight": new_weight}})
+    new_weight = FluctMath.score_weight_update(
+        total_score, avr_score_log, max_score, min_score)
+    score_set_cursor.update_one({"_id": 0},
+     {"$set": {"score_weight": new_weight}})
 
-    report_channel = discord.utils.get(bot.guilds[1].text_channels, name='sqcs-report')
+    report_channel = discord.utils.get(
+        bot.guilds[1].text_channels, name='sqcs-report')
     await report_channel.send(f'[Auto]Very important update. {Time.get_info("whole")}')
 
 
@@ -234,7 +249,8 @@ async def contribution_update(fluctlight_cursor) -> float:
     data = fluctlight_cursor.find({})
 
     for member in data:
-        member_frozen = fluctlight_cursor.find_one({"_id": member["_id"]})["deep_freeze"]
+        member_frozen = fluctlight_cursor.find_one(
+            {"_id": member["_id"]})["deep_freeze"]
 
         if member_frozen:
             continue
@@ -243,10 +259,12 @@ async def contribution_update(fluctlight_cursor) -> float:
         for i, char in enumerate(member["log"]):
             total_contrib += pow(2, -i) * float(char)
 
-        fluctlight_cursor.update_one({"_id": member["_id"]}, {"$inc": {"contrib": total_contrib}})
+        fluctlight_cursor.update_one({"_id": member["_id"]}, {
+                                     "$inc": {"contrib": total_contrib}})
         avr_contrib += total_contrib
 
-    total_member_count = fluctlight_cursor.find({"deep_freeze": {"$eq": False}}).count()
+    total_member_count = fluctlight_cursor.find(
+        {"deep_freeze": {"$eq": False}}).count()
     avr_contrib /= total_member_count
 
     return avr_contrib
@@ -265,7 +283,8 @@ async def lvl_ind_update(fluctlight_cursor, avr_contrib) -> None:
             member["contrib"],
             avr_contrib
         )
-        fluctlight_cursor.update_one({"_id": member["_id"]}, {"$inc": {"lvl_ind": delta_lvl_ind}})
+        fluctlight_cursor.update_one({"_id": member["_id"]}, {
+                                     "$inc": {"lvl_ind": delta_lvl_ind}})
 
 
 async def lvl_ind_detect(bot, fluctlight_cursor) -> None:
@@ -278,13 +297,13 @@ async def lvl_ind_detect(bot, fluctlight_cursor) -> None:
             user = guild.get_member(member["_id"])
             try:
                 await user.send(f'Your levelling index has reached warning range!({member["lvl_ind"]});')
-            except:
+            except BaseException:
                 pass
         elif member["lvl_ind"] >= 1.5:
             user = guild.get_member(member["_id"])
             try:
                 await user.send(f'Your levelling index has reached danger range!({member["lvl_ind"]});')
-            except:
+            except BaseException:
                 pass
 
             member_info = {

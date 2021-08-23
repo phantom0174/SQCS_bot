@@ -15,7 +15,8 @@ def sgn(num):
 
 class Time:
     @staticmethod
-    def get_info(mode: str = 'custom', custom_form: str = '') -> Union[str, int, None]:
+    def get_info(mode: str = 'custom',
+                 custom_form: str = '') -> Union[str, int, None]:
         dt1 = datetime.utcnow().replace(tzinfo=timezone.utc)
         dt2 = dt1.astimezone(timezone(timedelta(hours=8)))  # 轉換時區 -> 東八區
 
@@ -68,9 +69,8 @@ class FluctMath:
         active_days = sum(map(int, log))
         theta2 = sgn(active_days - (1 / 2) * member_week_count)
 
-        return float(
-            -sgn(theta1 + theta2) * abs((contrib - avr_contrib) * (theta1 + theta2)) / 2
-        )
+        return float(-sgn(theta1 + theta2) *
+                     abs((contrib - avr_contrib) * (theta1 + theta2)) / 2)
 
     @staticmethod
     def score_weight_update(t_score, avr_score, max_score, min_score) -> float:
