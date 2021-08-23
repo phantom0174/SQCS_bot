@@ -59,7 +59,7 @@ class Main(CogExtension):
 
                     try:
                         await member.add_roles(lvl_role)
-                    except:
+                    except BaseException:
                         pass
                     break
         await ctx.send(':white_check_mark: 身分組維修完成！')

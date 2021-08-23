@@ -15,7 +15,7 @@ class JsonApi:
     def reload_switcher():
         global link_dict
         link_dict = requests.get(link_header + json_links).json()['links']
-    
+
     @staticmethod
     def get(name):
         if name not in link_dict.keys():
@@ -23,7 +23,7 @@ class JsonApi:
 
         response = requests.get(link_header + link_dict[name])
         return response.json()
-    
+
     @staticmethod
     def put(name, alter_json):
         if name not in link_dict.keys():

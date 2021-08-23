@@ -27,9 +27,9 @@ class Fluctlight(CogExtension):
 
                 try:
                     await member.send(msg)
-                except:
+                except BaseException:
                     pass
-            except:
+            except BaseException:
                 await ctx.send(f':x: 彌補 {member_id} 時發生了錯誤！彌補分數：{delta_value}')
 
         await ctx.send(':white_check_mark: 指令執行完畢！')
@@ -111,7 +111,7 @@ class FluctlightAuto(CogExtension):
 
         main_data = main_cursor.find({})
         vice_data = vice_cursor.find({})
-        
+
         guild = self.bot.get_guild(743507979369709639)
 
         fluct_ext = Fluct()

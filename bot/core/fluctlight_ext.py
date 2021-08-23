@@ -56,14 +56,14 @@ class Fluct:
         }
         try:
             self.main_fluct_cursor.insert_one(default_main_fluctlight)
-        except:
+        except BaseException:
             pass
 
     async def delete_main(self, member_id: int = -1) -> NoReturn:
         member_final_id = await self.get_final_id(member_id)
         try:
             self.main_fluct_cursor.delete_one({"_id": member_final_id})
-        except:
+        except BaseException:
             pass
 
     async def reset_main(self, guild, deep_freeze_status: bool, member_id: int = -1) -> NoReturn:
@@ -82,14 +82,14 @@ class Fluct:
         }
         try:
             self.vice_fluct_cursor.insert_one(default_vice_fluctlight)
-        except:
+        except BaseException:
             pass
 
     async def delete_vice(self, member_id: int = -1) -> NoReturn:
         member_final_id = await self.get_final_id(member_id)
         try:
             self.vice_fluct_cursor.delete_one({"_id": member_final_id})
-        except:
+        except BaseException:
             pass
 
     async def reset_vice(self, member_id: int = -1) -> NoReturn:
@@ -278,13 +278,13 @@ async def lvl_ind_detect(bot, fluctlight_cursor) -> None:
             user = guild.get_member(member["_id"])
             try:
                 await user.send(f'Your levelling index has reached warning range!({member["lvl_ind"]});')
-            except:
+            except BaseException:
                 pass
         elif member["lvl_ind"] >= 1.5:
             user = guild.get_member(member["_id"])
             try:
                 await user.send(f'Your levelling index has reached danger range!({member["lvl_ind"]});')
-            except:
+            except BaseException:
                 pass
 
             member_info = {

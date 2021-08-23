@@ -15,7 +15,7 @@ async def report_lect_attend(bot, attendants: list, week: int) -> None:
             await fluct_ext.add_score(member_id)
             await fluct_ext.active_log_update(member_id)
             await fluct_ext.lect_attend_update(member_id)
-        except:
+        except BaseException:
             await report_channel.send(
                 f'[DB MANI ERROR][to: {member_id}][score_mode: lect_attend]')
 

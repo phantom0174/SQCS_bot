@@ -7,7 +7,6 @@ import os
 import pendulum as pend
 
 
-
 class GoogleCalendarNotif(CogExtension):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -108,7 +107,7 @@ class GoogleCalendarNotif(CogExtension):
 
         def get_new_notify_msg():
             pass
-        
+
         for event in self.gc:
             event_data = self.gc_cursor.find_one({"_id": event.id})
 

@@ -317,7 +317,7 @@ class LectureAttendVerify(CogExtension):
 
             verify_cursor.delete_one({"TOKEN": token, "reason": "lect"})
             await ctx.send(':white_check_mark: 操作成功！')
-        except:
+        except BaseException:
             guild = self.bot.get_guild(784607509629239316)
             report_channel = discord.utils.get(guild.text_channels, name='sqcs-lecture-attend')
 

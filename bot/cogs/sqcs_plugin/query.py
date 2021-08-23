@@ -43,7 +43,7 @@ class Query(CogExtension):
         """
         try:
             await ctx.author.send(embed=(await create_fluct_data_embed(ctx.author.id)))
-        except:
+        except BaseException:
             pass
 
     @query.command()
@@ -56,7 +56,7 @@ class Query(CogExtension):
         """
         try:
             await ctx.author.send(embed=(await create_fluct_data_embed(target_id)))
-        except:
+        except BaseException:
             pass
 
     # guild active percentage

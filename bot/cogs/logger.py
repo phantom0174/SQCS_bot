@@ -82,7 +82,7 @@ class LocalLogAuto(CogExtension):
     @tasks.loop(minutes=30)
     async def local_log_upload(self):
         await self.bot.wait_until_ready()
-        
+
         with open('./bot/buffer/bot.log', mode='r', encoding='utf8') as temp_file:
             local_logs = temp_file.read().split('\n')
 

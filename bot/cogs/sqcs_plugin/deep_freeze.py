@@ -17,7 +17,7 @@ class DeepFreeze(CogExtension):
         將 成員<member_id> 的深度凍結狀態設定為 status
 
         .member_id: 成員在Discord中的id
-        .status: 0 -> 無凍結； 1 -> 凍結 
+        .status: 0 -> 無凍結； 1 -> 凍結
         """
         if status not in [0, 1]:
             return await ctx.send(':x: 狀態參數必須為 0 或 1！')
@@ -35,7 +35,7 @@ class DeepFreeze(CogExtension):
             # no perm to send msg to user via server
             try:
                 await member.send(f':exclamation: 你的 `deep freeze` 狀態被設定為 {bool(status)} 了！')
-            except:
+            except BaseException:
                 pass
 
             await ctx.send(':white_check_mark: 指令執行完畢！')
