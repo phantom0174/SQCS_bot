@@ -8,23 +8,24 @@ import pendulum as pend
 
 
 class GoogleCalendarNotif(CogExtension):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    pass  # TOKEN expired error
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
 
-        credentials_path = os.path.abspath("./.credentials/credentials.json")
-        token_path = os.path.abspath("./.credentials/token.pickle")
+    #     credentials_path = os.path.abspath("./.credentials/credentials.json")
+    #     token_path = os.path.abspath("./.credentials/token.pickle")
 
-        self.gc = GoogleCalendar(
-            calendar='hsqcc819@gmail.com',
-            credentials_path=credentials_path,
-            token_path=token_path
-        )
+    #     self.gc = GoogleCalendar(
+    #         calendar='hsqcc819@gmail.com',
+    #         credentials_path=credentials_path,
+    #         token_path=token_path
+    #     )
 
-        self.gc_cursor = Mongo('sqcs-bot').get_cur('GCEvents')
+    #     self.gc_cursor = Mongo('sqcs-bot').get_cur('GCEvents')
 
-        self.collect_event.start()
-        self.notify_event.start()
-        self.update_event.start()
+    #     self.collect_event.start()
+    #     self.notify_event.start()
+    #     self.update_event.start()
 
     @tasks.loop(hours=1)
     async def collect_event(self):
