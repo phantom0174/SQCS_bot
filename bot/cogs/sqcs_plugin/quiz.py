@@ -202,8 +202,8 @@ class QuizAuto(CogExtension):
     async def quiz_auto(self):
         await self.bot.wait_until_ready()
 
-        guild = self.bot.get_guild(784607509629239316)
-        report_channel = discord.utils.get(guild.text_channels, name='sqcs-report')
+        report_guild = self.bot.get_guild(784607509629239316)
+        report_channel = discord.utils.get(report_guild.text_channels, name='sqcs-report')
 
         quiz_status = self.quiz_set_cursor.find_one({"_id": 0})["event_status"]
 
