@@ -288,9 +288,9 @@ async def quiz_end(bot):
     quiz_set_cursor.update_one({"_id": 0}, execute)
 
     # data re-check
-    new_quiz_dara = quiz_set_cursor.find_one({"_id": 0})
-    quiz_status = new_quiz_dara["event_status"]
-    correct_answer = new_quiz_dara["correct_answer"]
+    new_quiz_data = quiz_set_cursor.find_one({"_id": 0})
+    quiz_status = new_quiz_data["event_status"]
+    correct_answer = new_quiz_data["correct_answer"]
 
     await gm_channel.send(
         f'Quiz Event status set to {quiz_status}, '
